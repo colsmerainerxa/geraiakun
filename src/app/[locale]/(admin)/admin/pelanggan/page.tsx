@@ -1,9 +1,10 @@
 "use client"
 
-import { Search } from "lucide-react"
+import { Download, Search } from "lucide-react"
 import { useMemo, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -14,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { downloadCsv } from "@/lib/csv"
 import { useCustomers } from "@/lib/api/queries"
 import { formatDate, formatIDR, initials } from "@/lib/utils"
 import type { Customer } from "@/types"
@@ -43,14 +45,36 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari nama atau email..."
-          className="pl-9"
-        />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative max-w-md flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama atau email..."
+            className="pl-9"
+          />
+        </div>
+        <Button
+          variant="neutral"
+          className="shrink-0"
+          onClick={() =>
+            downloadCsv(
+              "pelanggan.csv",
+              filtered.map((c) => ({
+                nama: c.name,
+                email: c.email,
+                whatsapp: c.whatsapp,
+                bergabung: c.joinedAt,
+                pesanan: c.orderCount,
+                total_belanja: c.totalSpent,
+                status: c.status,
+              })),
+            )
+          }
+        >
+          <Download className="size-4" /> Export
+        </Button>
       </div>
 
       {isLoading ? (

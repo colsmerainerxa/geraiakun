@@ -1,8 +1,9 @@
 "use client"
 
-import { Search } from "lucide-react"
+import { Download, Search } from "lucide-react"
 import { useMemo, useState } from "react"
-import { OrderStatusBadge, paymentLabel } from "@/components/admin/parts"
+import { paymentLabel } from "@/components/admin/parts"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -20,8 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { downloadCsv } from "@/lib/csv"
 import { useOrders } from "@/lib/api/queries"
 import { formatDate, formatIDR } from "@/lib/utils"
+import { useAdminOverlay } from "@/stores/admin-overlay"
 import type { OrderStatus } from "@/types"
 
 const STATUS_FILTERS: { value: OrderStatus | "semua"; label: string }[] = [
@@ -32,24 +35,46 @@ const STATUS_FILTERS: { value: OrderStatus | "semua"; label: string }[] = [
   { value: "dibatalkan", label: "Dibatalkan" },
   { value: "refund", label: "Refund" },
 ]
+const STATUS_OPTIONS = STATUS_FILTERS.filter((f) => f.value !== "semua")
 
 export default function AdminOrdersPage() {
   const { data: orders, isLoading } = useOrders()
+  const overlay = useAdminOverlay((s) => s.orderStatus)
+  const setOrderStatus = useAdminOverlay((s) => s.setOrderStatus)
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<OrderStatus | "semua">("semua")
+
+  const eff = (invoice: string, fallback: OrderStatus): OrderStatus =>
+    overlay[invoice] ?? fallback
 
   const filtered = useMemo(() => {
     if (!orders) return []
     const q = search.toLowerCase().trim()
     return orders.filter((o) => {
-      if (status !== "semua" && o.status !== status) return false
+      if (status !== "semua" && eff(o.invoice, o.status) !== status) return false
       if (!q) return true
       return (
         o.invoice.toLowerCase().includes(q) ||
         o.customerName.toLowerCase().includes(q)
       )
     })
-  }, [orders, search, status])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orders, search, status, overlay])
+
+  function exportCsv() {
+    downloadCsv(
+      "pesanan.csv",
+      filtered.map((o) => ({
+        invoice: o.invoice,
+        pelanggan: o.customerName,
+        email: o.customerEmail,
+        total: o.total,
+        pembayaran: paymentLabel(o.paymentMethod),
+        tanggal: o.createdAt,
+        status: eff(o.invoice, o.status),
+      })),
+    )
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -78,15 +103,16 @@ export default function AdminOrdersPage() {
             ))}
           </SelectContent>
         </Select>
+        <Button variant="neutral" onClick={exportCsv} className="shrink-0">
+          <Download className="size-4" /> Export
+        </Button>
       </div>
 
       {isLoading ? (
         <Skeleton className="h-96" />
       ) : (
         <>
-          <p className="text-sm text-foreground/60">
-            {filtered.length} pesanan
-          </p>
+          <p className="text-sm text-foreground/60">{filtered.length} pesanan</p>
           <Table>
             <TableHeader>
               <TableRow>
@@ -128,7 +154,24 @@ export default function AdminOrdersPage() {
                     {formatDate(o.createdAt)}
                   </TableCell>
                   <TableCell>
-                    <OrderStatusBadge status={o.status} />
+                    {/* Inline status editor (demo overlay) */}
+                    <Select
+                      value={eff(o.invoice, o.status)}
+                      onValueChange={(v) =>
+                        setOrderStatus(o.invoice, v as OrderStatus)
+                      }
+                    >
+                      <SelectTrigger className="h-9 w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((f) => (
+                          <SelectItem key={f.value} value={f.value}>
+                            {f.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                 </TableRow>
               ))}

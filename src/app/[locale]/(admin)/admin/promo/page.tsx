@@ -3,11 +3,15 @@
 import { Ticket } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Switch } from "@/components/ui/switch"
 import { usePromos } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
+import { useAdminOverlay } from "@/stores/admin-overlay"
 
 export default function AdminPromoPage() {
   const { data: promos, isLoading } = usePromos()
+  const overlay = useAdminOverlay((s) => s.promoActive)
+  const setPromoActive = useAdminOverlay((s) => s.setPromoActive)
 
   if (isLoading || !promos) {
     return (
@@ -24,21 +28,29 @@ export default function AdminPromoPage() {
       {promos.map((p) => {
         const pct =
           p.quota > 0 ? Math.min(100, Math.round((p.used / p.quota) * 100)) : 0
+        const active = overlay[p.id] ?? p.active
         return (
           <div
             key={p.id}
             className={cn(
               "flex flex-col rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow",
-              !p.active && "opacity-70",
+              !active && "opacity-70",
             )}
           >
             <div className="flex items-start justify-between gap-2">
               <span className="flex size-10 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow-sm">
                 <Ticket className="size-5" />
               </span>
-              <Badge variant={p.active ? "success" : "neutral"}>
-                {p.active ? "Aktif" : "Nonaktif"}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant={active ? "success" : "neutral"}>
+                  {active ? "Aktif" : "Nonaktif"}
+                </Badge>
+                <Switch
+                  checked={active}
+                  onCheckedChange={(v) => setPromoActive(p.id, v)}
+                  aria-label={`Toggle ${p.code}`}
+                />
+              </div>
             </div>
 
             <div className="mt-3 flex items-center gap-2">

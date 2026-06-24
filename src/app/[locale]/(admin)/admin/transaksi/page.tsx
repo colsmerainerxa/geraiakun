@@ -1,12 +1,19 @@
 "use client"
 
-import { ArrowDownLeft, CheckCircle2, Clock, XCircle } from "lucide-react"
+import {
+  ArrowDownLeft,
+  CheckCircle2,
+  Clock,
+  Download,
+  XCircle,
+} from "lucide-react"
 import { useMemo } from "react"
 import {
   paymentLabel,
   StatCard,
   TransactionStatusBadge,
 } from "@/components/admin/parts"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
@@ -16,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { downloadCsv } from "@/lib/csv"
 import { useTransactions } from "@/lib/api/queries"
 import { formatDate, formatIDR } from "@/lib/utils"
 
@@ -62,6 +70,28 @@ export default function AdminTransactionsPage() {
           icon={XCircle}
           accent="bg-danger"
         />
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          variant="neutral"
+          onClick={() =>
+            downloadCsv(
+              "transaksi.csv",
+              (transactions ?? []).map((tr) => ({
+                id: tr.id,
+                invoice: tr.invoice,
+                pelanggan: tr.customerName,
+                metode: paymentLabel(tr.method),
+                jumlah: tr.amount,
+                tanggal: tr.createdAt,
+                status: tr.status,
+              })),
+            )
+          }
+        >
+          <Download className="size-4" /> Export
+        </Button>
       </div>
 
       {isLoading ? (

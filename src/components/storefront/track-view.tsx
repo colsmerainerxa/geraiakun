@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useMounted } from "@/hooks/use-mounted"
 import { useOrder } from "@/lib/api/queries"
+import { useAdminOverlay } from "@/stores/admin-overlay"
 import { usePurchasedOrders } from "@/stores/orders"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 import type { Order, OrderStatus } from "@/types"
@@ -58,8 +59,11 @@ function OrderResult({ order }: { order: Order }) {
   const t = useTranslations("track")
   const tc = useTranslations("common")
   const ts = useTranslations("orderStatus")
-  const meta = STATUS_META[order.status]
-  const activeIdx = TIMELINE.indexOf(order.status)
+  // Apply the demo admin status override if present.
+  const ovStatus = useAdminOverlay((s) => s.orderStatus[order.invoice])
+  const status = ovStatus ?? order.status
+  const meta = STATUS_META[status]
+  const activeIdx = TIMELINE.indexOf(status)
   const isTimeline = activeIdx !== -1
 
   return (
@@ -83,7 +87,7 @@ function OrderResult({ order }: { order: Order }) {
             </p>
           </div>
           <Badge variant={meta.variant} className="gap-1.5 px-3 py-1.5">
-            <meta.icon className="size-3.5" /> {ts(order.status)}
+            <meta.icon className="size-3.5" /> {ts(status)}
           </Badge>
         </div>
 
@@ -124,7 +128,7 @@ function OrderResult({ order }: { order: Order }) {
           </div>
         ) : (
           <div className="mt-4 rounded-base border-2 border-dashed border-border bg-background p-3 text-sm text-foreground/70">
-            {order.status === "dibatalkan"
+            {status === "dibatalkan"
               ? "Pesanan ini telah dibatalkan."
               : "Pesanan ini telah direfund."}
           </div>

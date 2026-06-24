@@ -4,6 +4,7 @@ import {
   KeyRound,
   LayoutDashboard,
   Menu,
+  Package,
   Receipt,
   ShoppingBag,
   Sparkles,
@@ -33,6 +34,7 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/produk", label: "Produk", icon: Package },
   { href: "/admin/pesanan", label: "Pesanan", icon: ShoppingBag },
   { href: "/admin/pelanggan", label: "Pelanggan", icon: Users },
   { href: "/admin/transaksi", label: "Transaksi", icon: Receipt },
