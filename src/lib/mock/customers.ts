@@ -1,0 +1,20 @@
+import type { Customer } from "@/types"
+
+export const customers: Customer[] = [
+  { id: "cust-1", name: "Rafa Pratama", email: "rafa.pratama@gmail.com", whatsapp: "0812-3456-7890", joinedAt: "2025-11-02", orderCount: 12, totalSpent: 1450000, status: "vip", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Rafa" },
+  { id: "cust-2", name: "Dewi Lestari", email: "dewi.lestari@gmail.com", whatsapp: "0813-2222-1111", joinedAt: "2025-12-14", orderCount: 8, totalSpent: 820000, status: "aktif", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Dewi" },
+  { id: "cust-3", name: "Bagas Saputra", email: "bagas.s@gmail.com", whatsapp: "0857-9999-0000", joinedAt: "2026-01-20", orderCount: 5, totalSpent: 540000, status: "aktif", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Bagas" },
+  { id: "cust-4", name: "Nabila Putri", email: "nabila.putri@gmail.com", whatsapp: "0821-7777-8888", joinedAt: "2026-02-08", orderCount: 3, totalSpent: 295000, status: "aktif", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Nabila" },
+  { id: "cust-5", name: "Kevin Wijaya", email: "kevin.wijaya@gmail.com", whatsapp: "0811-4444-5555", joinedAt: "2026-03-11", orderCount: 15, totalSpent: 2100000, status: "vip", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Kevin" },
+  { id: "cust-6", name: "Siti Rohmah", email: "siti.rohmah@gmail.com", whatsapp: "0852-3333-2222", joinedAt: "2026-04-02", orderCount: 2, totalSpent: 138000, status: "baru" , avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Siti" },
+  { id: "cust-7", name: "Dimas Arya", email: "dimas.arya@gmail.com", whatsapp: "0838-1212-3434", joinedAt: "2026-04-25", orderCount: 6, totalSpent: 670000, status: "aktif", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Dimas" },
+  { id: "cust-8", name: "Aulia Rahman", email: "aulia.rahman@gmail.com", whatsapp: "0815-5656-7878", joinedAt: "2026-05-10", orderCount: 1, totalSpent: 45000, status: "baru", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Aulia" },
+  { id: "cust-9", name: "Citra Maharani", email: "citra.m@gmail.com", whatsapp: "0822-9090-1010", joinedAt: "2026-05-22", orderCount: 4, totalSpent: 410000, status: "aktif", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Citra" },
+  { id: "cust-10", name: "Fajar Nugroho", email: "fajar.n@gmail.com", whatsapp: "0856-2323-4545", joinedAt: "2026-06-01", orderCount: 2, totalSpent: 188000, status: "baru", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Fajar" },
+  { id: "cust-11", name: "Gita Permata", email: "gita.permata@gmail.com", whatsapp: "0817-6767-8989", joinedAt: "2026-06-12", orderCount: 7, totalSpent: 760000, status: "aktif", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Gita" },
+  { id: "cust-12", name: "Yoga Pranata", email: "yoga.pranata@gmail.com", whatsapp: "0813-8080-7070", joinedAt: "2026-06-18", orderCount: 1, totalSpent: 89000, status: "baru", avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Yoga" },
+]
+
+export function getCustomer(id: string) {
+  return customers.find((c) => c.id === id)
+}

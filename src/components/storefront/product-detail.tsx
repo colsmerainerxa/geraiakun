@@ -1,0 +1,456 @@
+"use client"
+
+import {
+  Check,
+  Headphones,
+  Minus,
+  Plus,
+  ShieldCheck,
+  ShoppingCart,
+  Star,
+  Zap,
+} from "lucide-react"
+import { motion } from "motion/react"
+import { useLocale, useTranslations } from "next-intl"
+import { useState } from "react"
+import { toast } from "sonner"
+import { Container } from "@/components/shared/container"
+import { Reveal } from "@/components/shared/motion"
+import { SectionHeading } from "@/components/shared/section-heading"
+import { ProductCard } from "@/components/storefront/product-card"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Link, useRouter } from "@/i18n/navigation"
+import { bgFor } from "@/lib/accent"
+import {
+  cn,
+  discountPercent,
+  formatDate,
+  formatIDR,
+  formatNumber,
+  initials,
+} from "@/lib/utils"
+import { useCart } from "@/stores/cart"
+import { useUI } from "@/stores/ui"
+import type { Product, ProductBadge, Review } from "@/types"
+
+type ProductWithReviews = Product & { reviews: Review[] }
+
+const badgeMap: Record<
+  ProductBadge,
+  { key: string; variant: "default" | "lime" | "cyan" | "danger" }
+> = {
+  terlaris: { key: "bestSeller", variant: "default" },
+  baru: { key: "new", variant: "lime" },
+  promo: { key: "promo", variant: "danger" },
+  langka: { key: "rare", variant: "cyan" },
+}
+
+export function ProductDetail({
+  product,
+  related,
+}: {
+  product: ProductWithReviews
+  related: Product[]
+}) {
+  const t = useTranslations("product")
+  const tc = useTranslations("common")
+  const tn = useTranslations("nav")
+  const locale = useLocale()
+  const isEn = locale === "en"
+  const router = useRouter()
+  const addItem = useCart((s) => s.addItem)
+  const setCartOpen = useUI((s) => s.setCartOpen)
+
+  // Default to the cheapest in-stock variant, else the first.
+  const cheapest = [...product.variants].sort((a, b) => a.price - b.price)
+  const [variantId, setVariantId] = useState(
+    (cheapest.find((v) => v.stock > 0) ?? product.variants[0]).id,
+  )
+  const [qty, setQty] = useState(1)
+
+  const variant =
+    product.variants.find((v) => v.id === variantId) ?? product.variants[0]
+  const off = variant.originalPrice
+    ? discountPercent(variant.originalPrice, variant.price)
+    : 0
+  const soldOut = variant.stock <= 0
+  const features = isEn ? product.featuresEn : product.features
+  const description = isEn ? product.descriptionEn : product.description
+
+  function buildCartItem() {
+    return {
+      productId: product.id,
+      productName: product.name,
+      productLogo: product.logo,
+      productSlug: product.slug,
+      variantId: variant.id,
+      variantLabel: isEn ? variant.labelEn : variant.label,
+      price: variant.price,
+      qty,
+      accent: product.accent,
+    }
+  }
+
+  function handleAddToCart() {
+    addItem(buildCartItem())
+    toast.success(t("addedToCart"), {
+      description: `${product.name} · ${isEn ? variant.labelEn : variant.label}`,
+    })
+  }
+
+  function handleBuyNow() {
+    addItem(buildCartItem())
+    router.push("/checkout")
+  }
+
+  const trust = [
+    { icon: ShieldCheck, label: t("warranty") },
+    { icon: Zap, label: t("instant") },
+    { icon: Headphones, label: t("support") },
+  ]
+
+  return (
+    <Container className="py-8 lg:py-12">
+      {/* Breadcrumb */}
+      <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-foreground/60">
+        <Link href="/" className="hover:text-foreground hover:underline">
+          {tn("home")}
+        </Link>
+        <span>/</span>
+        <Link
+          href="/katalog"
+          className="hover:text-foreground hover:underline"
+        >
+          {tn("catalog")}
+        </Link>
+        <span>/</span>
+        <span className="font-bold text-foreground">{product.name}</span>
+      </nav>
+
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        {/* ---- Visual / hero ---- */}
+        <div className="lg:sticky lg:top-20 lg:self-start">
+          <div
+            className={cn(
+              "relative flex aspect-square items-center justify-center overflow-hidden rounded-base border-2 border-border shadow-shadow",
+              bgFor(product.accent),
+            )}
+          >
+            <div className="bg-dots pointer-events-none absolute inset-0 opacity-10" />
+            <motion.span
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="relative text-[8rem] drop-shadow-[4px_4px_0_rgba(0,0,0,0.25)] sm:text-[10rem]"
+            >
+              {product.logo}
+            </motion.span>
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+              {product.badges.map((b) => (
+                <Badge key={b} variant={badgeMap[b].variant}>
+                  {tc(badgeMap[b].key)}
+                </Badge>
+              ))}
+            </div>
+            {off > 0 && (
+              <span className="absolute right-4 top-4 rotate-3 rounded-base border-2 border-border bg-danger px-3 py-1 font-heading text-base font-extrabold text-white shadow-shadow-sm">
+                -{off}%
+              </span>
+            )}
+          </div>
+
+          {/* Trust strip */}
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            {trust.map((item) => (
+              <div
+                key={item.label}
+                className="flex flex-col items-center gap-1.5 rounded-base border-2 border-border bg-secondary-background p-3 text-center shadow-shadow-sm"
+              >
+                <item.icon className="size-5" />
+                <span className="text-xs font-bold leading-tight">
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ---- Buy box ---- */}
+        <div className="flex flex-col gap-5">
+          <div>
+            <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/50">
+              {product.brand}
+            </span>
+            <h1 className="mt-1 font-heading text-3xl font-extrabold leading-tight sm:text-4xl">
+              {product.name}
+            </h1>
+            <p className="mt-2 text-foreground/70">
+              {isEn ? product.taglineEn : product.tagline}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <span className="inline-flex items-center gap-1 font-bold">
+              <Star className="size-4 fill-warning text-warning" />
+              {product.rating}
+            </span>
+            <a
+              href="#reviews"
+              className="text-foreground/60 underline-offset-2 hover:underline"
+            >
+              {formatNumber(product.reviewCount)} {tc("reviews")}
+            </a>
+            <span className="text-foreground/40">•</span>
+            <span className="text-foreground/60">
+              {formatNumber(product.soldCount)} {tc("sold")}
+            </span>
+          </div>
+
+          {/* Price */}
+          <div className="flex items-end gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
+            <div>
+              {variant.originalPrice && (
+                <span className="block text-sm text-foreground/50 line-through">
+                  {formatIDR(variant.originalPrice)}
+                </span>
+              )}
+              <span className="font-heading text-4xl font-extrabold">
+                {formatIDR(variant.price)}
+              </span>
+            </div>
+            {off > 0 && (
+              <Badge variant="danger" className="mb-1.5">
+                Hemat {off}%
+              </Badge>
+            )}
+          </div>
+
+          {/* Variant selector */}
+          <div>
+            <span className="font-heading text-sm font-extrabold uppercase">
+              {t("chooseVariant")}
+            </span>
+            <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
+              {product.variants.map((v) => {
+                const active = v.id === variantId
+                const vOut = v.stock <= 0
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    disabled={vOut}
+                    onClick={() => {
+                      setVariantId(v.id)
+                      setQty(1)
+                    }}
+                    className={cn(
+                      "flex flex-col items-start gap-0.5 rounded-base border-2 px-3.5 py-2.5 text-left transition-all",
+                      active
+                        ? "border-border bg-main text-main-foreground shadow-shadow-sm"
+                        : "border-border bg-secondary-background hover:-translate-y-0.5",
+                      vOut && "cursor-not-allowed opacity-50 hover:translate-y-0",
+                    )}
+                  >
+                    <span className="font-heading text-sm font-bold">
+                      {isEn ? v.labelEn : v.label}
+                    </span>
+                    <span className="text-xs font-semibold">
+                      {formatIDR(v.price)}
+                      {vOut ? (
+                        <span className="ml-1 opacity-70">
+                          · {tc("outOfStock")}
+                        </span>
+                      ) : (
+                        <span className="ml-1 opacity-70">
+                          · {v.stock} {t("stockLeft")}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Qty + actions */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <span className="font-heading text-sm font-extrabold uppercase">
+                {tc("qty")}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  disabled={soldOut || qty <= 1}
+                  className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
+                  aria-label="Kurangi jumlah"
+                >
+                  <Minus className="size-4" />
+                </button>
+                <span className="w-10 text-center font-heading text-lg font-extrabold">
+                  {qty}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQty((q) => Math.min(variant.stock, q + 1))
+                  }
+                  disabled={soldOut || qty >= variant.stock}
+                  className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
+                  aria-label="Tambah jumlah"
+                >
+                  <Plus className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Button
+                size="lg"
+                variant="neutral"
+                onClick={handleAddToCart}
+                disabled={soldOut}
+              >
+                <ShoppingCart className="size-5" /> {tc("addToCart")}
+              </Button>
+              <Button size="lg" onClick={handleBuyNow} disabled={soldOut}>
+                {soldOut ? tc("outOfStock") : t("buyDirectly")}
+              </Button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
+              className="text-center text-sm text-foreground/60 underline-offset-2 hover:text-foreground hover:underline"
+            >
+              {tc("checkout")} →
+            </button>
+          </div>
+
+          {/* What you get */}
+          <div className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow-sm">
+            <h2 className="font-heading text-base font-bold">{t("features")}</h2>
+            <ul className="mt-3 grid gap-2">
+              {features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-border bg-accent-lime">
+                    <Check className="size-3" />
+                  </span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* ---- Details tabs ---- */}
+      <div className="mt-12">
+        <Tabs defaultValue="description">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="description">{t("description")}</TabsTrigger>
+            <TabsTrigger value="faq">{t("faq")}</TabsTrigger>
+            <TabsTrigger value="reviews">
+              {t("reviews")} ({product.reviews.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="description">
+            <div className="max-w-3xl rounded-base border-2 border-border bg-secondary-background p-6 text-foreground/80 shadow-shadow-sm">
+              <p className="leading-relaxed">{description}</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="faq">
+            <Accordion
+              type="single"
+              collapsible
+              className="flex max-w-3xl flex-col gap-3"
+              defaultValue="faq-0"
+            >
+              {product.faqs.map((f, i) => (
+                <AccordionItem key={f.q} value={`faq-${i}`}>
+                  <AccordionTrigger>{isEn ? f.qEn : f.q}</AccordionTrigger>
+                  <AccordionContent>{isEn ? f.aEn : f.a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <div id="reviews" className="grid max-w-3xl gap-3 scroll-mt-20">
+              {product.reviews.map((r) => (
+                <div
+                  key={r.id}
+                  className="rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar className="size-10">
+                      <AvatarImage src={r.avatar} alt={r.author} />
+                      <AvatarFallback>{initials(r.author)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-heading text-sm font-bold">
+                          {r.author}
+                        </span>
+                        {r.verified && (
+                          <Badge variant="success" className="gap-1">
+                            <Check className="size-3" /> {t("verifiedBuyer")}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-foreground/50">
+                        <span className="flex items-center gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={cn(
+                                "size-3",
+                                i < r.rating
+                                  ? "fill-warning text-warning"
+                                  : "text-foreground/20",
+                              )}
+                            />
+                          ))}
+                        </span>
+                        <span>· {r.variantLabel}</span>
+                        <span>· {formatDate(r.date, isEn ? "en-US" : "id-ID")}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm text-foreground/80">{r.comment}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* ---- Related ---- */}
+      {related.length > 0 && (
+        <div className="mt-16">
+          <Separator className="mb-10" />
+          <SectionHeading title={t("related")} />
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {related.map((p, i) => (
+              <Reveal key={p.id} delay={i * 0.05}>
+                <ProductCard product={p} />
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      )}
+    </Container>
+  )
+}

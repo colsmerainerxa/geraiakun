@@ -1,26 +1,150 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   NEOBRUTALISM DESIGN TOKENS — "beliakun"
+   Vibe: energetik, kontras tinggi, playful (target Gen Z / millennial ID)
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fef1e0;
+  --secondary-background: #ffffff;
+  --foreground: #0a0a0a;
+  --main-foreground: #0a0a0a;
+  --main: #ffd23f;
+  --border: #0a0a0a;
+  --ring: #0a0a0a;
+  --overlay: rgba(10, 10, 10, 0.7);
+
+  --accent-pink: #ff5c8a;
+  --accent-cyan: #4dd6e0;
+  --accent-lime: #a3e635;
+  --accent-purple: #b78cff;
+  --accent-blue: #5b9dff;
+
+  --success: #2fbf71;
+  --warning: #ffb020;
+  --danger: #ff4d4d;
+
+  --shadow: 4px 4px 0px 0px var(--border);
+  --shadow-sm: 2px 2px 0px 0px var(--border);
+  --shadow-lg: 6px 6px 0px 0px var(--border);
+
+  --radius-base: 8px;
+  --font-weight-base: 500;
+  --font-weight-heading: 800;
+}
+
+.dark {
+  --background: #1c1d24;
+  --secondary-background: #2a2c38;
+  --foreground: #f7f7f7;
+  --main-foreground: #0a0a0a;
+  --main: #ffd23f;
+  --border: #000000;
+  --ring: #f7f7f7;
+  --overlay: rgba(0, 0, 0, 0.8);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-secondary-background: var(--secondary-background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-main: var(--main);
+  --color-main-foreground: var(--main-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-lime: var(--accent-lime);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-blue: var(--accent-blue);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --spacing-box-x: 4px;
+  --spacing-box-y: 4px;
+  --spacing-reverse-box-x: -4px;
+  --spacing-reverse-box-y: -4px;
+
+  --radius-base: 8px;
+
+  --shadow-shadow: var(--shadow);
+  --shadow-shadow-sm: var(--shadow-sm);
+  --shadow-shadow-lg: var(--shadow-lg);
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-heading), var(--font-sans), sans-serif;
+  --font-weight-base: 500;
+  --font-weight-heading: 800;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-base);
+    font-optical-sizing: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-heading);
+    letter-spacing: -0.02em;
+  }
+  /* Smooth focus + nicer scrollbar */
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  /* Neobrutalism "press" interaction: shadow collapses + element nudges */
+  .brutal-press {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  .brutal-press:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .brutal-press:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px 0px var(--border);
+  }
+  /* Subtle dotted background for hero / sections */
+  .bg-dots {
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 22px 22px;
+    opacity: 1;
+  }
+  .marquee {
+    animation: marquee 24s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

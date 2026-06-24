@@ -1,0 +1,303 @@
+"use client"
+
+import { SlidersHorizontal, X } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { useSearchParams } from "next/navigation"
+import { useMemo, useState } from "react"
+import { Container } from "@/components/shared/container"
+import {
+  ProductCard,
+  ProductCardSkeleton,
+} from "@/components/storefront/product-card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { useCategories, useProducts } from "@/lib/api/queries"
+import type { ProductQuery, SortKey } from "@/lib/mock/fake-api"
+import { cn } from "@/lib/utils"
+import type { CategorySlug } from "@/types"
+
+const BADGE_OPTIONS = [
+  { value: "terlaris", label: "Terlaris" },
+  { value: "baru", label: "Baru" },
+  { value: "promo", label: "Promo" },
+  { value: "langka", label: "Langka" },
+]
+
+const PRICE_RANGES = [
+  { label: "< Rp50rb", min: 0, max: 50000 },
+  { label: "Rp50rb–100rb", min: 50000, max: 100000 },
+  { label: "Rp100rb–300rb", min: 100000, max: 300000 },
+  { label: "> Rp300rb", min: 300000, max: Number.POSITIVE_INFINITY },
+]
+
+function Filters({
+  category,
+  setCategory,
+  badges,
+  toggleBadge,
+  priceIdx,
+  setPriceIdx,
+  onReset,
+}: {
+  category: string
+  setCategory: (c: string) => void
+  badges: string[]
+  toggleBadge: (b: string) => void
+  priceIdx: number | null
+  setPriceIdx: (i: number | null) => void
+  onReset: () => void
+}) {
+  const t = useTranslations("catalog")
+  const { data: categories } = useCategories()
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
+          {t("category")}
+        </h3>
+        <div className="flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={() => setCategory("semua")}
+            className={cn(
+              "rounded-base border-2 px-3 py-2 text-left text-sm font-bold transition-all",
+              category === "semua"
+                ? "border-border bg-main text-main-foreground shadow-shadow-sm"
+                : "border-transparent hover:border-border",
+            )}
+          >
+            Semua
+          </button>
+          {categories?.map((c) => (
+            <button
+              type="button"
+              key={c.id}
+              onClick={() => setCategory(c.slug)}
+              className={cn(
+                "flex items-center justify-between rounded-base border-2 px-3 py-2 text-left text-sm font-bold transition-all",
+                category === c.slug
+                  ? "border-border bg-main text-main-foreground shadow-shadow-sm"
+                  : "border-transparent hover:border-border",
+              )}
+            >
+              {c.name}
+              <span className="text-xs opacity-60">{c.productCount}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
+          {t("priceRange")}
+        </h3>
+        <div className="flex flex-col gap-1">
+          {PRICE_RANGES.map((r, i) => (
+            <button
+              type="button"
+              key={r.label}
+              onClick={() => setPriceIdx(priceIdx === i ? null : i)}
+              className={cn(
+                "rounded-base border-2 px-3 py-2 text-left text-sm font-bold transition-all",
+                priceIdx === i
+                  ? "border-border bg-accent-cyan shadow-shadow-sm"
+                  : "border-transparent hover:border-border",
+              )}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
+          {t("badges")}
+        </h3>
+        <div className="flex flex-col gap-2">
+          {BADGE_OPTIONS.map((b) => (
+            <label
+              key={b.value}
+              className="flex cursor-pointer items-center gap-2.5 text-sm font-bold"
+            >
+              <Checkbox
+                checked={badges.includes(b.value)}
+                onCheckedChange={() => toggleBadge(b.value)}
+              />
+              {b.label}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <Button variant="neutral" onClick={onReset} className="w-full">
+        <X className="size-4" /> {t("reset")}
+      </Button>
+    </div>
+  )
+}
+
+export function CatalogView() {
+  const t = useTranslations("catalog")
+  const params = useSearchParams()
+  const initialSearch = params.get("q") ?? ""
+  const initialCategory = params.get("kategori") ?? "semua"
+
+  const [category, setCategory] = useState(initialCategory)
+  const [sort, setSort] = useState<SortKey>("populer")
+  const [badges, setBadges] = useState<string[]>([])
+  const [priceIdx, setPriceIdx] = useState<number | null>(null)
+
+  const query = useMemo<ProductQuery>(() => {
+    const range = priceIdx !== null ? PRICE_RANGES[priceIdx] : null
+    return {
+      category: category as CategorySlug | "semua",
+      search: initialSearch,
+      sort,
+      badges: badges.length ? badges : undefined,
+      minPrice: range?.min,
+      maxPrice:
+        range && range.max !== Number.POSITIVE_INFINITY ? range.max : undefined,
+    }
+  }, [category, initialSearch, sort, badges, priceIdx])
+
+  const { data: products, isLoading } = useProducts(query)
+
+  function toggleBadge(b: string) {
+    setBadges((prev) =>
+      prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b],
+    )
+  }
+  function reset() {
+    setCategory("semua")
+    setBadges([])
+    setPriceIdx(null)
+    setSort("populer")
+  }
+
+  const filterProps = {
+    category,
+    setCategory,
+    badges,
+    toggleBadge,
+    priceIdx,
+    setPriceIdx,
+    onReset: reset,
+  }
+
+  return (
+    <Container className="py-10">
+      <div className="mb-6">
+        <h1 className="font-heading text-3xl font-extrabold sm:text-4xl">
+          {initialSearch
+            ? `${t("searchResultsFor")} “${initialSearch}”`
+            : t("title")}
+        </h1>
+        <p className="mt-1 text-foreground/60">{t("subtitle")}</p>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
+        {/* Sidebar (desktop) */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-20 rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow">
+            <Filters {...filterProps} />
+          </div>
+        </aside>
+
+        <div>
+          {/* Toolbar */}
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              {/* Mobile filter */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="neutral" size="sm" className="lg:hidden">
+                    <SlidersHorizontal className="size-4" /> {t("filters")}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-80 overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>{t("filters")}</SheetTitle>
+                  </SheetHeader>
+                  <Filters {...filterProps} />
+                </SheetContent>
+              </Sheet>
+              <span className="text-sm text-foreground/60">
+                {products?.length ?? 0} {t("resultsFound")}
+              </span>
+            </div>
+
+            <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder={t("sortBy")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="populer">{t("sortPopuler")}</SelectItem>
+                <SelectItem value="termurah">{t("sortTermurah")}</SelectItem>
+                <SelectItem value="termahal">{t("sortTermahal")}</SelectItem>
+                <SelectItem value="rating">{t("sortRating")}</SelectItem>
+                <SelectItem value="terbaru">{t("sortTerbaru")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Active badges */}
+          {badges.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {badges.map((b) => (
+                <button key={b} type="button" onClick={() => toggleBadge(b)}>
+                  <Badge variant="neutral" className="gap-1">
+                    {b} <X className="size-3" />
+                  </Badge>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : products && products.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-base border-2 border-dashed border-border py-20 text-center">
+              <span className="text-5xl">🔍</span>
+              <h3 className="font-heading text-lg font-bold">
+                {t("noResults")}
+              </h3>
+              <p className="text-sm text-foreground/60">{t("noResultsDesc")}</p>
+              <Button variant="neutral" onClick={reset} className="mt-2">
+                {t("reset")}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </Container>
+  )
+}

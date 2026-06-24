@@ -1,0 +1,208 @@
+// ============================================================
+// Domain types — marketplace akun digital
+// ============================================================
+
+export type ID = string
+
+export type CategorySlug =
+  | "ai-chatbot"
+  | "desain-kreatif"
+  | "streaming"
+  | "produktivitas"
+  | "api-developer"
+  | "edukasi"
+
+export interface Category {
+  id: ID
+  slug: CategorySlug
+  name: string
+  nameEn: string
+  description: string
+  descriptionEn: string
+  icon: string // lucide icon name
+  color: string // css var token, mis. "accent-pink"
+  productCount: number
+}
+
+export type AccountType = "sharing" | "private" | "invite" | "lifetime"
+
+export interface ProductVariant {
+  id: ID
+  label: string // mis. "1 Bulan Private"
+  labelEn: string
+  type: AccountType
+  durationDays: number | null // null = lifetime
+  price: number
+  originalPrice: number | null
+  stock: number
+}
+
+export type ProductBadge = "terlaris" | "baru" | "promo" | "langka"
+
+export interface Product {
+  id: ID
+  slug: string
+  name: string
+  brand: string // GPT, Gemini, Canva, Perplexity...
+  tagline: string
+  taglineEn: string
+  description: string
+  descriptionEn: string
+  category: CategorySlug
+  image: string
+  gallery: string[]
+  logo: string
+  accent: string // css token
+  badges: ProductBadge[]
+  rating: number
+  reviewCount: number
+  soldCount: number
+  featured: boolean
+  variants: ProductVariant[]
+  features: string[]
+  featuresEn: string[]
+  faqs: { q: string; a: string; qEn: string; aEn: string }[]
+}
+
+export interface Review {
+  id: ID
+  productId: ID
+  author: string
+  avatar: string
+  rating: number
+  comment: string
+  date: string
+  variantLabel: string
+  verified: boolean
+}
+
+export type OrderStatus =
+  | "menunggu-pembayaran"
+  | "diproses"
+  | "selesai"
+  | "dibatalkan"
+  | "refund"
+
+export type PaymentMethod =
+  | "qris"
+  | "gopay"
+  | "ovo"
+  | "dana"
+  | "bca-va"
+  | "bni-va"
+  | "mandiri-va"
+
+export interface OrderItem {
+  productId: ID
+  productName: string
+  productLogo: string
+  variantId: ID
+  variantLabel: string
+  price: number
+  qty: number
+}
+
+export interface DeliveredCredential {
+  email: string
+  password: string
+  note: string
+  pin?: string
+}
+
+export interface Order {
+  id: ID
+  invoice: string
+  customerName: string
+  customerEmail: string
+  whatsapp: string
+  items: OrderItem[]
+  subtotal: number
+  discount: number
+  fee: number
+  total: number
+  status: OrderStatus
+  paymentMethod: PaymentMethod
+  createdAt: string
+  paidAt: string | null
+  credentials: DeliveredCredential[]
+}
+
+export interface Customer {
+  id: ID
+  name: string
+  email: string
+  avatar: string
+  whatsapp: string
+  joinedAt: string
+  orderCount: number
+  totalSpent: number
+  status: "aktif" | "baru" | "vip"
+}
+
+export interface CredentialStock {
+  id: ID
+  productId: ID
+  productName: string
+  variantLabel: string
+  email: string
+  status: "tersedia" | "terjual" | "kadaluarsa"
+  addedAt: string
+}
+
+export type PromoType = "persen" | "nominal"
+
+export interface Promo {
+  id: ID
+  code: string
+  description: string
+  type: PromoType
+  value: number
+  minSpend: number
+  maxDiscount: number | null
+  used: number
+  quota: number
+  expiresAt: string
+  active: boolean
+}
+
+export interface Transaction {
+  id: ID
+  invoice: string
+  customerName: string
+  amount: number
+  method: PaymentMethod
+  status: "berhasil" | "pending" | "gagal"
+  createdAt: string
+}
+
+export interface Banner {
+  id: ID
+  title: string
+  subtitle: string
+  cta: string
+  href: string
+  accent: string
+  active: boolean
+}
+
+export interface Testimonial {
+  id: ID
+  author: string
+  avatar: string
+  role: string
+  comment: string
+  rating: number
+}
+
+// Cart (client state)
+export interface CartItem {
+  productId: ID
+  productName: string
+  productLogo: string
+  productSlug: string
+  variantId: ID
+  variantLabel: string
+  price: number
+  qty: number
+  accent: string
+}
