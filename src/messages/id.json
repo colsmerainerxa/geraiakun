@@ -56,7 +56,8 @@
     "increase": "Tambah",
     "menu": "Menu",
     "recentlyViewed": "Baru Dilihat",
-    "frequentlyBought": "Sering Dibeli Bersama"
+    "frequentlyBought": "Sering Dibeli Bersama",
+    "backToTop": "Kembali ke atas"
   },
   "orderStatus": {
     "menunggu-pembayaran": "Menunggu Pembayaran",

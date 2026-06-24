@@ -56,7 +56,8 @@
     "increase": "Increase",
     "menu": "Menu",
     "recentlyViewed": "Recently Viewed",
-    "frequentlyBought": "Frequently Bought Together"
+    "frequentlyBought": "Frequently Bought Together",
+    "backToTop": "Back to top"
   },
   "orderStatus": {
     "menunggu-pembayaran": "Awaiting Payment",

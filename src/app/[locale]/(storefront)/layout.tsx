@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server"
+import { ScrollToTop } from "@/components/shared/scroll-to-top"
 import { CartDrawer } from "@/components/storefront/cart-drawer"
 import { Footer } from "@/components/storefront/footer"
 import { Navbar } from "@/components/storefront/navbar"
@@ -27,6 +28,7 @@ export default async function StorefrontLayout({
       </main>
       <Footer />
       <CartDrawer />
+      <ScrollToTop />
     </div>
   )
 }
