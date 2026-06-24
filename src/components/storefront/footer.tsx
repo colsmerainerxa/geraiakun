@@ -16,6 +16,7 @@ export function Footer() {
       title: t("explore"),
       links: [
         { href: "/katalog", label: tn("catalog") },
+        { href: "/artikel", label: tn("blog") },
         { href: "/kategori/ai-chatbot", label: "AI & Chatbot" },
         { href: "/kategori/streaming", label: "Streaming" },
         { href: "/kategori/desain-kreatif", label: "Desain" },

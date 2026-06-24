@@ -1,4 +1,5 @@
 import type {
+  BlogPosting,
   BreadcrumbList,
   ItemList,
   Organization,
@@ -105,6 +106,31 @@ export function itemListJsonLd(
       name: item.name,
       url: `${BASE}${item.path}`,
     })),
+  }
+}
+
+export function articleJsonLd(a: {
+  title: string
+  description: string
+  slug: string
+  date: string
+}): WithContext<BlogPosting> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: a.title,
+    description: a.description,
+    datePublished: a.date,
+    dateModified: a.date,
+    url: `${BASE}/artikel/${a.slug}`,
+    image: `${BASE}/opengraph-image`,
+    author: { "@type": "Organization", name: "beliakun", url: BASE },
+    publisher: {
+      "@type": "Organization",
+      name: "beliakun",
+      logo: { "@type": "ImageObject", url: `${BASE}/icon.png` },
+    },
+    mainEntityOfPage: `${BASE}/artikel/${a.slug}`,
   }
 }
 

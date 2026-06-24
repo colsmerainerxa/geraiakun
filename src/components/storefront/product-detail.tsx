@@ -18,6 +18,7 @@ import { Container } from "@/components/shared/container"
 import { Reveal } from "@/components/shared/motion"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { ProductCard } from "@/components/storefront/product-card"
+import { ShareButtons } from "@/components/storefront/share-buttons"
 import {
   Accordion,
   AccordionContent,
@@ -351,6 +352,15 @@ export function ProductDetail({
               ))}
             </ul>
           </div>
+
+          <ShareButtons
+            path={
+              isEn
+                ? `/en/produk/${product.slug}`
+                : `/produk/${product.slug}`
+            }
+            title={product.name}
+          />
 
           {/* Trademark / non-affiliation disclaimer (nominative use) */}
           <p className="text-xs leading-relaxed text-foreground/50">

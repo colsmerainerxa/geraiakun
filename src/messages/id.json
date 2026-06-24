@@ -9,6 +9,7 @@
     "categories": "Kategori",
     "howItWorks": "Cara Kerja",
     "help": "Bantuan",
+    "blog": "Artikel",
     "track": "Lacak Pesanan",
     "login": "Masuk",
     "register": "Daftar",
@@ -61,6 +62,16 @@
     "selesai": "Selesai",
     "dibatalkan": "Dibatalkan",
     "refund": "Refund"
+  },
+  "blog": {
+    "title": "Artikel & Panduan",
+    "subtitle": "Tips, panduan, dan review seputar tools AI & langganan digital",
+    "readTime": "menit baca",
+    "related": "Produk Terkait",
+    "moreArticles": "Artikel Lainnya",
+    "backToList": "Semua Artikel",
+    "share": "Bagikan",
+    "shareCopied": "Tautan tersalin!"
   },
   "home": {
     "heroBadge": "Marketplace Akun & Langganan Digital",

@@ -33,6 +33,7 @@ function useNavLinks() {
   return [
     { href: "/", label: t("home") },
     { href: "/katalog", label: t("catalog") },
+    { href: "/artikel", label: t("blog") },
     { href: "/lacak", label: t("track") },
     { href: "/bantuan", label: t("help") },
   ] as const
