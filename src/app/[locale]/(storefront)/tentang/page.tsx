@@ -78,8 +78,8 @@ export default async function TentangPage({
           title={t("aboutTitle")}
           subtitle={
             isEn
-              ? "Indonesia's most trusted premium digital account marketplace."
-              : "Marketplace akun digital premium paling terpercaya di Indonesia."
+              ? "A practical, transparent premium digital account marketplace."
+              : "Marketplace akun digital premium yang praktis dan transparan."
           }
         />
 

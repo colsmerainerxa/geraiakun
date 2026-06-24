@@ -19,7 +19,7 @@ export function organizationJsonLd(): WithContext<Organization> {
     url: BASE,
     logo: `${BASE}/icon.png`,
     description:
-      "Marketplace akun & langganan digital premium termurah dan terpercaya di Indonesia.",
+      "Marketplace akun & langganan digital premium yang praktis, transparan, dan bergaransi.",
     sameAs: [
       "https://instagram.com/beliakun",
       "https://twitter.com/beliakun",

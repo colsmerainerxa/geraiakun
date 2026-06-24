@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "beliakun — Akun Premium AI & Digital, Harga Mahasiswa",
-    "description": "Beli akun premium ChatGPT, Gemini, Canva, Perplexity, API key & langganan digital lainnya. Proses instan, garansi, harga termurah se-Indonesia."
+    "description": "Beli akun premium ChatGPT, Gemini, Canva, Perplexity, API key & langganan digital lainnya. Proses instan, bergaransi, dan harga hemat untuk pelajar & profesional."
   },
   "nav": {
     "home": "Beranda",
@@ -63,7 +63,7 @@
     "refund": "Refund"
   },
   "home": {
-    "heroBadge": "Marketplace Akun Digital #1 di Indonesia",
+    "heroBadge": "Marketplace Akun & Langganan Digital",
     "heroTitle": "Akun Premium AI & Digital, Harga Anak Kos",
     "heroSubtitle": "ChatGPT, Gemini, Canva, Perplexity, API key & ratusan langganan premium. Proses instan, bergaransi, dukungan 24 jam.",
     "heroCtaPrimary": "Mulai Belanja",
@@ -89,8 +89,8 @@
     "trust1Desc": "Akun bermasalah? Kami ganti tanpa ribet selama masa garansi.",
     "trust2Title": "Proses Instan",
     "trust2Desc": "Pembayaran terverifikasi, akun dikirim dalam hitungan detik.",
-    "trust3Title": "Harga Termurah",
-    "trust3Desc": "Dijamin termurah. Nemu lebih murah? Kami samakan.",
+    "trust3Title": "Harga Hemat",
+    "trust3Desc": "Harga transparan dan bersaing, ramah di kantong anak kos.",
     "trust4Title": "Support 24/7",
     "trust4Desc": "Tim CS ramah siap bantu kapan saja via WhatsApp.",
     "testimonialsTitle": "Kata Mereka",
@@ -100,7 +100,7 @@
     "ctaButton": "Belanja Sekarang"
   },
   "footer": {
-    "tagline": "Marketplace akun & langganan digital premium termurah dan terpercaya di Indonesia.",
+    "tagline": "Marketplace akun & langganan digital premium yang praktis, transparan, dan bergaransi.",
     "explore": "Jelajahi",
     "support": "Bantuan",
     "company": "Perusahaan",
@@ -153,7 +153,8 @@
     "verifiedBuyer": "Pembeli Terverifikasi",
     "stockLeft": "stok tersisa",
     "perVariant": "/varian",
-    "trustNote": "Pembayaran aman & data terenkripsi"
+    "trustNote": "Pembayaran aman & data terenkripsi",
+    "trademark": "{brand} adalah merek dagang milik pemiliknya. beliakun adalah penjual pihak ketiga yang independen dan tidak berafiliasi atau didukung secara resmi oleh {brand}."
   },
   "cart": {
     "title": "Keranjang Belanja",
@@ -231,7 +232,7 @@
     "loginTitle": "Masuk ke Akun",
     "loginSubtitle": "Selamat datang kembali! Yuk lanjut belanja.",
     "registerTitle": "Buat Akun Baru",
-    "registerSubtitle": "Daftar gratis & nikmati harga termurah.",
+    "registerSubtitle": "Daftar gratis & mulai belanja hemat.",
     "name": "Nama Lengkap",
     "email": "Email",
     "password": "Kata Sandi",

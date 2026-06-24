@@ -63,7 +63,7 @@
     "refund": "Refunded"
   },
   "home": {
-    "heroBadge": "Indonesia's #1 Digital Account Marketplace",
+    "heroBadge": "Premium Digital Account & Subscription Marketplace",
     "heroTitle": "Premium AI & Digital Accounts, Student Prices",
     "heroSubtitle": "ChatGPT, Gemini, Canva, Perplexity, API keys & hundreds of premium subscriptions. Instant delivery, warranty, 24/7 support.",
     "heroCtaPrimary": "Start Shopping",
@@ -89,8 +89,8 @@
     "trust1Desc": "Account issues? We replace it hassle-free within warranty.",
     "trust2Title": "Instant Delivery",
     "trust2Desc": "Payment verified, account delivered within seconds.",
-    "trust3Title": "Lowest Price",
-    "trust3Desc": "Guaranteed cheapest. Found it lower? We'll match it.",
+    "trust3Title": "Affordable Prices",
+    "trust3Desc": "Transparent, competitive pricing — friendly for every student budget.",
     "trust4Title": "24/7 Support",
     "trust4Desc": "Friendly support ready anytime via WhatsApp.",
     "testimonialsTitle": "What They Say",
@@ -100,7 +100,7 @@
     "ctaButton": "Shop Now"
   },
   "footer": {
-    "tagline": "Indonesia's cheapest and most trusted premium digital account & subscription marketplace.",
+    "tagline": "A practical, transparent, and warranted premium digital account & subscription marketplace.",
     "explore": "Explore",
     "support": "Support",
     "company": "Company",
@@ -153,7 +153,8 @@
     "verifiedBuyer": "Verified Buyer",
     "stockLeft": "stock left",
     "perVariant": "/variant",
-    "trustNote": "Secure payment & encrypted data"
+    "trustNote": "Secure payment & encrypted data",
+    "trademark": "{brand} is a trademark of its respective owner. beliakun is an independent third-party seller and is not affiliated with or endorsed by {brand}."
   },
   "cart": {
     "title": "Shopping Cart",
@@ -231,7 +232,7 @@
     "loginTitle": "Sign In",
     "loginSubtitle": "Welcome back! Let's keep shopping.",
     "registerTitle": "Create New Account",
-    "registerSubtitle": "Sign up free & enjoy the lowest prices.",
+    "registerSubtitle": "Sign up free & start saving.",
     "name": "Full Name",
     "email": "Email",
     "password": "Password",

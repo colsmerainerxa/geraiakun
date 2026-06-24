@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "beliakun — Akun Premium AI & Digital",
     short_name: "beliakun",
     description:
-      "Marketplace akun & langganan digital premium termurah dan terpercaya di Indonesia.",
+      "Marketplace akun & langganan digital premium yang praktis, transparan, dan bergaransi.",
     start_url: "/",
     display: "standalone",
     background_color: "#fef1e0",

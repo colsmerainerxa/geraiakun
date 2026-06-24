@@ -35,7 +35,7 @@ export default function OpengraphImage() {
           boxShadow: "6px 6px 0 #0a0a0a",
         }}
       >
-        Marketplace Akun Digital #1 di Indonesia
+        Marketplace Akun &amp; Langganan Digital
       </div>
 
       <div style={{ display: "flex", marginTop: "36px", fontSize: 132, fontWeight: 800, color: "#0a0a0a" }}>

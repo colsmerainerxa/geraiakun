@@ -351,6 +351,11 @@ export function ProductDetail({
               ))}
             </ul>
           </div>
+
+          {/* Trademark / non-affiliation disclaimer (nominative use) */}
+          <p className="text-xs leading-relaxed text-foreground/50">
+            {t("trademark", { brand: product.brand })}
+          </p>
         </div>
       </div>
 
