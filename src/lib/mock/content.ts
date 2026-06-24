@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     role: "Mahasiswa DKV",
     avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Salsa",
     comment:
-      "Canva Pro-nya kepake banget buat tugas. Murah, cepet, dan gak pernah error. beliakun emang juara!",
+      "ChatGPT Plus-nya kepake banget buat tugas & skripsi. Prosesnya cepet, harga ramah mahasiswa. Mantap!",
     rating: 5,
   },
   {
@@ -16,7 +16,7 @@ export const testimonials: Testimonial[] = [
     role: "Software Engineer",
     avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Reza",
     comment:
-      "Top up OpenAI API tiap minggu di sini. Instan masuk ke akun sendiri, dashboard usage aman. Recommended buat dev.",
+      "Top up API Key tiap minggu di sini. Token instan masuk ke key sendiri, cocok buat ngebangun bot. Recommended buat dev.",
     rating: 5,
   },
   {
@@ -25,7 +25,7 @@ export const testimonials: Testimonial[] = [
     role: "Content Creator",
     avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Maya",
     comment:
-      "CapCut Pro + ChatGPT Plus paket lengkap bikin konten. Workflow makin ngebut, biaya makin hemat.",
+      "Gemini Pro + ChatGPT Plus jadi combo wajib bikin konten. Riset cepet, nulis caption makin gampang.",
     rating: 5,
   },
   {
@@ -43,7 +43,7 @@ export const testimonials: Testimonial[] = [
     role: "Marketing",
     avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Putri",
     comment:
-      "Spotify + Netflix langganan setahun lebih hemat dari beli sendiri. Garansinya beneran jalan!",
+      "Langganan Gemini Pro setahun jauh lebih hemat dari beli sendiri. Garansinya beneran jalan!",
     rating: 5,
   },
   {
@@ -52,7 +52,7 @@ export const testimonials: Testimonial[] = [
     role: "Mahasiswa Teknik",
     avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Hafidz",
     comment:
-      "Perplexity Pro setahun cuma 89rb?! Gila sih ini. Belajar makin gampang. Thanks beliakun!",
+      "ChatGPT Plus sharing cuma 35rb?! Gila sih. Belajar coding makin gampang. Thanks beliakun!",
     rating: 5,
   },
 ]
@@ -60,20 +60,20 @@ export const testimonials: Testimonial[] = [
 export const banners: Banner[] = [
   {
     id: "b1",
-    title: "Flash Sale AI Tools",
-    subtitle: "Diskon hingga 70% untuk ChatGPT, Gemini & Claude",
-    cta: "Serbu Sekarang",
+    title: "Promo AI Tools",
+    subtitle: "Hemat hingga 50% untuk ChatGPT Plus & Gemini Pro",
+    cta: "Lihat Sekarang",
     href: "/kategori/ai-chatbot",
     accent: "accent-cyan",
     active: true,
   },
   {
     id: "b2",
-    title: "Paket Hemat Mahasiswa",
-    subtitle: "Bundling Canva + CapCut + Spotify mulai 50rb",
-    cta: "Lihat Paket",
-    href: "/katalog",
-    accent: "accent-pink",
+    title: "Coba API Key Gratis",
+    subtitle: "Mulai bangun bot & automasi dengan varian Trial",
+    cta: "Mulai Gratis",
+    href: "/kategori/api-developer",
+    accent: "accent-lime",
     active: true,
   },
   {
@@ -82,7 +82,7 @@ export const banners: Banner[] = [
     subtitle: "Semua produk bergaransi selama masa aktif langganan",
     cta: "Pelajari",
     href: "/bantuan",
-    accent: "accent-lime",
+    accent: "accent-pink",
     active: false,
   },
 ]

@@ -33,12 +33,13 @@ export async function generateMetadata({
     description: t("description"),
     keywords: [
       "jual akun digital",
-      "akun ChatGPT murah",
-      "Gemini Pro",
-      "Canva Pro",
-      "Perplexity Pro",
+      "ChatGPT Plus murah",
+      "akun ChatGPT Plus sharing",
+      "akun ChatGPT Plus private",
+      "Gemini Pro murah",
       "API key murah",
-      "langganan premium Indonesia",
+      "kredit token API",
+      "langganan AI premium Indonesia",
     ],
     alternates: seoAlternates(locale, ""),
     openGraph: {

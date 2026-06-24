@@ -18,7 +18,7 @@ const authors = [
 
 const comments = [
   "Prosesnya cepat banget, gak sampai 5 menit udah masuk email. Mantap!",
-  "Harga termurah yang pernah aku temuin. Akun aman, recommended seller!",
+  "Harganya ramah banget di kantong. Akun aman, recommended seller!",
   "Awalnya ragu, ternyata legit. CS-nya ramah dan fast respon. Makasih!",
   "Udah langganan 3 bulan di sini, gak pernah ada masalah. Auto langganan terus.",
   "Akun normal, garansi jalan. Worth it banget buat anak kuliahan kayak aku.",
