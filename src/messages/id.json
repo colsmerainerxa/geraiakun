@@ -50,7 +50,17 @@
     "new": "BARU",
     "bestSeller": "TERLARIS",
     "promo": "PROMO",
-    "rare": "LANGKA"
+    "rare": "LANGKA",
+    "decrease": "Kurangi",
+    "increase": "Tambah",
+    "menu": "Menu"
+  },
+  "orderStatus": {
+    "menunggu-pembayaran": "Menunggu Pembayaran",
+    "diproses": "Diproses",
+    "selesai": "Selesai",
+    "dibatalkan": "Dibatalkan",
+    "refund": "Refund"
   },
   "home": {
     "heroBadge": "Marketplace Akun Digital #1 di Indonesia",
@@ -199,6 +209,7 @@
   },
   "account": {
     "title": "Akun Saya",
+    "invoice": "Invoice",
     "greeting": "Halo",
     "myOrders": "Pesanan Saya",
     "myAccounts": "Akun Digital",

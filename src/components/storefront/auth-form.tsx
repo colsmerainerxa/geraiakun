@@ -105,11 +105,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   id="name"
                   className="pl-9"
                   aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? "auth-name-error" : undefined}
                   {...register("name")}
                 />
               </div>
               {errors.name && (
-                <span className="text-xs font-bold text-danger">
+                <span
+                  id="auth-name-error"
+                  className="text-xs font-bold text-danger"
+                >
                   {errors.name.message}
                 </span>
               )}
@@ -126,11 +130,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 className="pl-9"
                 placeholder="email@kamu.com"
                 aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "auth-email-error" : undefined}
                 {...register("email")}
               />
             </div>
             {errors.email && (
-              <span className="text-xs font-bold text-danger">
+              <span
+                id="auth-email-error"
+                className="text-xs font-bold text-danger"
+              >
                 {errors.email.message}
               </span>
             )}
@@ -145,6 +153,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 type={showPw ? "text" : "password"}
                 className="px-9"
                 aria-invalid={!!errors.password}
+                aria-describedby={
+                  errors.password ? "auth-password-error" : undefined
+                }
                 {...register("password")}
               />
               <button
@@ -161,7 +172,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
               </button>
             </div>
             {errors.password && (
-              <span className="text-xs font-bold text-danger">
+              <span
+                id="auth-password-error"
+                className="text-xs font-bold text-danger"
+              >
                 {errors.password.message}
               </span>
             )}
@@ -177,11 +191,17 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   type="password"
                   className="pl-9"
                   aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={
+                    errors.confirmPassword ? "auth-confirm-error" : undefined
+                  }
                   {...register("confirmPassword")}
                 />
               </div>
               {errors.confirmPassword && (
-                <span className="text-xs font-bold text-danger">
+                <span
+                  id="auth-confirm-error"
+                  className="text-xs font-bold text-danger"
+                >
                   {errors.confirmPassword.message}
                 </span>
               )}

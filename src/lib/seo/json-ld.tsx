@@ -1,5 +1,6 @@
 import type {
   BreadcrumbList,
+  ItemList,
   Organization,
   Product as ProductSchema,
   WebSite,
@@ -54,7 +55,9 @@ export function productJsonLd(p: Product): WithContext<ProductSchema> {
     description: p.description,
     brand: { "@type": "Brand", name: p.brand },
     category: p.category,
+    sku: p.id,
     url: `${BASE}/produk/${p.slug}`,
+    image: `${BASE}/opengraph-image`,
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: p.rating,
@@ -89,12 +92,51 @@ export function breadcrumbJsonLd(
   }
 }
 
+export function itemListJsonLd(
+  items: { name: string; path: string }[],
+): WithContext<ItemList> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    numberOfItems: items.length,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      url: `${BASE}${item.path}`,
+    })),
+  }
+}
+
+export function faqPageJsonLd(items: { q: string; a: string }[]): object {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  }
+}
+
+// Escape characters that could break out of the <script> context. Data is
+// currently static/trusted, but this hardens against future user-derived fields.
+// (< already prevents the </script> breakout, which is the only real risk for
+// a JSON-LD script.)
+function safeJsonLd(data: object) {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+}
+
 export function JsonLd({ data }: { data: object }) {
   return (
     <script
       type="application/ld+json"
       // biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(data) }}
     />
   )
 }

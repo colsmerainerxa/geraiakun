@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { LegalDoc } from "@/components/storefront/legal-doc"
+import { seoAlternates } from "@/lib/seo/site"
 
 export async function generateMetadata({
   params,
@@ -13,10 +14,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "static" })
   return {
     title: t("privacyTitle"),
-    alternates: {
-      canonical: "/privasi",
-      languages: { id: "/privasi", en: "/en/privasi" },
-    },
+    alternates: seoAlternates(locale, "/privasi"),
   }
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { fakeApi, type ProductQuery } from "@/lib/mock/fake-api"
 
 // Centralized query keys — single source of truth for cache invalidation.
@@ -37,6 +37,9 @@ export function useProducts(query: ProductQuery = {}) {
   return useQuery({
     queryKey: qk.products(query),
     queryFn: () => fakeApi.getProducts(query),
+    // Keep showing the previous grid while a new filter/sort fetch resolves
+    // (no skeleton flash between filter changes).
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { ContactForm } from "@/components/storefront/contact-form"
+import { seoAlternates } from "@/lib/seo/site"
 
 export async function generateMetadata({
   params,
@@ -14,10 +15,7 @@ export async function generateMetadata({
   return {
     title: t("contactTitle"),
     description: t("contactSubtitle"),
-    alternates: {
-      canonical: "/kontak",
-      languages: { id: "/kontak", en: "/en/kontak" },
-    },
+    alternates: seoAlternates(locale, "/kontak"),
   }
 }
 

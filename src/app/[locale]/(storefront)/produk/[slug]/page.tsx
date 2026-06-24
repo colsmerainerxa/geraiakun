@@ -7,9 +7,11 @@ import { fakeApi } from "@/lib/mock/fake-api"
 import { products } from "@/lib/mock/products"
 import {
   breadcrumbJsonLd,
+  faqPageJsonLd,
   JsonLd,
   productJsonLd,
 } from "@/lib/seo/json-ld"
+import { seoAlternates } from "@/lib/seo/site"
 
 export function generateStaticParams() {
   return routing.locales.flatMap((locale) =>
@@ -34,10 +36,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: {
-      canonical: path,
-      languages: { id: path, en: `/en${path}` },
-    },
+    alternates: seoAlternates(locale, path),
     openGraph: {
       type: "website",
       title: `${title} · beliakun`,
@@ -73,6 +72,16 @@ export default async function ProductPage({
           { name: product.name, path: `/produk/${slug}` },
         ])}
       />
+      {product.faqs.length > 0 && (
+        <JsonLd
+          data={faqPageJsonLd(
+            product.faqs.map((f) => ({
+              q: locale === "en" ? f.qEn : f.q,
+              a: locale === "en" ? f.aEn : f.a,
+            })),
+          )}
+        />
+      )}
       <ProductDetail product={product} related={related} />
     </>
   )

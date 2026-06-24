@@ -15,8 +15,16 @@ export default async function StorefrontLayout({
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-base focus:border-2 focus:border-border focus:bg-main focus:px-4 focus:py-2 focus:font-heading focus:font-bold focus:shadow-shadow"
+      >
+        {locale === "en" ? "Skip to content" : "Lewati ke konten"}
+      </a>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main id="main" className="flex-1">
+        {children}
+      </main>
       <Footer />
       <CartDrawer />
     </div>

@@ -3,6 +3,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { FaqAccordion } from "@/components/storefront/faq-accordion"
+import { helpFaqs, localizedFaqs } from "@/lib/faq"
+import { faqPageJsonLd, JsonLd } from "@/lib/seo/json-ld"
+import { seoAlternates } from "@/lib/seo/site"
 
 export async function generateMetadata({
   params,
@@ -14,10 +17,7 @@ export async function generateMetadata({
   return {
     title: t("faqTitle"),
     description: t("faqSubtitle"),
-    alternates: {
-      canonical: "/bantuan",
-      languages: { id: "/bantuan", en: "/en/bantuan" },
-    },
+    alternates: seoAlternates(locale, "/bantuan"),
   }
 }
 
@@ -32,6 +32,7 @@ export default async function BantuanPage({
 
   return (
     <Container className="py-12 sm:py-16">
+      <JsonLd data={faqPageJsonLd(localizedFaqs(helpFaqs, locale === "en"))} />
       <div className="mx-auto max-w-3xl">
         <SectionHeading
           eyebrow="FAQ"

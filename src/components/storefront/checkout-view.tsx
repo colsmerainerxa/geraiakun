@@ -4,7 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
   ArrowLeft,
   CheckCircle2,
+  Copy,
   CreditCard,
+  KeyRound,
   Lock,
   QrCode,
   ShieldCheck,
@@ -14,6 +16,7 @@ import { motion } from "motion/react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import { Container } from "@/components/shared/container"
 import { PromoInput } from "@/components/storefront/promo-input"
@@ -25,8 +28,9 @@ import { bgFor } from "@/lib/accent"
 import { computeDiscount } from "@/lib/promo"
 import { cn, formatIDR } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
+import { usePurchasedOrders } from "@/stores/orders"
 import { usePromo } from "@/stores/promo"
-import type { PaymentMethod } from "@/types"
+import type { Order, PaymentMethod } from "@/types"
 
 const schema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
@@ -79,15 +83,17 @@ function makeInvoice() {
 export function CheckoutView() {
   const t = useTranslations("checkout")
   const tc = useTranslations("common")
+  const tt = useTranslations("track")
   const router = useRouter()
   const items = useCart((s) => s.items)
   const clear = useCart((s) => s.clear)
   const promo = usePromo((s) => s.promo)
   const clearPromo = usePromo((s) => s.clear)
+  const addOrder = usePurchasedOrders((s) => s.addOrder)
 
   const [method, setMethod] = useState<PaymentMethod>("qris")
   const [processing, setProcessing] = useState(false)
-  const [done, setDone] = useState<{ invoice: string } | null>(null)
+  const [done, setDone] = useState<Order | null>(null)
 
   const {
     register,
@@ -107,14 +113,45 @@ export function CheckoutView() {
     }
   }, [items.length, done, router])
 
-  function onSubmit() {
+  function onSubmit(data: FormValues) {
     setProcessing(true)
     setTimeout(() => {
       const invoice = makeInvoice()
+      const now = new Date().toISOString()
+      const order: Order = {
+        id: `ord-${invoice}`,
+        invoice,
+        customerName: data.name,
+        customerEmail: data.email,
+        whatsapp: data.whatsapp,
+        items: items.map((i) => ({
+          productId: i.productId,
+          productName: i.productName,
+          productLogo: i.productLogo,
+          variantId: i.variantId,
+          variantLabel: i.variantLabel,
+          price: i.price,
+          qty: i.qty,
+        })),
+        subtotal,
+        discount,
+        fee: FEE,
+        total,
+        status: "selesai",
+        paymentMethod: method,
+        createdAt: now,
+        paidAt: now,
+        credentials: items.map((i) => ({
+          email: `akun.${i.productSlug.replace(/[^a-z0-9]/g, "")}@premium.mail`,
+          password: `Bk!${i.productName.replace(/[^A-Za-z]/g, "").slice(0, 3)}${Math.floor(1000 + Math.random() * 9000)}`,
+          note: `Login lewat aplikasi/web resmi ${i.productName}. Jangan ubah email & password.`,
+        })),
+      }
+      addOrder(order)
       clear()
       clearPromo()
       setProcessing(false)
-      setDone({ invoice })
+      setDone(order)
     }, 1600)
   }
 
@@ -141,6 +178,46 @@ export function CheckoutView() {
             {done.invoice}
           </p>
         </div>
+
+        {done.credentials.length > 0 && (
+          <div className="mt-6 w-full max-w-md text-left">
+            <div className="mb-2 flex items-center justify-center gap-2">
+              <KeyRound className="size-4" />
+              <span className="font-heading text-sm font-bold">
+                {tt("credentials")}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {done.credentials.map((c) => (
+                <div
+                  key={c.email}
+                  className="rounded-base border-2 border-border bg-secondary-background p-3 text-sm"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate font-mono">{c.email}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${c.email} / ${c.password}`,
+                        )
+                        toast.success(tt("copied"))
+                      }}
+                      className="flex size-7 shrink-0 items-center justify-center rounded-base border-2 border-border bg-background hover:bg-main"
+                      aria-label={tt("copy")}
+                    >
+                      <Copy className="size-3.5" />
+                    </button>
+                  </div>
+                  <span className="block font-mono text-foreground/70">
+                    {c.password}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg">
             <Link href={`/lacak?inv=${done.invoice}`}>{t("viewOrder")}</Link>
@@ -190,10 +267,14 @@ export function CheckoutView() {
                   id="name"
                   placeholder={t("namePlaceholder")}
                   aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? "name-error" : undefined}
                   {...register("name")}
                 />
                 {errors.name && (
-                  <span className="text-xs font-bold text-danger">
+                  <span
+                    id="name-error"
+                    className="text-xs font-bold text-danger"
+                  >
                     {errors.name.message}
                   </span>
                 )}
@@ -205,14 +286,18 @@ export function CheckoutView() {
                   type="email"
                   placeholder={t("emailPlaceholder")}
                   aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : "email-note"}
                   {...register("email")}
                 />
                 {errors.email ? (
-                  <span className="text-xs font-bold text-danger">
+                  <span
+                    id="email-error"
+                    className="text-xs font-bold text-danger"
+                  >
                     {errors.email.message}
                   </span>
                 ) : (
-                  <span className="text-xs text-foreground/50">
+                  <span id="email-note" className="text-xs text-foreground/50">
                     {t("emailNote")}
                   </span>
                 )}
@@ -224,10 +309,16 @@ export function CheckoutView() {
                   inputMode="tel"
                   placeholder={t("whatsappPlaceholder")}
                   aria-invalid={!!errors.whatsapp}
+                  aria-describedby={
+                    errors.whatsapp ? "whatsapp-error" : undefined
+                  }
                   {...register("whatsapp")}
                 />
                 {errors.whatsapp && (
-                  <span className="text-xs font-bold text-danger">
+                  <span
+                    id="whatsapp-error"
+                    className="text-xs font-bold text-danger"
+                  >
                     {errors.whatsapp.message}
                   </span>
                 )}

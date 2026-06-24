@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Suspense } from "react"
 import { TrackView } from "@/components/storefront/track-view"
+import { seoAlternates } from "@/lib/seo/site"
 
 export async function generateMetadata({
   params,
@@ -13,10 +14,7 @@ export async function generateMetadata({
   return {
     title: t("title"),
     description: t("subtitle"),
-    alternates: {
-      canonical: "/lacak",
-      languages: { id: "/lacak", en: "/en/lacak" },
-    },
+    alternates: seoAlternates(locale, "/lacak"),
   }
 }
 

@@ -5,7 +5,7 @@ import { Space_Grotesk } from "next/font/google"
 import { notFound } from "next/navigation"
 import { Providers } from "@/app/providers"
 import { routing } from "@/i18n/routing"
-import { SITE_URL } from "@/lib/seo/site"
+import { seoAlternates, SITE_URL } from "@/lib/seo/site"
 import "../globals.css"
 
 const fontSans = Space_Grotesk({
@@ -40,10 +40,7 @@ export async function generateMetadata({
       "API key murah",
       "langganan premium Indonesia",
     ],
-    alternates: {
-      canonical: "/",
-      languages: { id: "/", en: "/en" },
-    },
+    alternates: seoAlternates(locale, ""),
     openGraph: {
       type: "website",
       locale: locale === "id" ? "id_ID" : "en_US",

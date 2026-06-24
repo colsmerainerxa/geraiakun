@@ -163,7 +163,7 @@ export function ProductDetail({
               ))}
             </div>
             {off > 0 && (
-              <span className="absolute right-4 top-4 rotate-3 rounded-base border-2 border-border bg-danger px-3 py-1 font-heading text-base font-extrabold text-white shadow-shadow-sm">
+              <span className="absolute right-4 top-4 rotate-3 rounded-base border-2 border-border bg-danger px-3 py-1 font-heading text-base font-extrabold text-foreground shadow-shadow-sm">
                 -{off}%
               </span>
             )}
@@ -230,7 +230,7 @@ export function ProductDetail({
             </div>
             {off > 0 && (
               <Badge variant="danger" className="mb-1.5">
-                Hemat {off}%
+                {isEn ? `Save ${off}%` : `Hemat ${off}%`}
               </Badge>
             )}
           </div>
@@ -294,7 +294,7 @@ export function ProductDetail({
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   disabled={soldOut || qty <= 1}
                   className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
-                  aria-label="Kurangi jumlah"
+                  aria-label={tc("decrease")}
                 >
                   <Minus className="size-4" />
                 </button>
@@ -308,7 +308,7 @@ export function ProductDetail({
                   }
                   disabled={soldOut || qty >= variant.stock}
                   className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
-                  aria-label="Tambah jumlah"
+                  aria-label={tc("increase")}
                 >
                   <Plus className="size-4" />
                 </button>

@@ -103,7 +103,7 @@ export function CartView() {
                         type="button"
                         onClick={() => updateQty(item.variantId, item.qty - 1)}
                         className="flex size-7 items-center justify-center rounded-base border-2 border-border bg-secondary-background hover:bg-main"
-                        aria-label="Kurangi"
+                        aria-label={tc("decrease")}
                       >
                         <Minus className="size-3.5" />
                       </button>
@@ -114,7 +114,7 @@ export function CartView() {
                         type="button"
                         onClick={() => updateQty(item.variantId, item.qty + 1)}
                         className="flex size-7 items-center justify-center rounded-base border-2 border-border bg-secondary-background hover:bg-main"
-                        aria-label="Tambah"
+                        aria-label={tc("increase")}
                       >
                         <Plus className="size-3.5" />
                       </button>

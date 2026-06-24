@@ -19,7 +19,7 @@ export default function ErrorPage({
 
   return (
     <Container className="flex min-h-[70vh] flex-col items-center justify-center py-20 text-center">
-      <span className="flex size-20 items-center justify-center rounded-base border-2 border-border bg-danger text-white shadow-shadow">
+      <span className="flex size-20 items-center justify-center rounded-base border-2 border-border bg-danger text-foreground shadow-shadow">
         <TriangleAlert className="size-10" />
       </span>
       <h1 className="mt-6 font-heading text-2xl font-extrabold sm:text-3xl">

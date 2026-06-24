@@ -20,6 +20,7 @@ import { useUI } from "@/stores/ui"
 export function CartDrawer() {
   const t = useTranslations("common")
   const tn = useTranslations("nav")
+  const tcart = useTranslations("cart")
   const { cartOpen, setCartOpen } = useUI()
   const items = useCart((s) => s.items)
   const updateQty = useCart((s) => s.updateQty)
@@ -41,12 +42,12 @@ export function CartDrawer() {
               <div className="flex size-20 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow">
                 <ShoppingBag className="size-9" />
               </div>
-              <p className="font-heading text-lg font-bold">Keranjang kosong</p>
-              <p className="text-sm text-foreground/60">
-                Yuk pilih akun premium favoritmu!
+              <p className="font-heading text-lg font-bold">
+                {tcart("empty")}
               </p>
+              <p className="text-sm text-foreground/60">{tcart("emptyDesc")}</p>
               <Button onClick={() => setCartOpen(false)} asChild className="mt-2">
-                <Link href="/katalog">Mulai Belanja</Link>
+                <Link href="/katalog">{tcart("startShopping")}</Link>
               </Button>
             </div>
           ) : (
@@ -94,7 +95,7 @@ export function CartDrawer() {
                               updateQty(item.variantId, item.qty - 1)
                             }
                             className="flex size-6 items-center justify-center rounded-[5px] border-2 border-border bg-secondary-background hover:bg-main"
-                            aria-label="Kurangi"
+                            aria-label={t("decrease")}
                           >
                             <Minus className="size-3" />
                           </button>
@@ -107,7 +108,7 @@ export function CartDrawer() {
                               updateQty(item.variantId, item.qty + 1)
                             }
                             className="flex size-6 items-center justify-center rounded-[5px] border-2 border-border bg-secondary-background hover:bg-main"
-                            aria-label="Tambah"
+                            aria-label={t("increase")}
                           >
                             <Plus className="size-3" />
                           </button>

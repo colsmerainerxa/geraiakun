@@ -15,7 +15,7 @@ const buttonVariants = cva(
         cyan: "bg-accent-cyan text-foreground shadow-shadow brutal-press",
         lime: "bg-accent-lime text-foreground shadow-shadow brutal-press",
         purple: "bg-accent-purple text-foreground shadow-shadow brutal-press",
-        danger: "bg-danger text-white shadow-shadow brutal-press",
+        danger: "bg-danger text-foreground shadow-shadow brutal-press",
         ghost:
           "border-transparent bg-transparent hover:bg-foreground/5 active:bg-foreground/10",
         link: "border-transparent bg-transparent underline-offset-4 hover:underline",

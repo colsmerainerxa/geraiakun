@@ -7,17 +7,24 @@ import {
   Play,
   Rocket,
 } from "lucide-react"
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query"
 import type { Metadata } from "next"
 import { getLocale, setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
 import { Container } from "@/components/shared/container"
 import { CategoryView } from "@/components/storefront/category-view"
+import { itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { Badge } from "@/components/ui/badge"
 import { routing } from "@/i18n/routing"
 import { bgFor } from "@/lib/accent"
 import { categories } from "@/lib/mock/categories"
 import { fakeApi } from "@/lib/mock/fake-api"
 import { cn } from "@/lib/utils"
+import { seoAlternates } from "@/lib/seo/site"
 
 const icons: Record<string, LucideIcon> = {
   Bot,
@@ -51,10 +58,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: {
-      canonical: path,
-      languages: { id: path, en: `/en${path}` },
-    },
+    alternates: seoAlternates(locale, path),
   }
 }
 
@@ -73,8 +77,23 @@ export default async function CategoryPage({
   const isEn = currentLocale === "en"
   const Icon = icons[category.icon] ?? Bot
 
+  // Prefetch the category's products so the grid is in the SSR HTML (crawlable)
+  // and CatalogView/CategoryView hydrates without a client fetch waterfall.
+  const catQuery = { category: category.slug, sort: "populer" } as const
+  const catProducts = await fakeApi.getProducts(catQuery)
+  const qc = new QueryClient()
+  qc.setQueryData(["products", catQuery], catProducts)
+
   return (
     <Container className="py-10">
+      <JsonLd
+        data={itemListJsonLd(
+          catProducts.map((p) => ({
+            name: p.name,
+            path: `/produk/${p.slug}`,
+          })),
+        )}
+      />
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center">
         <span
           className={cn(
@@ -97,7 +116,9 @@ export default async function CategoryPage({
         </div>
       </div>
 
-      <CategoryView slug={category.slug} />
+      <HydrationBoundary state={dehydrate(qc)}>
+        <CategoryView slug={category.slug} />
+      </HydrationBoundary>
     </Container>
   )
 }

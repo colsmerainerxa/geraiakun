@@ -8,8 +8,9 @@ import { productMinPrice, products } from "./products"
 import { reviewsForProduct } from "./reviews"
 import { promos, transactions } from "./transactions"
 
-// Simulasi latensi jaringan supaya UI loading state terasa nyata.
-const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms))
+// Data mock resolve instan — latensi buatan dihapus agar UI terasa cepat.
+// (Dengan API nyata, latensi datang dari jaringan; tak perlu disimulasikan.)
+const delay = (_ms = 0) => Promise.resolve()
 
 export type SortKey = "populer" | "termurah" | "termahal" | "rating" | "terbaru"
 

@@ -22,7 +22,8 @@ export default function AdminPromoPage() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {promos.map((p) => {
-        const pct = Math.min(100, Math.round((p.used / p.quota) * 100))
+        const pct =
+          p.quota > 0 ? Math.min(100, Math.round((p.used / p.quota) * 100)) : 0
         return (
           <div
             key={p.id}

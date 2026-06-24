@@ -30,7 +30,8 @@ export default function AdminDashboardPage() {
     )
   }
 
-  const maxTrend = Math.max(...data.trend.map((d) => d.value))
+  const maxTrend = Math.max(1, ...data.trend.map((d) => d.value))
+  const credTotal = data.credentials.total || 1
 
   return (
     <div className="flex flex-col gap-6">
@@ -129,7 +130,7 @@ export default function AdminDashboardPage() {
                     <div
                       className={cn("h-full", row.accent)}
                       style={{
-                        width: `${(row.value / data.credentials.total) * 100}%`,
+                        width: `${(row.value / credTotal) * 100}%`,
                       }}
                     />
                   </div>

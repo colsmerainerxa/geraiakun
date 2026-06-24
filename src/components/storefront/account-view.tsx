@@ -39,6 +39,7 @@ function maskEmail(email: string) {
 
 export function AccountView() {
   const t = useTranslations("account")
+  const ts = useTranslations("orderStatus")
   const locale = useLocale()
   const dateLocale = locale === "en" ? "en-US" : "id-ID"
   const { data: orders, isLoading } = useOrders()
@@ -140,7 +141,7 @@ export function AccountView() {
             <div className="overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
               {/* Header (desktop) */}
               <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr] gap-4 border-b-2 border-border bg-main px-5 py-3 font-heading text-xs font-extrabold uppercase tracking-wide text-main-foreground sm:grid">
-                <span>Invoice</span>
+                <span>{t("invoice")}</span>
                 <span>{t("orderDate")}</span>
                 <span>{t("orderStatus")}</span>
                 <span className="text-right">{t("orderTotal")}</span>
@@ -160,7 +161,7 @@ export function AccountView() {
                       </span>
                       <span>
                         <Badge variant={statusVariant[o.status]}>
-                          {o.status}
+                          {ts(o.status)}
                         </Badge>
                       </span>
                       <span className="text-right font-heading font-extrabold">

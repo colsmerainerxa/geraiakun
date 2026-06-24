@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
+import { seoAlternates } from "@/lib/seo/site"
 
 export async function generateMetadata({
   params,
@@ -13,10 +14,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "static" })
   return {
     title: t("aboutTitle"),
-    alternates: {
-      canonical: "/tentang",
-      languages: { id: "/tentang", en: "/en/tentang" },
-    },
+    alternates: seoAlternates(locale, "/tentang"),
   }
 }
 

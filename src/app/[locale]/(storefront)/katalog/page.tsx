@@ -1,7 +1,19 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query"
 import type { Metadata } from "next"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Suspense } from "react"
 import { CatalogView } from "@/components/storefront/catalog-view"
+import { fakeApi } from "@/lib/mock/fake-api"
+import { itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
+import { seoAlternates } from "@/lib/seo/site"
+
+// Matches CatalogView's initial query (no filters) so the prefetched cache
+// hydrates the first client render — products land in the SSR HTML.
+const DEFAULT_QUERY = { category: "semua", search: "", sort: "populer" } as const
 
 export async function generateMetadata({
   params,
@@ -13,7 +25,7 @@ export async function generateMetadata({
   return {
     title: t("title"),
     description: t("subtitle"),
-    alternates: { canonical: "/katalog", languages: { id: "/katalog", en: "/en/katalog" } },
+    alternates: seoAlternates(locale, "/katalog"),
   }
 }
 
@@ -24,9 +36,35 @@ export default async function CatalogPage({
 }) {
   const { locale } = await params
   setRequestLocale(locale)
+
+  const qc = new QueryClient()
+  const [products] = await Promise.all([
+    fakeApi.getProducts(DEFAULT_QUERY),
+    qc.prefetchQuery({
+      queryKey: ["products", DEFAULT_QUERY],
+      queryFn: () => fakeApi.getProducts(DEFAULT_QUERY),
+    }),
+    qc.prefetchQuery({
+      queryKey: ["categories"],
+      queryFn: () => fakeApi.getCategories(),
+    }),
+  ])
+
   return (
-    <Suspense>
-      <CatalogView />
-    </Suspense>
+    <>
+      <JsonLd
+        data={itemListJsonLd(
+          products.map((p) => ({
+            name: p.name,
+            path: `/produk/${p.slug}`,
+          })),
+        )}
+      />
+      <HydrationBoundary state={dehydrate(qc)}>
+        <Suspense>
+          <CatalogView />
+        </Suspense>
+      </HydrationBoundary>
+    </>
   )
 }

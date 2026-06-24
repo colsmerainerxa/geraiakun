@@ -19,7 +19,9 @@ import { Container } from "@/components/shared/container"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useMounted } from "@/hooks/use-mounted"
 import { useOrder } from "@/lib/api/queries"
+import { usePurchasedOrders } from "@/stores/orders"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 import type { Order, OrderStatus } from "@/types"
 
@@ -55,6 +57,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 function OrderResult({ order }: { order: Order }) {
   const t = useTranslations("track")
   const tc = useTranslations("common")
+  const ts = useTranslations("orderStatus")
   const meta = STATUS_META[order.status]
   const activeIdx = TIMELINE.indexOf(order.status)
   const isTimeline = activeIdx !== -1
@@ -80,7 +83,7 @@ function OrderResult({ order }: { order: Order }) {
             </p>
           </div>
           <Badge variant={meta.variant} className="gap-1.5 px-3 py-1.5">
-            <meta.icon className="size-3.5" /> {meta.label}
+            <meta.icon className="size-3.5" /> {ts(order.status)}
           </Badge>
         </div>
 
@@ -104,7 +107,7 @@ function OrderResult({ order }: { order: Order }) {
                       })()}
                     </span>
                     <span className="max-w-20 text-center text-[11px] font-bold leading-tight">
-                      {STATUS_META[s].label}
+                      {ts(s)}
                     </span>
                   </div>
                   {i < TIMELINE.length - 1 && (
@@ -226,8 +229,19 @@ export function TrackView() {
   const initial = params.get("inv") ?? ""
   const [input, setInput] = useState(initial)
   const [query, setQuery] = useState(initial)
+  const mounted = useMounted()
 
-  const { data: order, isLoading, isFetched } = useOrder(query)
+  // User-created orders (checkout) live in a persisted store; seeded demo
+  // orders come from the mock API. Check the local store first.
+  const localOrder = usePurchasedOrders((s) =>
+    query
+      ? s.orders.find(
+          (o) => o.invoice.toLowerCase() === query.toLowerCase(),
+        )
+      : undefined,
+  )
+  const { data: remoteOrder, isLoading, isFetched } = useOrder(query)
+  const order = localOrder ?? remoteOrder
 
   return (
     <Container className="max-w-3xl py-12">
@@ -266,7 +280,7 @@ export function TrackView() {
         {t("tryExample")}
       </p>
 
-      {query && isFetched && !order && (
+      {mounted && query && isFetched && !order && (
         <div className="mx-auto mt-8 max-w-md rounded-base border-2 border-dashed border-danger bg-danger/10 p-5 text-center text-sm font-bold text-danger">
           {t("notFound")}
         </div>

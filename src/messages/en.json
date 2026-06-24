@@ -50,7 +50,17 @@
     "new": "NEW",
     "bestSeller": "BEST SELLER",
     "promo": "PROMO",
-    "rare": "RARE"
+    "rare": "RARE",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "menu": "Menu"
+  },
+  "orderStatus": {
+    "menunggu-pembayaran": "Awaiting Payment",
+    "diproses": "Processing",
+    "selesai": "Completed",
+    "dibatalkan": "Cancelled",
+    "refund": "Refunded"
   },
   "home": {
     "heroBadge": "Indonesia's #1 Digital Account Marketplace",
@@ -199,6 +209,7 @@
   },
   "account": {
     "title": "My Account",
+    "invoice": "Invoice",
     "greeting": "Hi",
     "myOrders": "My Orders",
     "myAccounts": "Digital Accounts",

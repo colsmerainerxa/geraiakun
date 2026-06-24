@@ -1,7 +1,7 @@
 "use client"
 
 import { SlidersHorizontal, X } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
 import { useMemo, useState } from "react"
 import { Container } from "@/components/shared/container"
@@ -12,7 +12,6 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -33,11 +32,16 @@ import { cn } from "@/lib/utils"
 import type { CategorySlug } from "@/types"
 
 const BADGE_OPTIONS = [
-  { value: "terlaris", label: "Terlaris" },
-  { value: "baru", label: "Baru" },
-  { value: "promo", label: "Promo" },
-  { value: "langka", label: "Langka" },
+  { value: "terlaris", label: "Terlaris", labelEn: "Best Seller" },
+  { value: "baru", label: "Baru", labelEn: "New" },
+  { value: "promo", label: "Promo", labelEn: "Promo" },
+  { value: "langka", label: "Langka", labelEn: "Rare" },
 ]
+
+function badgeLabel(value: string, isEn: boolean) {
+  const o = BADGE_OPTIONS.find((x) => x.value === value)
+  return o ? (isEn ? o.labelEn : o.label) : value
+}
 
 const PRICE_RANGES = [
   { label: "< Rp50rb", min: 0, max: 50000 },
@@ -64,6 +68,7 @@ function Filters({
   onReset: () => void
 }) {
   const t = useTranslations("catalog")
+  const isEn = useLocale() === "en"
   const { data: categories } = useCategories()
 
   return (
@@ -83,7 +88,7 @@ function Filters({
                 : "border-transparent hover:border-border",
             )}
           >
-            Semua
+            {isEn ? "All" : "Semua"}
           </button>
           {categories?.map((c) => (
             <button
@@ -141,7 +146,7 @@ function Filters({
                 checked={badges.includes(b.value)}
                 onCheckedChange={() => toggleBadge(b.value)}
               />
-              {b.label}
+              {isEn ? b.labelEn : b.label}
             </label>
           ))}
         </div>
@@ -157,6 +162,7 @@ function Filters({
 export function CatalogView() {
   const t = useTranslations("catalog")
   const params = useSearchParams()
+  const isEn = useLocale() === "en"
   const initialSearch = params.get("q") ?? ""
   const initialCategory = params.get("kategori") ?? "semua"
 
@@ -264,7 +270,7 @@ export function CatalogView() {
               {badges.map((b) => (
                 <button key={b} type="button" onClick={() => toggleBadge(b)}>
                   <Badge variant="neutral" className="gap-1">
-                    {b} <X className="size-3" />
+                    {badgeLabel(b, isEn)} <X className="size-3" />
                   </Badge>
                 </button>
               ))}
