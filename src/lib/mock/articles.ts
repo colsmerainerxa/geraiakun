@@ -310,6 +310,168 @@ export const articles: Article[] = [
     ],
     relatedSlugs: ["api-key"],
   },
+  {
+    slug: "cara-bayar-qris-akun-premium",
+    title: "Cara Bayar QRIS untuk Akun Premium (Anti Ribet)",
+    titleEn: "How to Pay with QRIS for Premium Accounts (Hassle-Free)",
+    excerpt:
+      "QRIS bikin bayar akun premium gampang banget — satu scan dari e-wallet mana pun. Ini langkahnya.",
+    excerptEn:
+      "QRIS makes paying for premium accounts super easy — one scan from any e-wallet. Here are the steps.",
+    category: "Panduan",
+    categoryEn: "Guide",
+    emoji: "💳",
+    accent: "accent-cyan",
+    date: "2026-06-25",
+    readMinutes: 3,
+    sections: [
+      {
+        heading: "Kenapa QRIS?",
+        headingEn: "Why QRIS?",
+        body: "QRIS bisa dibayar dari hampir semua e-wallet dan m-banking — GoPay, OVO, DANA, ShopeePay, sampai mobile banking. Cukup satu kode, tanpa pusing pilih channel. Pembayaran terverifikasi otomatis.",
+        bodyEn: "QRIS can be paid from almost any e-wallet and mobile bank — GoPay, OVO, DANA, ShopeePay, even mobile banking. Just one code, no need to pick a channel. Payment is auto-verified.",
+      },
+      {
+        heading: "Langkah bayar",
+        headingEn: "Payment steps",
+        body: "Pilih produk & varian, lanjut ke checkout, pilih metode QRIS, lalu scan kode yang muncul dengan aplikasi e-wallet kamu. Setelah terbayar, detail akun otomatis dikirim ke email dan dashboard.",
+        bodyEn: "Pick a product & variant, go to checkout, choose QRIS, then scan the code with your e-wallet app. Once paid, account details are sent automatically to your email and dashboard.",
+      },
+    ],
+    relatedSlugs: ["chatgpt-plus", "gemini-pro"],
+  },
+  {
+    slug: "apa-itu-akun-private",
+    title: "Apa Itu Akun Private dan Kenapa Lebih Aman?",
+    titleEn: "What Is a Private Account and Why Is It Safer?",
+    excerpt:
+      "Akun private = login sepenuhnya milikmu. Ini kelebihannya dibanding sharing, dan kapan kamu butuh.",
+    excerptEn:
+      "A private account = a login that's fully yours. Here are its advantages over sharing, and when you need it.",
+    category: "Tips",
+    categoryEn: "Tips",
+    emoji: "🔒",
+    accent: "accent-blue",
+    date: "2026-06-20",
+    readMinutes: 3,
+    sections: [
+      {
+        heading: "Definisi singkat",
+        headingEn: "Quick definition",
+        body: "Akun private adalah akun yang hanya kamu yang pakai, dengan login sendiri. Tidak ada pengguna lain yang berbagi sesi, sehingga lebih stabil dan privasimu lebih terjaga.",
+        bodyEn: "A private account is one only you use, with your own login. No other users share the session, so it's more stable and your privacy is better protected.",
+      },
+      {
+        heading: "Kapan butuh private?",
+        headingEn: "When do you need private?",
+        body: "Kalau kamu memakai layanannya setiap hari, menyimpan riwayat penting, atau butuh keandalan tinggi (mis. kerja/klien), private adalah pilihan tepat. Untuk pemakaian ringan dan hemat, sharing sudah cukup.",
+        bodyEn: "If you use the service daily, store important history, or need high reliability (e.g. work/clients), private is the right pick. For light, budget use, sharing is enough.",
+      },
+    ],
+    relatedSlugs: ["chatgpt-plus", "gemini-pro"],
+  },
+  {
+    slug: "gemini-pro-untuk-skripsi",
+    title: "Gemini Pro untuk Skripsi: Riset & Nulis Lebih Cepat",
+    titleEn: "Gemini Pro for Your Thesis: Faster Research & Writing",
+    excerpt:
+      "Mentok di bab 2? Gemini Pro bisa bantu riset, merapikan tulisan, dan terhubung langsung ke Docs.",
+    excerptEn:
+      "Stuck on chapter 2? Gemini Pro can help with research, polishing your writing, and connects right into Docs.",
+    category: "Panduan",
+    categoryEn: "Guide",
+    emoji: "📚",
+    accent: "accent-purple",
+    date: "2026-06-12",
+    readMinutes: 4,
+    sections: [
+      {
+        heading: "Riset literatur lebih cepat",
+        headingEn: "Faster literature research",
+        body: "Pakai Deep Research untuk merangkum banyak sumber sekaligus dan menemukan celah penelitian. Tetap verifikasi tiap klaim ke sumber aslinya dan catat sitasinya sejak awal.",
+        bodyEn: "Use Deep Research to summarize many sources at once and find research gaps. Always verify each claim against the original source and note citations from the start.",
+      },
+      {
+        heading: "Nulis & rapikan di Docs",
+        headingEn: "Write & polish in Docs",
+        body: "Karena terintegrasi dengan Google Docs, kamu bisa minta bantuan merapikan kalimat, memperbaiki struktur, dan menyesuaikan gaya bahasa akademik langsung di dokumenmu.",
+        bodyEn: "Since it integrates with Google Docs, you can ask for help tidying sentences, improving structure, and matching an academic tone right inside your document.",
+      },
+      {
+        heading: "Etika & integritas",
+        headingEn: "Ethics & integrity",
+        body: "Jadikan AI sebagai asisten, bukan penulis utama. Ide dan analisis tetap milikmu; AI mempercepat bagian teknis. Cek aturan kampusmu soal penggunaan AI.",
+        bodyEn: "Treat AI as an assistant, not the main author. Ideas and analysis stay yours; AI speeds up the technical parts. Check your campus rules on AI use.",
+      },
+    ],
+    relatedSlugs: ["gemini-pro", "chatgpt-plus"],
+  },
+  {
+    slug: "bikin-bot-whatsapp-api-key",
+    title: "Bikin Bot WhatsApp dengan API Key: Langkah Awal",
+    titleEn: "Build a WhatsApp Bot with an API Key: First Steps",
+    excerpt:
+      "Mau bot WA yang bisa jawab otomatis pakai AI? Ini gambaran besar dan cara mulai dengan API Key.",
+    excerptEn:
+      "Want a WhatsApp bot that auto-replies with AI? Here's the big picture and how to start with an API Key.",
+    category: "Panduan",
+    categoryEn: "Guide",
+    emoji: "🤖",
+    accent: "accent-lime",
+    date: "2026-06-06",
+    readMinutes: 5,
+    sections: [
+      {
+        heading: "Komponen yang dibutuhkan",
+        headingEn: "What you'll need",
+        body: "Tiga bahan utama: gateway WhatsApp (mis. API resmi atau library), server kecil untuk menerima pesan, dan API Key AI untuk menghasilkan balasan. Token dari API Key inilah yang 'menghidupkan' balasan cerdas botmu.",
+        bodyEn: "Three main ingredients: a WhatsApp gateway (e.g. the official API or a library), a small server to receive messages, and an AI API Key to generate replies. The API Key's tokens are what 'power' your bot's smart responses.",
+      },
+      {
+        heading: "Alur sederhananya",
+        headingEn: "The simple flow",
+        body: "Pesan masuk → server kirim teks ke model lewat API Key → model balas → server teruskan ke WhatsApp. Mulai dari Trial gratis untuk menguji alur, lalu naik ke Basic saat trafik bertambah.",
+        bodyEn: "Message in → server sends the text to the model via the API Key → model replies → server forwards it to WhatsApp. Start with the free Trial to test the flow, then move to Basic as traffic grows.",
+      },
+      {
+        heading: "Tips hemat & aman",
+        headingEn: "Cost & safety tips",
+        body: "Batasi panjang balasan, tambah rate-limit per pengguna, dan jangan pernah taruh API Key di sisi klien. Simpan key di server sebagai environment variable.",
+        bodyEn: "Cap reply length, add a per-user rate-limit, and never put the API Key on the client side. Keep the key on the server as an environment variable.",
+      },
+    ],
+    relatedSlugs: ["api-key", "gemini-pro"],
+  },
+  {
+    slug: "tips-aman-akun-sharing",
+    title: "Tips Aman Pakai Akun Sharing biar Awet",
+    titleEn: "Tips for Using a Sharing Account Safely (and Keeping It Alive)",
+    excerpt:
+      "Akun sharing bisa awet kalau tahu aturannya. Lima tips simpel biar akunmu nggak gampang bermasalah.",
+    excerptEn:
+      "A sharing account can last if you know the rules. Five simple tips so yours doesn't break easily.",
+    category: "Tips",
+    categoryEn: "Tips",
+    emoji: "🛡️",
+    accent: "accent-pink",
+    date: "2026-05-30",
+    readMinutes: 3,
+    sections: [
+      {
+        heading: "Aturan emas",
+        headingEn: "The golden rule",
+        body: "Jangan pernah mengubah email, password, atau metode pemulihan akun sharing. Perubahan ini biasanya memicu logout massal dan membuat akun tidak stabil untuk semua pengguna.",
+        bodyEn: "Never change the email, password, or recovery method of a sharing account. These changes usually trigger mass logouts and make the account unstable for everyone.",
+      },
+      {
+        heading: "Pakai dengan wajar",
+        headingEn: "Use it reasonably",
+        body: "Hindari login di terlalu banyak perangkat sekaligus dan jangan menyimpan data sensitif di akun sharing. Kalau butuh privasi penuh atau pemakaian intens, pertimbangkan upgrade ke private.",
+        bodyEn: "Avoid logging in on too many devices at once and don't store sensitive data on a sharing account. If you need full privacy or heavy use, consider upgrading to private.",
+      },
+    ],
+    relatedSlugs: ["chatgpt-plus"],
+  },
 ]
 
 export function getArticle(slug: string) {

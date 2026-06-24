@@ -42,6 +42,7 @@ import {
   formatPrice,
   initials,
 } from "@/lib/utils"
+import { articles } from "@/lib/mock/articles"
 import { products } from "@/lib/mock/products"
 import { useCart } from "@/stores/cart"
 import { useRecentlyViewed } from "@/stores/recently-viewed"
@@ -85,6 +86,9 @@ export function ProductDetail({
   const crossSell = products
     .filter((p) => p.slug !== product.slug)
     .slice(0, 2)
+  const relatedArticles = articles
+    .filter((a) => a.relatedSlugs.includes(product.slug))
+    .slice(0, 3)
 
   // Default to the cheapest in-stock variant, else the first.
   const cheapest = [...product.variants].sort((a, b) => a.price - b.price)
@@ -546,6 +550,39 @@ export function ProductDetail({
               <Reveal key={p.id} delay={i * 0.05}>
                 <ProductCard product={p} />
               </Reveal>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ---- Related articles (internal linking) ---- */}
+      {relatedArticles.length > 0 && (
+        <div className="mt-16">
+          <SectionHeading title={isEn ? "Related Articles" : "Artikel Terkait"} />
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
+            {relatedArticles.map((a) => (
+              <Link
+                key={a.slug}
+                href={`/artikel/${a.slug}`}
+                className="group flex flex-col overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow transition-shadow hover:shadow-shadow-lg"
+              >
+                <div
+                  className={cn(
+                    "flex aspect-[16/9] items-center justify-center border-b-2 border-border text-5xl",
+                    bgFor(a.accent),
+                  )}
+                >
+                  {a.emoji}
+                </div>
+                <div className="p-4">
+                  <h3 className="font-heading text-sm font-bold leading-snug">
+                    {isEn ? a.titleEn : a.title}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs text-foreground/70">
+                    {isEn ? a.excerptEn : a.excerpt}
+                  </p>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
