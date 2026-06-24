@@ -9,7 +9,13 @@ import { Card } from "@/components/ui/card"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { productMinPrice } from "@/lib/mock/products"
-import { cn, discountPercent, formatIDR, formatNumber } from "@/lib/utils"
+import {
+  cn,
+  discountPercent,
+  formatIDR,
+  formatNumber,
+  formatPrice,
+} from "@/lib/utils"
 import type { Product, ProductBadge } from "@/types"
 
 const badgeMap: Record<
@@ -55,6 +61,9 @@ export function ProductCard({ product }: { product: Product }) {
                   {t(badgeMap[b].key)}
                 </Badge>
               ))}
+              {min === 0 && (
+                <Badge variant="lime">{isEn ? "Free" : "Gratis"}</Badge>
+              )}
             </div>
             {off > 0 && (
               <span className="absolute right-2.5 top-2.5 rotate-3 rounded-base border-2 border-border bg-danger px-2 py-0.5 font-heading text-xs font-extrabold text-foreground shadow-shadow-sm">
@@ -91,7 +100,7 @@ export function ProductCard({ product }: { product: Product }) {
                   </span>
                 )}
                 <span className="font-heading text-lg font-extrabold text-foreground">
-                  {formatIDR(min)}
+                  {formatPrice(min, isEn)}
                 </span>
               </div>
             </div>

@@ -21,6 +21,12 @@ export function formatIDR(value: number, opts?: { compact?: boolean }) {
   }).format(value)
 }
 
+/** Format harga; tampilkan "Gratis"/"Free" untuk nilai 0. */
+export function formatPrice(value: number, isEn = false) {
+  if (value === 0) return isEn ? "Free" : "Gratis"
+  return formatIDR(value)
+}
+
 /** Format tanggal ISO -> "23 Jun 2026" sesuai locale */
 export function formatDate(iso: string, locale = "id-ID") {
   return new Intl.DateTimeFormat(locale, {

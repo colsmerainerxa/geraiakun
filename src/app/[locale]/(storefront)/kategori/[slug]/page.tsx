@@ -17,11 +17,17 @@ import { getLocale, setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
 import { Container } from "@/components/shared/container"
 import { CategoryView } from "@/components/storefront/category-view"
-import { itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { routing } from "@/i18n/routing"
 import { bgFor } from "@/lib/accent"
-import { categories } from "@/lib/mock/categories"
+import { categories, categoryContent } from "@/lib/mock/categories"
+import { faqPageJsonLd, itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { fakeApi } from "@/lib/mock/fake-api"
 import { cn } from "@/lib/utils"
 import { seoAlternates } from "@/lib/seo/site"
@@ -77,6 +83,14 @@ export default async function CategoryPage({
   const isEn = currentLocale === "en"
   const Icon = icons[category.icon] ?? Bot
 
+  const content = categoryContent[slug]
+  const faqs = content
+    ? content.faqs.map((f) => ({
+        q: isEn ? f.qEn : f.q,
+        a: isEn ? f.aEn : f.a,
+      }))
+    : []
+
   // Prefetch the category's products so the grid is in the SSR HTML (crawlable)
   // and CatalogView/CategoryView hydrates without a client fetch waterfall.
   const catQuery = { category: category.slug, sort: "populer" } as const
@@ -116,9 +130,36 @@ export default async function CategoryPage({
         </div>
       </div>
 
+      {content && (
+        <p className="mb-8 max-w-3xl leading-relaxed text-foreground/80">
+          {isEn ? content.introEn : content.intro}
+        </p>
+      )}
+
       <HydrationBoundary state={dehydrate(qc)}>
         <CategoryView slug={category.slug} />
       </HydrationBoundary>
+
+      {faqs.length > 0 && (
+        <div className="mt-16 max-w-3xl">
+          <JsonLd data={faqPageJsonLd(faqs)} />
+          <h2 className="font-heading text-2xl font-extrabold">
+            {isEn ? "Frequently Asked Questions" : "Pertanyaan Umum"}
+          </h2>
+          <Accordion
+            type="single"
+            collapsible
+            className="mt-6 flex flex-col gap-3"
+          >
+            {faqs.map((f, i) => (
+              <AccordionItem key={f.q} value={`faq-${i}`}>
+                <AccordionTrigger>{f.q}</AccordionTrigger>
+                <AccordionContent>{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      )}
     </Container>
   )
 }

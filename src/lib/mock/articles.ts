@@ -166,6 +166,150 @@ export const articles: Article[] = [
     ],
     relatedSlugs: ["api-key", "gemini-pro"],
   },
+  {
+    slug: "aktifkan-gemini-pro-invite-vs-login",
+    title: "Cara Aktifkan Gemini Pro: Via Invite vs Via Login",
+    titleEn: "How to Activate Gemini Pro: via Invite vs via Login",
+    excerpt:
+      "Dua metode aktivasi, satu hasil yang sama: Gemini Pro aktif. Ini bedanya dan cara pakainya.",
+    excerptEn:
+      "Two activation methods, one same result: Gemini Pro active. Here's the difference and how to use them.",
+    category: "Panduan",
+    categoryEn: "Guide",
+    emoji: "✨",
+    accent: "accent-blue",
+    date: "2026-06-24",
+    readMinutes: 4,
+    sections: [
+      {
+        heading: "Apa beda Via Invite dan Via Login?",
+        headingEn: "Invite vs Login: what's the difference?",
+        body: "Via Invite berarti kamu diundang ke sebuah grup/family, lalu login memakai email Google milikmu sendiri — paling nyaman karena data tetap di akunmu. Via Login berarti kamu diberi kredensial untuk masuk ke akun yang sudah Pro.",
+        bodyEn: "Via Invite means you're invited into a group/family, then sign in with your own Google email — the most comfortable since your data stays on your account. Via Login means you're given credentials to sign in to an already-Pro account.",
+      },
+      {
+        heading: "Langkah aktivasi Via Invite",
+        headingEn: "Activating via Invite",
+        body: "Cek email Google-mu, buka undangan yang masuk, lalu terima. Gemini Pro langsung aktif di akunmu sendiri dalam beberapa menit. Tidak perlu ganti password apa pun.",
+        bodyEn: "Check your Google email, open the incoming invite, then accept. Gemini Pro activates on your own account within minutes. No password changes needed.",
+      },
+      {
+        heading: "Langkah aktivasi Via Login",
+        headingEn: "Activating via Login",
+        body: "Login memakai email & password yang kami kirim, dan jangan mengubah keduanya agar akun tetap stabil. Cocok jika kamu tidak masalah memakai akun terpisah dari email utamamu.",
+        bodyEn: "Sign in with the email & password we send, and don't change either so the account stays stable. Great if you don't mind using an account separate from your main email.",
+      },
+    ],
+    relatedSlugs: ["gemini-pro"],
+  },
+  {
+    slug: "chatgpt-plus-logout-sendiri-solusi",
+    title: "ChatGPT Plus Tiba-tiba Logout? Ini Penyebab & Solusinya",
+    titleEn: "ChatGPT Plus Logging You Out? Causes & Fixes",
+    excerpt:
+      "Ke-logout di tengah ngerjain tugas itu nyebelin. Ini alasan umumnya dan cara cepat mengatasinya.",
+    excerptEn:
+      "Getting logged out mid-task is annoying. Here are the common reasons and quick fixes.",
+    category: "Tips",
+    categoryEn: "Tips",
+    emoji: "🤖",
+    accent: "accent-cyan",
+    date: "2026-06-23",
+    readMinutes: 3,
+    sections: [
+      {
+        heading: "Kenapa bisa ke-logout?",
+        headingEn: "Why does it log out?",
+        body: "Penyebab paling umum adalah login di terlalu banyak perangkat sekaligus, atau pada akun sharing yang sedang dipakai bersamaan. Sistem keamanan akan menendang sesi paling lama untuk menjaga akun.",
+        bodyEn: "The most common cause is signing in on too many devices at once, or a sharing account being used simultaneously. The security system kicks the oldest session to protect the account.",
+      },
+      {
+        heading: "Solusi cepat",
+        headingEn: "Quick fixes",
+        body: "Login ulang dengan kredensial yang sama dan jangan mengubah password. Kalau masih sering ke-logout, hubungi CS kami — selama masa garansi kami bantu cek atau ganti akun tanpa biaya.",
+        bodyEn: "Sign in again with the same credentials and don't change the password. If it keeps logging out, contact our support — within the warranty period we'll check or replace it free of charge.",
+      },
+      {
+        heading: "Biar lebih stabil",
+        headingEn: "For more stability",
+        body: "Kalau kamu pakai ChatGPT Plus intens setiap hari, varian Private jauh lebih stabil karena akun sepenuhnya milikmu sendiri tanpa berbagi sesi.",
+        bodyEn: "If you use ChatGPT Plus intensely every day, the Private variant is far more stable since the account is fully yours with no shared sessions.",
+      },
+    ],
+    relatedSlugs: ["chatgpt-plus"],
+  },
+  {
+    slug: "chatgpt-plus-atau-gemini-pro-2026",
+    title: "ChatGPT Plus atau Gemini Pro? Panduan Memilih di 2026",
+    titleEn: "ChatGPT Plus or Gemini Pro? A 2026 Buying Guide",
+    excerpt:
+      "Dua raksasa AI, dua kekuatan berbeda. Ini cara memilih yang paling pas dengan kebutuhanmu.",
+    excerptEn:
+      "Two AI giants, two different strengths. Here's how to pick the one that fits you best.",
+    category: "Review",
+    categoryEn: "Review",
+    emoji: "⚖️",
+    accent: "accent-purple",
+    date: "2026-06-08",
+    readMinutes: 5,
+    sections: [
+      {
+        heading: "Kekuatan ChatGPT Plus",
+        headingEn: "Where ChatGPT Plus shines",
+        body: "Paling kuat untuk menulis, menjelaskan konsep rumit, brainstorming, dan coding. Reasoning-nya tajam dan ekosistem pluginnya luas. Pilihan utama kalau pekerjaanmu banyak berkutat dengan teks dan kode.",
+        bodyEn: "Strongest for writing, explaining complex concepts, brainstorming, and coding. Its reasoning is sharp and its plugin ecosystem is broad. The top pick if your work revolves around text and code.",
+      },
+      {
+        heading: "Kekuatan Gemini Pro",
+        headingEn: "Where Gemini Pro shines",
+        body: "Unggul untuk riset mendalam dengan sumber, plus integrasi mulus ke Gmail, Docs, dan Sheets — ditambah bonus Google One 2TB. Cocok kalau kamu hidup di ekosistem Google.",
+        bodyEn: "Excels at deep, sourced research, plus seamless integration with Gmail, Docs, and Sheets — with a Google One 2TB bonus. Ideal if you live in the Google ecosystem.",
+      },
+      {
+        heading: "Jadi, pilih yang mana?",
+        headingEn: "So which one?",
+        body: "Banyak pengguna serius justru memakai keduanya: ChatGPT Plus untuk menulis & coding, Gemini Pro untuk riset & dokumen. Kalau budget terbatas, mulai dari yang paling sering kamu butuhkan dulu.",
+        bodyEn: "Many power users actually run both: ChatGPT Plus for writing & coding, Gemini Pro for research & documents. On a tight budget, start with the one you'll need most.",
+      },
+    ],
+    relatedSlugs: ["chatgpt-plus", "gemini-pro"],
+  },
+  {
+    slug: "estimasi-token-api-key",
+    title: "Estimasi Token API Key: Berapa Token yang Kamu Butuh?",
+    titleEn: "API Key Token Estimates: How Many Do You Need?",
+    excerpt:
+      "Bingung pilih Basic atau Pro? Pahami dulu berapa token yang biasanya dihabiskan tiap pemakaian.",
+    excerptEn:
+      "Unsure between Basic and Pro? First understand how many tokens typical usage burns.",
+    category: "Panduan",
+    categoryEn: "Guide",
+    emoji: "🔑",
+    accent: "accent-lime",
+    date: "2026-06-04",
+    readMinutes: 4,
+    sections: [
+      {
+        heading: "1 token itu seberapa?",
+        headingEn: "How big is one token?",
+        body: "Sebagai patokan kasar, 1 token kira-kira setara 4 karakter atau sekitar 0,75 kata dalam bahasa Inggris. Jadi 1.000 token kira-kira 750 kata — gabungan prompt dan jawaban.",
+        bodyEn: "As a rough rule, 1 token is about 4 characters or roughly 0.75 English words. So 1,000 tokens is about 750 words — combining the prompt and the response.",
+      },
+      {
+        heading: "Contoh estimasi pemakaian",
+        headingEn: "Usage estimate examples",
+        body: "Chatbot ringan bisa menghabiskan ratusan token per percakapan, sementara meringkas dokumen panjang bisa ribuan token sekali jalan. Automasi yang sering memanggil API tentu lebih boros.",
+        bodyEn: "A light chatbot might burn hundreds of tokens per conversation, while summarizing a long document can take thousands in one go. Automation that calls the API frequently uses far more.",
+      },
+      {
+        heading: "Pilih paket yang pas",
+        headingEn: "Pick the right plan",
+        body: "Mulai dari Trial gratis untuk mengukur pola pemakaianmu. Butuh volume? Basic memberi 10 juta token. Mau model kelas atas? Pro memberi 5 juta token dengan kualitas lebih tinggi.",
+        bodyEn: "Start with the free Trial to measure your usage pattern. Need volume? Basic gives 10 million tokens. Want a higher-tier model? Pro gives 5 million tokens at higher quality.",
+      },
+    ],
+    relatedSlugs: ["api-key"],
+  },
 ]
 
 export function getArticle(slug: string) {

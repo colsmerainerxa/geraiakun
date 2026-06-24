@@ -38,6 +38,7 @@ import {
   formatDate,
   formatIDR,
   formatNumber,
+  formatPrice,
   initials,
 } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
@@ -226,7 +227,7 @@ export function ProductDetail({
                 </span>
               )}
               <span className="font-heading text-4xl font-extrabold">
-                {formatIDR(variant.price)}
+                {formatPrice(variant.price, isEn)}
               </span>
             </div>
             {off > 0 && (
@@ -266,7 +267,7 @@ export function ProductDetail({
                       {isEn ? v.labelEn : v.label}
                     </span>
                     <span className="text-xs font-semibold">
-                      {formatIDR(v.price)}
+                      {formatPrice(v.price, isEn)}
                       {vOut ? (
                         <span className="ml-1 opacity-70">
                           · {tc("outOfStock")}
