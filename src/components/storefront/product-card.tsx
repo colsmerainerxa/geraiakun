@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { WishlistButton } from "@/components/storefront/wishlist-button"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { productMinPrice } from "@/lib/mock/products"
@@ -64,12 +65,12 @@ export function ProductCard({ product }: { product: Product }) {
               {min === 0 && (
                 <Badge variant="lime">{isEn ? "Free" : "Gratis"}</Badge>
               )}
+              {off > 0 && <Badge variant="danger">-{off}%</Badge>}
             </div>
-            {off > 0 && (
-              <span className="absolute right-2.5 top-2.5 rotate-3 rounded-base border-2 border-border bg-danger px-2 py-0.5 font-heading text-xs font-extrabold text-foreground shadow-shadow-sm">
-                -{off}%
-              </span>
-            )}
+            <WishlistButton
+              slug={product.slug}
+              className="absolute right-2.5 top-2.5"
+            />
           </div>
 
           {/* Body */}

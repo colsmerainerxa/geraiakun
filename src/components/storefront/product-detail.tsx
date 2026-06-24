@@ -12,13 +12,14 @@ import {
 } from "lucide-react"
 import { motion } from "motion/react"
 import { useLocale, useTranslations } from "next-intl"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { Reveal } from "@/components/shared/motion"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { ProductCard } from "@/components/storefront/product-card"
 import { ShareButtons } from "@/components/storefront/share-buttons"
+import { WishlistButton } from "@/components/storefront/wishlist-button"
 import {
   Accordion,
   AccordionContent,
@@ -41,7 +42,9 @@ import {
   formatPrice,
   initials,
 } from "@/lib/utils"
+import { products } from "@/lib/mock/products"
 import { useCart } from "@/stores/cart"
+import { useRecentlyViewed } from "@/stores/recently-viewed"
 import { useUI } from "@/stores/ui"
 import type { Product, ProductBadge, Review } from "@/types"
 
@@ -72,6 +75,16 @@ export function ProductDetail({
   const router = useRouter()
   const addItem = useCart((s) => s.addItem)
   const setCartOpen = useUI((s) => s.setCartOpen)
+  const addRecent = useRecentlyViewed((s) => s.add)
+
+  // Record this product as recently viewed (demo: persisted to localStorage).
+  useEffect(() => {
+    addRecent(product.slug)
+  }, [product.slug, addRecent])
+
+  const crossSell = products
+    .filter((p) => p.slug !== product.slug)
+    .slice(0, 2)
 
   // Default to the cheapest in-stock variant, else the first.
   const cheapest = [...product.variants].sort((a, b) => a.price - b.price)
@@ -122,7 +135,7 @@ export function ProductDetail({
   ]
 
   return (
-    <Container className="py-8 lg:py-12">
+    <Container className="py-8 pb-24 lg:py-12 lg:pb-12">
       {/* Breadcrumb */}
       <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-foreground/60">
         <Link href="/" className="hover:text-foreground hover:underline">
@@ -189,16 +202,22 @@ export function ProductDetail({
 
         {/* ---- Buy box ---- */}
         <div className="flex flex-col gap-5">
-          <div>
-            <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/50">
-              {product.brand}
-            </span>
-            <h1 className="mt-1 font-heading text-3xl font-extrabold leading-tight sm:text-4xl">
-              {product.name}
-            </h1>
-            <p className="mt-2 text-foreground/70">
-              {isEn ? product.taglineEn : product.tagline}
-            </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/50">
+                {product.brand}
+              </span>
+              <h1 className="mt-1 font-heading text-3xl font-extrabold leading-tight sm:text-4xl">
+                {product.name}
+              </h1>
+              <p className="mt-2 text-foreground/70">
+                {isEn ? product.taglineEn : product.tagline}
+              </p>
+            </div>
+            <WishlistButton
+              slug={product.slug}
+              className="mt-1 size-10 shrink-0"
+            />
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -370,6 +389,70 @@ export function ProductDetail({
         </div>
       </div>
 
+      {/* ---- Cross-sell ---- */}
+      {crossSell.length > 0 && (
+        <div className="mt-12">
+          <h2 className="font-heading text-xl font-extrabold">
+            {tc("frequentlyBought")}
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {crossSell.map((p) => {
+              const pMin = Math.min(...p.variants.map((cv) => cv.price))
+              const pv =
+                p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
+              return (
+                <div
+                  key={p.id}
+                  className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm"
+                >
+                  <Link
+                    href={`/produk/${p.slug}`}
+                    className={cn(
+                      "flex size-14 shrink-0 items-center justify-center rounded-base border-2 border-border text-2xl",
+                      bgFor(p.accent),
+                    )}
+                  >
+                    {p.logo}
+                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/produk/${p.slug}`}
+                      className="block truncate font-heading text-sm font-bold hover:underline"
+                    >
+                      {p.name}
+                    </Link>
+                    <span className="font-heading text-sm font-extrabold">
+                      {formatPrice(pMin, isEn)}
+                    </span>
+                  </div>
+                  <Button
+                    size="icon-sm"
+                    variant="neutral"
+                    aria-label={tc("addToCart")}
+                    onClick={() => {
+                      addItem({
+                        productId: p.id,
+                        productName: p.name,
+                        productLogo: p.logo,
+                        productSlug: p.slug,
+                        variantId: pv.id,
+                        variantLabel: isEn ? pv.labelEn : pv.label,
+                        price: pv.price,
+                        qty: 1,
+                        accent: p.accent,
+                      })
+                      toast.success(t("addedToCart"), { description: p.name })
+                    }}
+                  >
+                    <Plus className="size-4" />
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ---- Details tabs ---- */}
       <div className="mt-12">
         <Tabs defaultValue="description">
@@ -467,6 +550,37 @@ export function ProductDetail({
           </div>
         </div>
       )}
+
+      {/* Sticky buy bar (mobile) */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
+          <div className="flex flex-col leading-none">
+            <span className="text-[11px] text-foreground/50">
+              {isEn ? "From" : "Mulai"}
+            </span>
+            <span className="font-heading text-lg font-extrabold">
+              {formatPrice(variant.price, isEn)}
+            </span>
+          </div>
+          <Button
+            className="ml-auto flex-1"
+            size="lg"
+            onClick={handleBuyNow}
+            disabled={soldOut}
+          >
+            {soldOut ? tc("outOfStock") : t("buyDirectly")}
+          </Button>
+          <Button
+            variant="neutral"
+            size="icon"
+            onClick={handleAddToCart}
+            disabled={soldOut}
+            aria-label={tc("addToCart")}
+          >
+            <ShoppingCart className="size-5" />
+          </Button>
+        </div>
+      </div>
     </Container>
   )
 }

@@ -54,7 +54,9 @@
     "rare": "RARE",
     "decrease": "Decrease",
     "increase": "Increase",
-    "menu": "Menu"
+    "menu": "Menu",
+    "recentlyViewed": "Recently Viewed",
+    "frequentlyBought": "Frequently Bought Together"
   },
   "orderStatus": {
     "menunggu-pembayaran": "Awaiting Payment",
@@ -72,6 +74,13 @@
     "backToList": "All Articles",
     "share": "Share",
     "shareCopied": "Link copied!"
+  },
+  "wishlist": {
+    "title": "Favorites",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "empty": "No favorites yet",
+    "emptyDesc": "Tap the heart icon on a product to save it here."
   },
   "home": {
     "heroBadge": "Premium Digital Account & Subscription Marketplace",

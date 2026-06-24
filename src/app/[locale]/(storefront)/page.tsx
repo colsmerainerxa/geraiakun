@@ -16,6 +16,7 @@ import { SectionHeading } from "@/components/shared/section-heading"
 import { CategoryCard } from "@/components/storefront/category-card"
 import { Hero } from "@/components/storefront/hero"
 import { ProductCard } from "@/components/storefront/product-card"
+import { RecentlyViewedStrip } from "@/components/storefront/recently-viewed-strip"
 import { TestimonialsMarquee } from "@/components/storefront/testimonials-marquee"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
@@ -102,6 +103,9 @@ export default async function HomePage({
           </RevealGroup>
         </Container>
       </div>
+
+      {/* Recently viewed (client; hidden when empty) */}
+      <RecentlyViewedStrip />
 
       {/* How it works */}
       <Container id="cara-kerja" className="scroll-mt-20 py-16">

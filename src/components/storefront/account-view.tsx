@@ -3,6 +3,7 @@
 import { Package, Sparkles, Wallet } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { Reveal } from "@/components/shared/motion"
+import { ProductCard } from "@/components/storefront/product-card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -11,9 +12,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useOrders } from "@/lib/api/queries"
+import { products } from "@/lib/mock/products"
 import { cn, formatDate, formatIDR, initials } from "@/lib/utils"
+import { useWishlist } from "@/stores/wishlist"
 import type { OrderStatus } from "@/types"
 
 const DEMO_NAME = "Rafa Pratama"
@@ -40,6 +44,14 @@ function maskEmail(email: string) {
 export function AccountView() {
   const t = useTranslations("account")
   const ts = useTranslations("orderStatus")
+  const tw = useTranslations("wishlist")
+  const mounted = useMounted()
+  const wishedSlugs = useWishlist((s) => s.slugs)
+  const wished = mounted
+    ? wishedSlugs
+        .map((s) => products.find((p) => p.slug === s))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p))
+    : []
   const locale = useLocale()
   const dateLocale = locale === "en" ? "en-US" : "id-ID"
   const { data: orders, isLoading } = useOrders()
@@ -122,6 +134,7 @@ export function AccountView() {
         <TabsList>
           <TabsTrigger value="orders">{t("myOrders")}</TabsTrigger>
           <TabsTrigger value="accounts">{t("myAccounts")}</TabsTrigger>
+          <TabsTrigger value="favorites">{tw("title")}</TabsTrigger>
         </TabsList>
 
         {/* Orders */}
@@ -216,6 +229,19 @@ export function AccountView() {
                   )
                 }),
               )}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Favorites */}
+        <TabsContent value="favorites">
+          {wished.length === 0 ? (
+            <EmptyState label={tw("empty")} />
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {wished.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
             </div>
           )}
         </TabsContent>

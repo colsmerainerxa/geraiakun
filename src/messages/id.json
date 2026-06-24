@@ -54,7 +54,9 @@
     "rare": "LANGKA",
     "decrease": "Kurangi",
     "increase": "Tambah",
-    "menu": "Menu"
+    "menu": "Menu",
+    "recentlyViewed": "Baru Dilihat",
+    "frequentlyBought": "Sering Dibeli Bersama"
   },
   "orderStatus": {
     "menunggu-pembayaran": "Menunggu Pembayaran",
@@ -72,6 +74,13 @@
     "backToList": "Semua Artikel",
     "share": "Bagikan",
     "shareCopied": "Tautan tersalin!"
+  },
+  "wishlist": {
+    "title": "Favorit",
+    "add": "Tambah ke favorit",
+    "remove": "Hapus dari favorit",
+    "empty": "Belum ada produk favorit",
+    "emptyDesc": "Tandai produk dengan ikon hati untuk menyimpannya di sini."
   },
   "home": {
     "heroBadge": "Marketplace Akun & Langganan Digital",

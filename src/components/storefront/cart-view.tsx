@@ -2,14 +2,15 @@
 
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { Container } from "@/components/shared/container"
 import { PromoInput } from "@/components/storefront/promo-input"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
+import { products } from "@/lib/mock/products"
 import { computeDiscount } from "@/lib/promo"
-import { cn, formatIDR } from "@/lib/utils"
+import { cn, formatIDR, formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { usePromo } from "@/stores/promo"
 
@@ -18,14 +19,19 @@ const FEE = 1000
 export function CartView() {
   const t = useTranslations("cart")
   const tc = useTranslations("common")
+  const isEn = useLocale() === "en"
   const items = useCart((s) => s.items)
   const updateQty = useCart((s) => s.updateQty)
   const removeItem = useCart((s) => s.removeItem)
+  const addItem = useCart((s) => s.addItem)
   const promo = usePromo((s) => s.promo)
 
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount = computeDiscount(promo, subtotal)
   const total = subtotal - discount + FEE
+  const cross = products
+    .filter((p) => !items.some((i) => i.productSlug === p.slug))
+    .slice(0, 2)
 
   if (items.length === 0) {
     return (
@@ -175,6 +181,68 @@ export function CartView() {
           </div>
         </aside>
       </div>
+
+      {cross.length > 0 && (
+        <div className="mt-12">
+          <h2 className="font-heading text-xl font-extrabold">
+            {tc("frequentlyBought")}
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {cross.map((p) => {
+              const pMin = Math.min(...p.variants.map((cv) => cv.price))
+              const pv =
+                p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
+              return (
+                <div
+                  key={p.id}
+                  className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm"
+                >
+                  <Link
+                    href={`/produk/${p.slug}`}
+                    className={cn(
+                      "flex size-14 shrink-0 items-center justify-center rounded-base border-2 border-border text-2xl",
+                      bgFor(p.accent),
+                    )}
+                  >
+                    {p.logo}
+                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/produk/${p.slug}`}
+                      className="block truncate font-heading text-sm font-bold hover:underline"
+                    >
+                      {p.name}
+                    </Link>
+                    <span className="font-heading text-sm font-extrabold">
+                      {formatPrice(pMin, isEn)}
+                    </span>
+                  </div>
+                  <Button
+                    size="icon-sm"
+                    variant="neutral"
+                    aria-label={tc("addToCart")}
+                    onClick={() =>
+                      addItem({
+                        productId: p.id,
+                        productName: p.name,
+                        productLogo: p.logo,
+                        productSlug: p.slug,
+                        variantId: pv.id,
+                        variantLabel: isEn ? pv.labelEn : pv.label,
+                        price: pv.price,
+                        qty: 1,
+                        accent: p.accent,
+                      })
+                    }
+                  >
+                    <Plus className="size-4" />
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </Container>
   )
 }
