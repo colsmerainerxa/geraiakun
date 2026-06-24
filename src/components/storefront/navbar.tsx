@@ -105,6 +105,15 @@ export function Navbar() {
           <ThemeToggle />
 
           <Button
+            variant="ghost"
+            size="sm"
+            className="hidden sm:inline-flex"
+            asChild
+          >
+            <Link href="/masuk">{t("login")}</Link>
+          </Button>
+
+          <Button
             variant="neutral"
             size="icon-sm"
             className="hidden sm:inline-flex"
@@ -188,6 +197,23 @@ export function Navbar() {
                   <Link href="/admin">
                     <LayoutDashboard className="size-4" /> {t("admin")}
                   </Link>
+                </Button>
+                <div className="my-1 h-0.5 bg-border" />
+                <Button
+                  variant="default"
+                  className="justify-start"
+                  asChild
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Link href="/masuk">{t("login")}</Link>
+                </Button>
+                <Button
+                  variant="neutral"
+                  className="justify-start"
+                  asChild
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Link href="/daftar">{t("register")}</Link>
                 </Button>
               </nav>
               <div className="mt-auto flex items-center justify-between">

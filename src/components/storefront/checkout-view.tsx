@@ -16,13 +16,16 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Container } from "@/components/shared/container"
+import { PromoInput } from "@/components/storefront/promo-input"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
+import { computeDiscount } from "@/lib/promo"
 import { cn, formatIDR } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
+import { usePromo } from "@/stores/promo"
 import type { PaymentMethod } from "@/types"
 
 const schema = z.object({
@@ -79,6 +82,8 @@ export function CheckoutView() {
   const router = useRouter()
   const items = useCart((s) => s.items)
   const clear = useCart((s) => s.clear)
+  const promo = usePromo((s) => s.promo)
+  const clearPromo = usePromo((s) => s.clear)
 
   const [method, setMethod] = useState<PaymentMethod>("qris")
   const [processing, setProcessing] = useState(false)
@@ -91,7 +96,8 @@ export function CheckoutView() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0)
-  const total = subtotal + FEE
+  const discount = computeDiscount(promo, subtotal)
+  const total = subtotal - discount + FEE
 
   // Empty cart guard (skip once an order succeeded).
   useEffect(() => {
@@ -106,6 +112,7 @@ export function CheckoutView() {
     setTimeout(() => {
       const invoice = makeInvoice()
       clear()
+      clearPromo()
       setProcessing(false)
       setDone({ invoice })
     }, 1600)
@@ -307,11 +314,21 @@ export function CheckoutView() {
               ))}
             </ul>
 
-            <div className="mt-5 flex flex-col gap-2 border-t-2 border-dashed border-border pt-4 text-sm">
+            <div className="mt-5">
+              <PromoInput subtotal={subtotal} />
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2 border-t-2 border-dashed border-border pt-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-foreground/70">{tc("subtotal")}</span>
                 <span className="font-bold">{formatIDR(subtotal)}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-success">
+                  <span>{tc("discount")}</span>
+                  <span className="font-bold">- {formatIDR(discount)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-foreground/70">{tc("fee")}</span>
                 <span className="font-bold">{formatIDR(FEE)}</span>

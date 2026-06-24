@@ -5,6 +5,7 @@ import { Space_Grotesk } from "next/font/google"
 import { notFound } from "next/navigation"
 import { Providers } from "@/app/providers"
 import { routing } from "@/i18n/routing"
+import { SITE_URL } from "@/lib/seo/site"
 import "../globals.css"
 
 const fontSans = Space_Grotesk({
@@ -24,7 +25,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "meta" })
-  const baseUrl = "https://beliakun.id"
+  const baseUrl = SITE_URL
 
   return {
     metadataBase: new URL(baseUrl),

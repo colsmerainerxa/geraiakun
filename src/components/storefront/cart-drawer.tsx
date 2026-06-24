@@ -19,6 +19,7 @@ import { useUI } from "@/stores/ui"
 
 export function CartDrawer() {
   const t = useTranslations("common")
+  const tn = useTranslations("nav")
   const { cartOpen, setCartOpen } = useUI()
   const items = useCart((s) => s.items)
   const updateQty = useCart((s) => s.updateQty)
@@ -138,6 +139,14 @@ export function CartDrawer() {
               asChild
             >
               <Link href="/checkout">{t("checkout")}</Link>
+            </Button>
+            <Button
+              variant="neutral"
+              className="w-full"
+              onClick={() => setCartOpen(false)}
+              asChild
+            >
+              <Link href="/keranjang">{tn("cart")}</Link>
             </Button>
           </SheetFooter>
         )}

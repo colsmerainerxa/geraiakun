@@ -5,9 +5,10 @@ import type {
   WebSite,
   WithContext,
 } from "schema-dts"
+import { SITE_URL } from "@/lib/seo/site"
 import type { Product } from "@/types"
 
-const BASE = "https://beliakun.id"
+const BASE = SITE_URL
 
 export function organizationJsonLd(): WithContext<Organization> {
   return {
