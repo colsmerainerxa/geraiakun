@@ -9,6 +9,7 @@ import {
   PackageSearch,
   RotateCcw,
   Search,
+  ShieldCheck,
 } from "lucide-react"
 import { motion } from "motion/react"
 import { useTranslations } from "next-intl"
@@ -19,6 +20,7 @@ import { Container } from "@/components/shared/container"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Link } from "@/i18n/navigation"
 import { useMounted } from "@/hooks/use-mounted"
 import { useOrder } from "@/lib/api/queries"
 import { useAdminOverlay } from "@/stores/admin-overlay"
@@ -89,6 +91,15 @@ function OrderResult({ order }: { order: Order }) {
           <Badge variant={meta.variant} className="gap-1.5 px-3 py-1.5">
             <meta.icon className="size-3.5" /> {ts(status)}
           </Badge>
+        </div>
+
+        {/* Warranty / help CTA */}
+        <div className="mt-4 flex flex-wrap gap-2 border-t-2 border-dashed border-border pt-4">
+          <Button variant="neutral" size="sm" asChild>
+            <Link href={`/bantuan/tiket?inv=${order.invoice}`}>
+              <ShieldCheck className="size-4" /> {t("claimWarranty")}
+            </Link>
+          </Button>
         </div>
 
         {/* Timeline */}

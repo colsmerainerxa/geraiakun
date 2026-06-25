@@ -22,8 +22,8 @@ export function ScrollToTop() {
       aria-label={t("backToTop")}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={cn(
-        // bottom-20 on mobile clears the product sticky buy bar.
-        "fixed bottom-20 right-5 z-30 flex size-11 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow transition-all hover:translate-x-0.5 hover:translate-y-0.5 lg:bottom-6",
+        // Stack above the WhatsApp FAB (bottom-4 right-4) on both mobile & desktop.
+        "fixed bottom-24 right-5 z-30 flex size-11 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow transition-all hover:translate-x-0.5 hover:translate-y-0.5 lg:bottom-28",
         show
           ? "opacity-100"
           : "pointer-events-none translate-y-2 opacity-0",

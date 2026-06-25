@@ -66,6 +66,12 @@ export function ProductCard({ product }: { product: Product }) {
                 <Badge variant="lime">{isEn ? "Free" : "Gratis"}</Badge>
               )}
               {off > 0 && <Badge variant="danger">-{off}%</Badge>}
+              {/* Stock urgency: tampilkan bila stok varian termurah menipis */}
+              {minVariant && minVariant.stock > 0 && minVariant.stock <= 5 && (
+                <Badge variant="warning" className="animate-pulse">
+                  {isEn ? `Only ${minVariant.stock} left` : `Sisa ${minVariant.stock}!`}
+                </Badge>
+              )}
             </div>
             <WishlistButton
               slug={product.slug}

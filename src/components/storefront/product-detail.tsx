@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  BookOpen,
   Check,
   Headphones,
   Minus,
@@ -18,7 +19,11 @@ import { Container } from "@/components/shared/container"
 import { Reveal } from "@/components/shared/motion"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { ProductCard } from "@/components/storefront/product-card"
+import { NotifyMe } from "@/components/storefront/notify-me"
+import { QaSection } from "@/components/storefront/qa-section"
+import { ReviewsSection } from "@/components/storefront/reviews-section"
 import { ShareButtons } from "@/components/storefront/share-buttons"
+import { ViewersBadge } from "@/components/storefront/social-proof-toast"
 import { WishlistButton } from "@/components/storefront/wishlist-button"
 import {
   Accordion,
@@ -26,9 +31,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Link, useRouter } from "@/i18n/navigation"
@@ -36,11 +41,9 @@ import { bgFor } from "@/lib/accent"
 import {
   cn,
   discountPercent,
-  formatDate,
   formatIDR,
   formatNumber,
   formatPrice,
-  initials,
 } from "@/lib/utils"
 import { articles } from "@/lib/mock/articles"
 import { products } from "@/lib/mock/products"
@@ -241,6 +244,9 @@ export function ProductDetail({
             </span>
           </div>
 
+          {/* Live viewers (social proof) */}
+          <ViewersBadge />
+
           {/* Price */}
           <div className="flex items-end gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
             <div>
@@ -259,6 +265,23 @@ export function ProductDetail({
               </Badge>
             )}
           </div>
+
+          {/* Stock urgency (low stock) */}
+          {!soldOut && variant.stock <= 7 && (
+            <div className="rounded-base border-2 border-warning bg-warning/10 p-3">
+              <div className="mb-1.5 flex items-center justify-between text-xs font-bold">
+                <span className="text-foreground">🔥 {isEn ? "Selling fast!" : "Laris!"}</span>
+                <span className="text-foreground/70">
+                  {isEn ? `Only ${variant.stock} left` : `Sisa ${variant.stock} stok`}
+                </span>
+              </div>
+              <Progress
+                value={Math.min(95, 100 - (variant.stock / 10) * 100)}
+                className="h-2 border-0 bg-warning/20"
+                indicatorClassName="bg-warning"
+              />
+            </div>
+          )}
 
           {/* Variant selector */}
           <div>
@@ -309,62 +332,76 @@ export function ProductDetail({
 
           {/* Qty + actions */}
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <span className="font-heading text-sm font-extrabold uppercase">
-                {tc("qty")}
-              </span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  disabled={soldOut || qty <= 1}
-                  className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
-                  aria-label={tc("decrease")}
-                >
-                  <Minus className="size-4" />
-                </button>
-                <span className="w-10 text-center font-heading text-lg font-extrabold">
-                  {qty}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setQty((q) => Math.min(variant.stock, q + 1))
-                  }
-                  disabled={soldOut || qty >= variant.stock}
-                  className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
-                  aria-label={tc("increase")}
-                >
-                  <Plus className="size-4" />
-                </button>
-              </div>
-            </div>
+            {soldOut ? (
+              <NotifyMe variantLabel={isEn ? variant.labelEn : variant.label} />
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="font-heading text-sm font-extrabold uppercase">
+                    {tc("qty")}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                      disabled={qty <= 1}
+                      className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
+                      aria-label={tc("decrease")}
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="w-10 text-center font-heading text-lg font-extrabold">
+                      {qty}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setQty((q) => Math.min(variant.stock, q + 1))
+                      }
+                      disabled={qty >= variant.stock}
+                      className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
+                      aria-label={tc("increase")}
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
+                </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Button
-                size="lg"
-                variant="neutral"
-                onClick={handleAddToCart}
-                disabled={soldOut}
-              >
-                <ShoppingCart className="size-5" /> {tc("addToCart")}
-              </Button>
-              <Button size="lg" onClick={handleBuyNow} disabled={soldOut}>
-                {soldOut ? tc("outOfStock") : t("buyDirectly")}
-              </Button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setCartOpen(true)}
-              className="text-center text-sm text-foreground/60 underline-offset-2 hover:text-foreground hover:underline"
-            >
-              {tc("checkout")} →
-            </button>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Button size="lg" variant="neutral" onClick={handleAddToCart}>
+                    <ShoppingCart className="size-5" /> {tc("addToCart")}
+                  </Button>
+                  <Button size="lg" onClick={handleBuyNow}>
+                    {t("buyDirectly")}
+                  </Button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCartOpen(true)}
+                  className="text-center text-sm text-foreground/60 underline-offset-2 hover:text-foreground hover:underline"
+                >
+                  {tc("checkout")} →
+                </button>
+              </>
+            )}
           </div>
 
           {/* What you get */}
           <div className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow-sm">
-            <h2 className="font-heading text-base font-bold">{t("features")}</h2>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="font-heading text-base font-bold">{t("features")}</h2>
+              <Button
+                variant="neutral"
+                size="sm"
+                asChild
+                className="shrink-0"
+              >
+                <Link href={`/produk/${product.slug}/aktivasi`}>
+                  <BookOpen className="size-4" />{" "}
+                  {isEn ? "Activation Guide" : "Panduan Aktivasi"}
+                </Link>
+              </Button>
+            </div>
             <ul className="mt-3 grid gap-2">
               {features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
@@ -466,6 +503,7 @@ export function ProductDetail({
             <TabsTrigger value="reviews">
               {t("reviews")} ({product.reviews.length})
             </TabsTrigger>
+            <TabsTrigger value="qa">{isEn ? "Q&A" : "Tanya Jawab"}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="description">
@@ -491,51 +529,11 @@ export function ProductDetail({
           </TabsContent>
 
           <TabsContent value="reviews">
-            <div id="reviews" className="grid max-w-3xl gap-3 scroll-mt-20">
-              {product.reviews.map((r) => (
-                <div
-                  key={r.id}
-                  className="rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="size-10">
-                      <AvatarImage src={r.avatar} alt={r.author} />
-                      <AvatarFallback>{initials(r.author)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-heading text-sm font-bold">
-                          {r.author}
-                        </span>
-                        {r.verified && (
-                          <Badge variant="success" className="gap-1">
-                            <Check className="size-3" /> {t("verifiedBuyer")}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-foreground/50">
-                        <span className="flex items-center gap-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={cn(
-                                "size-3",
-                                i < r.rating
-                                  ? "fill-warning text-warning"
-                                  : "text-foreground/20",
-                              )}
-                            />
-                          ))}
-                        </span>
-                        <span>· {r.variantLabel}</span>
-                        <span>· {formatDate(r.date, isEn ? "en-US" : "id-ID")}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm text-foreground/80">{r.comment}</p>
-                </div>
-              ))}
-            </div>
+            <ReviewsSection product={product} mockReviews={product.reviews} />
+          </TabsContent>
+
+          <TabsContent value="qa">
+            <QaSection product={product} />
           </TabsContent>
         </Tabs>
       </div>

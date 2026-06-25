@@ -3,7 +3,6 @@
 import {
   LayoutDashboard,
   Menu,
-  Search,
   ShoppingCart,
   Sparkles,
   User,
@@ -15,7 +14,8 @@ import { Container } from "@/components/shared/container"
 import { LocaleSwitcher } from "@/components/shared/locale-switcher"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { NotificationCenter } from "@/components/storefront/notification-center"
+import { SearchBar as SearchBarAutocomplete } from "@/components/storefront/search-bar"
 import {
   Sheet,
   SheetContent,
@@ -24,7 +24,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { useMounted } from "@/hooks/use-mounted"
-import { Link, useRouter } from "@/i18n/navigation"
+import { Link } from "@/i18n/navigation"
 import { useCart } from "@/stores/cart"
 import { useUI } from "@/stores/ui"
 
@@ -40,28 +40,7 @@ function useNavLinks() {
 }
 
 function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
-  const t = useTranslations("nav")
-  const router = useRouter()
-  const [q, setQ] = useState("")
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-        router.push(`/katalog${q ? `?q=${encodeURIComponent(q)}` : ""}`)
-        onSubmit?.()
-      }}
-      className="relative w-full"
-    >
-      <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
-      <Input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={t("search")}
-        className="pl-9"
-        aria-label={t("search")}
-      />
-    </form>
-  )
+  return <SearchBarAutocomplete onSubmit={onSubmit} />
 }
 
 export function Navbar() {
@@ -104,6 +83,7 @@ export function Navbar() {
             <LocaleSwitcher />
           </div>
           <ThemeToggle />
+          <NotificationCenter />
 
           <Button
             variant="ghost"

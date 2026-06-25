@@ -206,3 +206,94 @@ export interface CartItem {
   qty: number
   accent: string
 }
+
+// ============================================================
+// User-generated content (client state, persisted)
+// ============================================================
+
+/** Review yang ditulis pengguna (di luar seed mock). */
+export interface UserReview {
+  id: ID
+  productId: ID
+  author: string
+  rating: number
+  title: string
+  comment: string
+  variantLabel: string
+  date: string // ISO
+  verified: boolean
+}
+
+/** Pertanyaan Q&A yang diajukan pengguna di halaman produk. */
+export interface QaQuestion {
+  id: ID
+  productId: ID
+  author: string
+  question: string
+  date: string // ISO
+  answer: string | null
+  answeredBy: string | null
+  answeredAt: string | null
+}
+
+// ============================================================
+// Support — Ticketing & notifikasi
+// ============================================================
+
+export type TicketType =
+  | "garansi" // klaim garansi / ganti akun
+  | "pembayaran" // masalah pembayaran / refund
+  | "akun" // akun bermasalah / tidak bisa login
+  | "lainnya"
+
+export type TicketStatus =
+  | "baru" // baru dibuat, belum ditangani
+  | "ditinjau" // sedang diperiksa tim
+  | "diproses" // proses penggantian/refund
+  | "selesai"
+  | "ditolak"
+
+export type TicketPriority = "rendah" | "normal" | "tinggi"
+
+export interface TicketMessage {
+  id: ID
+  author: string
+  role: "pelanggan" | "agen"
+  message: string
+  date: string // ISO
+}
+
+export interface Ticket {
+  id: ID
+  code: string // mis. TKT-2401-001
+  type: TicketType
+  subject: string
+  description: string
+  invoice: string | null // terkait pesanan (opsional)
+  productId: ID | null // terkait produk (opsional)
+  productName: string | null // nama produk terkait (opsional, untuk display)
+  priority: TicketPriority
+  status: TicketStatus
+  customerName: string
+  customerEmail: string
+  whatsapp: string
+  messages: TicketMessage[]
+  createdAt: string // ISO
+  updatedAt: string // ISO
+}
+
+export type NotificationKind =
+  | "pesanan" // status pesanan berubah
+  | "promo" // promo / flash sale
+  | "tiket" // update tiket
+  | "info" // pengumuman umum
+
+export interface AppNotification {
+  id: ID
+  kind: NotificationKind
+  title: string
+  body: string
+  href: string | null
+  read: boolean
+  createdAt: string // ISO
+}
