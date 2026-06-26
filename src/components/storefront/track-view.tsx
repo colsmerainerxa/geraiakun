@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Clock,
   Copy,
+  Download,
   KeyRound,
   PackageSearch,
   RotateCcw,
@@ -12,7 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react"
 import { motion } from "motion/react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -23,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Link } from "@/i18n/navigation"
 import { useMounted } from "@/hooks/use-mounted"
 import { useOrder } from "@/lib/api/queries"
+import { downloadInvoice } from "@/lib/invoice"
 import { useAdminOverlay } from "@/stores/admin-overlay"
 import { usePurchasedOrders } from "@/stores/orders"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
@@ -61,6 +63,7 @@ function OrderResult({ order }: { order: Order }) {
   const t = useTranslations("track")
   const tc = useTranslations("common")
   const ts = useTranslations("orderStatus")
+  const isEn = useLocale() === "en"
   // Apply the demo admin status override if present.
   const ovStatus = useAdminOverlay((s) => s.orderStatus[order.invoice])
   const status = ovStatus ?? order.status
@@ -99,6 +102,12 @@ function OrderResult({ order }: { order: Order }) {
             <Link href={`/bantuan/tiket?inv=${order.invoice}`}>
               <ShieldCheck className="size-4" /> {t("claimWarranty")}
             </Link>
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => downloadInvoice(order, isEn ? "en" : "id")}
+          >
+            <Download className="size-4" /> {t("downloadInvoice")}
           </Button>
         </div>
 

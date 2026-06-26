@@ -1,7 +1,9 @@
 import type { LucideIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, paymentLabel } from "@/lib/utils"
 import type { CredentialStock, OrderStatus, Transaction } from "@/types"
+
+export { paymentLabel }
 
 export function StatCard({
   label,
@@ -89,18 +91,4 @@ export function CredentialStatusBadge({
 }) {
   const m = CRED_STATUS[status]
   return <Badge variant={m.variant}>{m.label}</Badge>
-}
-
-const PAYMENT_LABEL: Record<string, string> = {
-  qris: "QRIS",
-  gopay: "GoPay",
-  ovo: "OVO",
-  dana: "DANA",
-  "bca-va": "BCA VA",
-  "bni-va": "BNI VA",
-  "mandiri-va": "Mandiri VA",
-}
-
-export function paymentLabel(method: string) {
-  return PAYMENT_LABEL[method] ?? method.toUpperCase()
 }

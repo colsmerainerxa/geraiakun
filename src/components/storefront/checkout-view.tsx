@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Copy,
   CreditCard,
+  Download,
   KeyRound,
   Lock,
   QrCode,
@@ -13,7 +14,7 @@ import {
   Wallet,
 } from "lucide-react"
 import { motion } from "motion/react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -25,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
+import { downloadInvoice } from "@/lib/invoice"
 import { computeDiscount } from "@/lib/promo"
 import { cn, formatIDR } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
@@ -84,6 +86,7 @@ export function CheckoutView() {
   const t = useTranslations("checkout")
   const tc = useTranslations("common")
   const tt = useTranslations("track")
+  const isEn = useLocale() === "en"
   const router = useRouter()
   const items = useCart((s) => s.items)
   const clear = useCart((s) => s.clear)
@@ -222,7 +225,14 @@ export function CheckoutView() {
           <Button asChild size="lg">
             <Link href={`/lacak?inv=${done.invoice}`}>{t("viewOrder")}</Link>
           </Button>
-          <Button asChild variant="neutral" size="lg">
+          <Button
+            variant="neutral"
+            size="lg"
+            onClick={() => downloadInvoice(done, isEn ? "en" : "id")}
+          >
+            <Download className="size-5" /> {t("downloadInvoice")}
+          </Button>
+          <Button asChild variant="ghost" size="lg">
             <Link href="/katalog">{tc("continue")}</Link>
           </Button>
         </div>

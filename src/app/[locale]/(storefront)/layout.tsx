@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server"
 import { ScrollToTop } from "@/components/shared/scroll-to-top"
 import { CartDrawer } from "@/components/storefront/cart-drawer"
+import { CompareBar, CompareDrawer } from "@/components/storefront/compare"
 import { Footer } from "@/components/storefront/footer"
 import { Navbar } from "@/components/storefront/navbar"
 import { SocialProofToast } from "@/components/storefront/social-proof-toast"
@@ -30,6 +31,8 @@ export default async function StorefrontLayout({
       </main>
       <Footer />
       <CartDrawer />
+      <CompareDrawer />
+      <CompareBar />
       <SocialProofToast />
       <WhatsAppWidget />
       <ScrollToTop />

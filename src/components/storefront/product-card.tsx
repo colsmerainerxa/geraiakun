@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { CompareButton } from "@/components/storefront/compare"
 import { WishlistButton } from "@/components/storefront/wishlist-button"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
@@ -76,6 +77,10 @@ export function ProductCard({ product }: { product: Product }) {
             <WishlistButton
               slug={product.slug}
               className="absolute right-2.5 top-2.5"
+            />
+            <CompareButton
+              slug={product.slug}
+              className="absolute bottom-2.5 right-2.5"
             />
           </div>
 

@@ -4,10 +4,12 @@ import {
   KeyRound,
   LayoutDashboard,
   Menu,
+  MessageCircleQuestion,
   Package,
   Receipt,
   ShoppingBag,
   Sparkles,
+  Star,
   Store,
   Ticket,
   Users,
@@ -40,6 +42,8 @@ const NAV: NavItem[] = [
   { href: "/admin/transaksi", label: "Transaksi", icon: Receipt },
   { href: "/admin/promo", label: "Promo", icon: Ticket },
   { href: "/admin/stok", label: "Stok Akun", icon: KeyRound },
+  { href: "/admin/tiket", label: "Tiket Bantuan", icon: MessageCircleQuestion },
+  { href: "/admin/ulasan", label: "Ulasan & Tanya", icon: Star },
 ]
 
 function useActive() {

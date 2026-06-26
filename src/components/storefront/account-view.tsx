@@ -1,11 +1,13 @@
 "use client"
 
-import { Package, Sparkles, Wallet } from "lucide-react"
+import { ArrowRight, Gift, Package, Sparkles, Wallet } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { Reveal } from "@/components/shared/motion"
+import { AccountSettingsView } from "@/components/storefront/account-settings-view"
 import { ProductCard } from "@/components/storefront/product-card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Tabs,
   TabsContent,
@@ -16,12 +18,11 @@ import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useOrders } from "@/lib/api/queries"
 import { products } from "@/lib/mock/products"
-import { cn, formatDate, formatIDR, initials } from "@/lib/utils"
+import { cn, formatDate, formatIDR, formatNumber, initials } from "@/lib/utils"
 import { useWishlist } from "@/stores/wishlist"
+import { useUser } from "@/stores/user"
+import { getTier, useLoyalty } from "@/stores/loyalty"
 import type { OrderStatus } from "@/types"
-
-const DEMO_NAME = "Rafa Pratama"
-const DEMO_AVATAR = "https://api.dicebear.com/9.x/notionists/svg?seed=Rafa"
 
 const statusVariant: Record<
   OrderStatus,
@@ -46,6 +47,7 @@ export function AccountView() {
   const ts = useTranslations("orderStatus")
   const tw = useTranslations("wishlist")
   const mounted = useMounted()
+  const profile = useUser((s) => s.profile)
   const wishedSlugs = useWishlist((s) => s.slugs)
   const wished = mounted
     ? wishedSlugs
@@ -64,6 +66,9 @@ export function AccountView() {
     .reduce((s, o) => s + o.total, 0)
 
   const delivered = list.filter((o) => o.credentials.length > 0)
+  const loyaltyPoints = useLoyalty((s) => s.points)
+  const loyaltyLifetime = useLoyalty((s) => s.lifetimeEarned)
+  const loyaltyTier = mounted ? getTier(loyaltyLifetime) : null
 
   const stats = [
     {
@@ -92,13 +97,17 @@ export function AccountView() {
       <Reveal>
         <div className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <Avatar className="size-16">
-            <AvatarImage src={DEMO_AVATAR} alt={DEMO_NAME} />
-            <AvatarFallback>{initials(DEMO_NAME)}</AvatarFallback>
+            {mounted && profile.avatar && (
+              <AvatarImage src={profile.avatar} alt={profile.name} />
+            )}
+            <AvatarFallback>
+              {initials(mounted ? profile.name : "Rafa Pratama")}
+            </AvatarFallback>
           </Avatar>
           <div>
             <p className="text-sm text-foreground/60">{t("greeting")},</p>
             <h1 className="font-heading text-2xl font-extrabold sm:text-3xl">
-              {DEMO_NAME}
+              {mounted ? profile.name : "Rafa Pratama"}
             </h1>
           </div>
         </div>
@@ -129,12 +138,38 @@ export function AccountView() {
         ))}
       </div>
 
+      {/* Loyalty banner */}
+      {mounted && loyaltyTier && (
+        <Reveal>
+          <Link
+            href="/reward"
+            className="group flex flex-wrap items-center justify-between gap-4 rounded-base border-2 border-border bg-accent-purple p-5 shadow-shadow transition-all hover:-translate-y-0.5 hover:shadow-shadow-lg"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
+                <Gift className="size-5" />
+              </span>
+              <div>
+                <p className="font-heading text-sm font-extrabold">
+                  {loyaltyTier.name} · {formatNumber(loyaltyPoints)} poin
+                </p>
+                <p className="text-xs text-foreground/70">{loyaltyTier.perk}</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded-base border-2 border-border bg-secondary-background px-3 py-1.5 font-heading text-xs font-bold transition-all group-hover:bg-main">
+              {t("redeemPoints")} <ArrowRight className="size-3.5" />
+            </span>
+          </Link>
+        </Reveal>
+      )}
+
       {/* Tabs */}
       <Tabs defaultValue="orders">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="orders">{t("myOrders")}</TabsTrigger>
           <TabsTrigger value="accounts">{t("myAccounts")}</TabsTrigger>
           <TabsTrigger value="favorites">{tw("title")}</TabsTrigger>
+          <TabsTrigger value="settings">{t("settings")}</TabsTrigger>
         </TabsList>
 
         {/* Orders */}
@@ -238,11 +273,29 @@ export function AccountView() {
           {wished.length === 0 ? (
             <EmptyState label={tw("empty")} />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {wished.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <>
+              <div className="mb-4 flex justify-end">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/wishlist">
+                    {tw("viewAll")} <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {wished.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* Settings */}
+        <TabsContent value="settings">
+          {mounted ? (
+            <AccountSettingsView />
+          ) : (
+            <div className="h-96 animate-pulse rounded-base border-2 border-border/40 bg-secondary-background" />
           )}
         </TabsContent>
       </Tabs>

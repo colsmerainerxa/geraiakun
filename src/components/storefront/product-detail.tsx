@@ -19,6 +19,7 @@ import { Container } from "@/components/shared/container"
 import { Reveal } from "@/components/shared/motion"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { ProductCard } from "@/components/storefront/product-card"
+import { CompareButton } from "@/components/storefront/compare"
 import { NotifyMe } from "@/components/storefront/notify-me"
 import { QaSection } from "@/components/storefront/qa-section"
 import { ReviewsSection } from "@/components/storefront/reviews-section"
@@ -221,10 +222,14 @@ export function ProductDetail({
                 {isEn ? product.taglineEn : product.tagline}
               </p>
             </div>
-            <WishlistButton
-              slug={product.slug}
-              className="mt-1 size-10 shrink-0"
-            />
+            <div className="mt-1 flex shrink-0 items-center gap-2">
+              <WishlistButton slug={product.slug} className="size-10" />
+              <CompareButton
+                slug={product.slug}
+                size="sm"
+                withLabel
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-sm">

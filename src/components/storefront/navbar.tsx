@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  Heart,
   LayoutDashboard,
   Menu,
   ShoppingCart,
@@ -27,6 +28,7 @@ import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useCart } from "@/stores/cart"
 import { useUI } from "@/stores/ui"
+import { useWishlist } from "@/stores/wishlist"
 
 function useNavLinks() {
   const t = useTranslations("nav")
@@ -49,6 +51,7 @@ export function Navbar() {
   const { setCartOpen } = useUI()
   const mounted = useMounted()
   const count = useCart((s) => s.items.reduce((a, i) => a + i.qty, 0))
+  const wishCount = useWishlist((s) => s.slugs.length)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -84,6 +87,28 @@ export function Navbar() {
           </div>
           <ThemeToggle />
           <NotificationCenter />
+
+          <Button
+            variant="neutral"
+            size="icon-sm"
+            className="relative hidden sm:inline-flex"
+            asChild
+            aria-label={t("wishlist")}
+          >
+            <Link href="/wishlist">
+              <Heart className="size-4" />
+              {mounted && wishCount > 0 && (
+                <motion.span
+                  key={wishCount}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-border bg-accent-pink text-[10px] font-extrabold text-foreground"
+                >
+                  {wishCount}
+                </motion.span>
+              )}
+            </Link>
+          </Button>
 
           <Button
             variant="ghost"
@@ -167,6 +192,16 @@ export function Navbar() {
                 >
                   <Link href="/akun">
                     <User className="size-4" /> {t("account")}
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  asChild
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Link href="/wishlist">
+                    <Heart className="size-4" /> {t("wishlist")}
                   </Link>
                 </Button>
                 <Button
