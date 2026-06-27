@@ -21,10 +21,7 @@ function Progress({
       {...props}
     >
       <ProgressPrimitive.Indicator
-        className={cn(
-          "h-full bg-main transition-all duration-500",
-          indicatorClassName,
-        )}
+        className={cn("h-full bg-main transition-all duration-500", indicatorClassName)}
         style={{ width: `${value ?? 0}%` }}
       />
     </ProgressPrimitive.Root>

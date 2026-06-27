@@ -26,8 +26,7 @@ export default function AdminPromoPage() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {promos.map((p) => {
-        const pct =
-          p.quota > 0 ? Math.min(100, Math.round((p.used / p.quota) * 100)) : 0
+        const pct = p.quota > 0 ? Math.min(100, Math.round((p.used / p.quota) * 100)) : 0
         const active = overlay[p.id] ?? p.active
         return (
           <div
@@ -79,10 +78,7 @@ export default function AdminPromoPage() {
               </div>
               <div className="mt-1.5 h-2.5 overflow-hidden rounded-full border-2 border-border bg-background">
                 <div
-                  className={cn(
-                    "h-full",
-                    pct >= 100 ? "bg-danger" : "bg-accent-lime",
-                  )}
+                  className={cn("h-full", pct >= 100 ? "bg-danger" : "bg-accent-lime")}
                   style={{ width: `${pct}%` }}
                 />
               </div>

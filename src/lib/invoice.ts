@@ -19,11 +19,8 @@ const STATUS_LABEL: Record<string, string> = {
 export function buildInvoiceHTML(order: Order, locale: "id" | "en" = "id"): string {
   const isEn = locale === "en"
   const date = formatDate(order.createdAt, isEn ? "en-US" : "id-ID")
-  const paidDate = order.paidAt
-    ? formatDate(order.paidAt, isEn ? "en-US" : "id-ID")
-    : "—"
-  const statusLabel =
-    STATUS_LABEL[order.status] ?? order.status
+  const paidDate = order.paidAt ? formatDate(order.paidAt, isEn ? "en-US" : "id-ID") : "—"
+  const statusLabel = STATUS_LABEL[order.status] ?? order.status
 
   const itemsRows = order.items
     .map(
@@ -168,9 +165,11 @@ export function buildInvoiceHTML(order: Order, locale: "id" | "en" = "id"): stri
 
       <div class="foot">
         ${isEn ? "Thank you for your purchase!" : "Terima kasih atas pembelianmu!"} 🙌<br/>
-        ${isEn
-          ? "This invoice was issued electronically by beliakun. Keep it as proof of purchase for warranty claims."
-          : "Invoice ini diterbitkan secara elektronik oleh beliakun. Simpan sebagai bukti pembelian untuk klaim garansi."}
+        ${
+          isEn
+            ? "This invoice was issued electronically by beliakun. Keep it as proof of purchase for warranty claims."
+            : "Invoice ini diterbitkan secara elektronik oleh beliakun. Simpan sebagai bukti pembelian untuk klaim garansi."
+        }
         <br/>© 2026 beliakun · beliakun.com
       </div>
     </div>

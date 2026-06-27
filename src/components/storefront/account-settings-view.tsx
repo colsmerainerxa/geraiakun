@@ -33,8 +33,8 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Link, useRouter } from "@/i18n/navigation"
 import { cn, formatDate, initials } from "@/lib/utils"
-import { useUser } from "@/stores/user"
 import type { ActivityEntry, NotificationPrefs } from "@/stores/user"
+import { useUser } from "@/stores/user"
 
 const profileSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
@@ -180,9 +180,7 @@ export function AccountSettingsView() {
           <h2 className="font-heading text-lg font-bold">{t("editProfile")}</h2>
           <div className="mt-4 flex items-center gap-4">
             <Avatar className="size-16">
-              {profile.avatar && (
-                <AvatarImage src={profile.avatar} alt={profile.name} />
-              )}
+              {profile.avatar && <AvatarImage src={profile.avatar} alt={profile.name} />}
               <AvatarFallback>{initials(profile.name)}</AvatarFallback>
             </Avatar>
             <div className="text-sm">
@@ -195,10 +193,7 @@ export function AccountSettingsView() {
             </div>
           </div>
 
-          <form
-            onSubmit={submitProfile(onSaveProfile)}
-            className="mt-5 grid gap-4"
-          >
+          <form onSubmit={submitProfile(onSaveProfile)} className="mt-5 grid gap-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
                 id="name"
@@ -253,15 +248,9 @@ export function AccountSettingsView() {
         {/* Change password */}
         <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <h2 className="font-heading text-lg font-bold">{t("changePassword")}</h2>
-          <p className="mt-1 text-sm text-foreground/60">
-            {t("changePasswordDesc")}
-          </p>
+          <p className="mt-1 text-sm text-foreground/60">{t("changePasswordDesc")}</p>
           <form onSubmit={submitPw(onChangePassword)} className="mt-4 grid gap-4">
-            <Field
-              id="pw-current"
-              label={t("currentPassword")}
-              error={pwErrors.current?.message}
-            >
+            <Field id="pw-current" label={t("currentPassword")} error={pwErrors.current?.message}>
               <Input
                 id="pw-current"
                 type={showPw ? "text" : "password"}
@@ -271,11 +260,7 @@ export function AccountSettingsView() {
               <TogglePw show={showPw} setShow={setShowPw} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field
-                id="pw-next"
-                label={t("newPassword")}
-                error={pwErrors.next?.message}
-              >
+              <Field id="pw-next" label={t("newPassword")} error={pwErrors.next?.message}>
                 <Input
                   id="pw-next"
                   type={showPw ? "text" : "password"}
@@ -284,11 +269,7 @@ export function AccountSettingsView() {
                 />
                 <TogglePw show={showPw} setShow={setShowPw} />
               </Field>
-              <Field
-                id="pw-confirm"
-                label={t("confirmPassword")}
-                error={pwErrors.confirm?.message}
-              >
+              <Field id="pw-confirm" label={t("confirmPassword")} error={pwErrors.confirm?.message}>
                 <Input
                   id="pw-confirm"
                   type={showPw ? "text" : "password"}
@@ -308,12 +289,8 @@ export function AccountSettingsView() {
 
         {/* Notification preferences */}
         <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-          <h2 className="font-heading text-lg font-bold">
-            {t("notifications")}
-          </h2>
-          <p className="mt-1 text-sm text-foreground/60">
-            {t("notificationsDesc")}
-          </p>
+          <h2 className="font-heading text-lg font-bold">{t("notifications")}</h2>
+          <p className="mt-1 text-sm text-foreground/60">{t("notificationsDesc")}</p>
           <div className="mt-4 flex flex-col divide-y-2 divide-dashed divide-border">
             {PREF_FIELDS.map((f) => (
               <div
@@ -325,12 +302,8 @@ export function AccountSettingsView() {
                     <f.icon className="size-4" />
                   </span>
                   <div>
-                    <p className="font-heading text-sm font-bold">
-                      {t(f.labelKey)}
-                    </p>
-                    <p className="text-xs text-foreground/60">
-                      {t(f.descKey)}
-                    </p>
+                    <p className="font-heading text-sm font-bold">{t(f.labelKey)}</p>
+                    <p className="text-xs text-foreground/60">{t(f.descKey)}</p>
                   </div>
                 </div>
                 <Switch
@@ -357,12 +330,8 @@ export function AccountSettingsView() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold leading-snug">
-                      {a.message}
-                    </p>
-                    <p className="text-xs text-foreground/50">
-                      {formatDate(a.date, dateLocale)}
-                    </p>
+                    <p className="text-sm font-semibold leading-snug">{a.message}</p>
+                    <p className="text-xs text-foreground/50">{formatDate(a.date, dateLocale)}</p>
                   </div>
                 </li>
               )
@@ -372,18 +341,10 @@ export function AccountSettingsView() {
 
         {/* Danger zone */}
         <section className="rounded-base border-2 border-danger bg-danger/5 p-6">
-          <h2 className="font-heading text-lg font-bold text-danger">
-            {t("dangerZone")}
-          </h2>
-          <p className="mt-1 text-sm text-foreground/60">
-            {t("logoutDesc")}
-          </p>
+          <h2 className="font-heading text-lg font-bold text-danger">{t("dangerZone")}</h2>
+          <p className="mt-1 text-sm text-foreground/60">{t("logoutDesc")}</p>
           <div className="mt-4 flex flex-col gap-2">
-            <Button
-              variant="danger"
-              onClick={() => setLogoutOpen(true)}
-              className="w-full"
-            >
+            <Button variant="danger" onClick={() => setLogoutOpen(true)} className="w-full">
               <LogOut className="size-4" /> {t("logout")}
             </Button>
           </div>
@@ -441,20 +402,12 @@ function Field({
         )}
         {children}
       </div>
-      {error && (
-        <span className="text-xs font-bold text-danger">{error}</span>
-      )}
+      {error && <span className="text-xs font-bold text-danger">{error}</span>}
     </div>
   )
 }
 
-function TogglePw({
-  show,
-  setShow,
-}: {
-  show: boolean
-  setShow: (v: boolean) => void
-}) {
+function TogglePw({ show, setShow }: { show: boolean; setShow: (v: boolean) => void }) {
   return (
     <button
       type="button"

@@ -119,12 +119,8 @@ export function TicketForm({
   return (
     <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
       <div className="mb-5">
-        <h2 className="font-heading text-xl font-extrabold">
-          {title ?? t("claimTitle")}
-        </h2>
-        <p className="mt-1 text-sm text-foreground/60">
-          {subtitle ?? t("claimSubtitle")}
-        </p>
+        <h2 className="font-heading text-xl font-extrabold">{title ?? t("claimTitle")}</h2>
+        <p className="mt-1 text-sm text-foreground/60">{subtitle ?? t("claimSubtitle")}</p>
       </div>
 
       {createdCode && (
@@ -141,10 +137,7 @@ export function TicketForm({
           {/* Type */}
           <div className={defaultType ? "hidden" : "block"}>
             <Label htmlFor="type">{t("type")}</Label>
-            <Select
-              value={typeVal}
-              onValueChange={(v) => setValue("type", v as TicketType)}
-            >
+            <Select value={typeVal} onValueChange={(v) => setValue("type", v as TicketType)}>
               <SelectTrigger id="type" className="mt-1.5">
                 <SelectValue />
               </SelectTrigger>
@@ -215,9 +208,7 @@ export function TicketForm({
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <Label htmlFor="customerName">
-              {isEn ? "Name" : "Nama"}
-            </Label>
+            <Label htmlFor="customerName">{isEn ? "Name" : "Nama"}</Label>
             <Input
               id="customerName"
               className="mt-1.5"

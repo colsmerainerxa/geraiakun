@@ -13,21 +13,21 @@ import {
   ShieldCheck,
 } from "lucide-react"
 import { motion } from "motion/react"
-import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Link } from "@/i18n/navigation"
 import { useMounted } from "@/hooks/use-mounted"
+import { Link } from "@/i18n/navigation"
 import { useOrder } from "@/lib/api/queries"
 import { downloadInvoice } from "@/lib/invoice"
+import { cn, formatDate, formatIDR } from "@/lib/utils"
 import { useAdminOverlay } from "@/stores/admin-overlay"
 import { usePurchasedOrders } from "@/stores/orders"
-import { cn, formatDate, formatIDR } from "@/lib/utils"
 import type { Order, OrderStatus } from "@/types"
 
 const STATUS_META: Record<
@@ -81,12 +81,8 @@ function OrderResult({ order }: { order: Order }) {
       <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <span className="text-xs text-foreground/60">
-              {t("status")}
-            </span>
-            <p className="font-heading text-2xl font-extrabold">
-              {order.invoice}
-            </p>
+            <span className="text-xs text-foreground/60">{t("status")}</span>
+            <p className="font-heading text-2xl font-extrabold">{order.invoice}</p>
             <p className="mt-1 text-sm text-foreground/60">
               {order.customerName} · {formatDate(order.createdAt)}
             </p>
@@ -103,10 +99,7 @@ function OrderResult({ order }: { order: Order }) {
               <ShieldCheck className="size-4" /> {t("claimWarranty")}
             </Link>
           </Button>
-          <Button
-            size="sm"
-            onClick={() => downloadInvoice(order, isEn ? "en" : "id")}
-          >
+          <Button size="sm" onClick={() => downloadInvoice(order, isEn ? "en" : "id")}>
             <Download className="size-4" /> {t("downloadInvoice")}
           </Button>
         </div>
@@ -165,9 +158,7 @@ function OrderResult({ order }: { order: Order }) {
                 {item.productLogo}
               </div>
               <div className="flex-1">
-                <p className="font-heading text-sm font-bold leading-tight">
-                  {item.productName}
-                </p>
+                <p className="font-heading text-sm font-bold leading-tight">{item.productName}</p>
                 <p className="text-xs text-foreground/60">
                   {item.variantLabel} × {item.qty}
                 </p>
@@ -180,9 +171,7 @@ function OrderResult({ order }: { order: Order }) {
         </ul>
         <div className="mt-4 flex items-center justify-between border-t-2 border-dashed border-border pt-3">
           <span className="font-heading font-bold">{tc("total")}</span>
-          <span className="font-heading text-xl font-extrabold">
-            {formatIDR(order.total)}
-          </span>
+          <span className="font-heading text-xl font-extrabold">{formatIDR(order.total)}</span>
         </div>
       </div>
 
@@ -191,37 +180,24 @@ function OrderResult({ order }: { order: Order }) {
         <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <div className="flex items-center gap-2">
             <KeyRound className="size-5" />
-            <h3 className="font-heading text-base font-bold">
-              {t("credentials")}
-            </h3>
+            <h3 className="font-heading text-base font-bold">{t("credentials")}</h3>
           </div>
-          <p className="mt-1 text-xs text-foreground/60">
-            {t("credentialsNote")}
-          </p>
+          <p className="mt-1 text-xs text-foreground/60">{t("credentialsNote")}</p>
           <div className="mt-4 flex flex-col gap-3">
             {order.credentials.map((c) => (
-              <div
-                key={c.email}
-                className="rounded-base border-2 border-border bg-background p-4"
-              >
+              <div key={c.email} className="rounded-base border-2 border-border bg-background p-4">
                 <div className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <span className="text-xs text-foreground/50">Email</span>
-                      <p className="truncate font-mono text-sm font-bold">
-                        {c.email}
-                      </p>
+                      <p className="truncate font-mono text-sm font-bold">{c.email}</p>
                     </div>
                     <CopyButton value={c.email} label="Email" />
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <span className="text-xs text-foreground/50">
-                        Password
-                      </span>
-                      <p className="truncate font-mono text-sm font-bold">
-                        {c.password}
-                      </p>
+                      <span className="text-xs text-foreground/50">Password</span>
+                      <p className="truncate font-mono text-sm font-bold">{c.password}</p>
                     </div>
                     <CopyButton value={c.password} label="Password" />
                   </div>
@@ -258,11 +234,7 @@ export function TrackView() {
   // User-created orders (checkout) live in a persisted store; seeded demo
   // orders come from the mock API. Check the local store first.
   const localOrder = usePurchasedOrders((s) =>
-    query
-      ? s.orders.find(
-          (o) => o.invoice.toLowerCase() === query.toLowerCase(),
-        )
-      : undefined,
+    query ? s.orders.find((o) => o.invoice.toLowerCase() === query.toLowerCase()) : undefined,
   )
   const { data: remoteOrder, isLoading, isFetched } = useOrder(query)
   const order = localOrder ?? remoteOrder
@@ -273,9 +245,7 @@ export function TrackView() {
         <span className="inline-flex size-16 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow">
           <PackageSearch className="size-8" />
         </span>
-        <h1 className="mt-4 font-heading text-3xl font-extrabold sm:text-4xl">
-          {t("title")}
-        </h1>
+        <h1 className="mt-4 font-heading text-3xl font-extrabold sm:text-4xl">{t("title")}</h1>
         <p className="mt-2 text-foreground/70">{t("subtitle")}</p>
       </div>
 
@@ -300,9 +270,7 @@ export function TrackView() {
           {isLoading ? "…" : t("button")}
         </Button>
       </form>
-      <p className="mt-2 text-center text-xs text-foreground/50">
-        {t("tryExample")}
-      </p>
+      <p className="mt-2 text-center text-xs text-foreground/50">{t("tryExample")}</p>
 
       {mounted && query && isFetched && !order && (
         <div className="mx-auto mt-8 max-w-md rounded-base border-2 border-dashed border-danger bg-danger/10 p-5 text-center text-sm font-bold text-danger">

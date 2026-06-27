@@ -2,10 +2,13 @@
 
 import { Check, Clock, MessageCircle, X } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
+import { usePathname } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useMounted } from "@/hooks/use-mounted"
+import { cn } from "@/lib/utils"
+import { useCompare } from "@/stores/compare"
 
 // Nomor WA demo (format internasional tanpa +). Ganti dengan nomor asli.
 const WA_NUMBER = "6281234567890"
@@ -15,6 +18,10 @@ export function WhatsAppWidget() {
   const isEn = useLocale() === "en"
   const mounted = useMounted()
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
+  const isProductDetail = /^(?:\/(?:id|en))?\/produk\/[^/]+\/?$/.test(pathname)
+  const compareCount = useCompare((s) => s.slugs.length)
+  const hideOnMobile = isProductDetail && compareCount > 0
 
   // Tutup saat navigasi/scroll jauh (opsional, ringan). Cukup tutup dengan Esc.
   useEffect(() => {
@@ -34,7 +41,13 @@ export function WhatsAppWidget() {
   )}`
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-3">
+    <div
+      className={cn(
+        "fixed right-4 z-40 flex-col items-end gap-3",
+        hideOnMobile ? "hidden lg:flex" : "flex",
+        isProductDetail ? "bottom-24 lg:bottom-4" : "bottom-4",
+      )}
+    >
       <AnimatePresence>
         {open && (
           <motion.div
@@ -54,9 +67,7 @@ export function WhatsAppWidget() {
                 </span>
               </span>
               <div className="flex-1">
-                <p className="font-heading text-sm font-extrabold">
-                  {t("waTitle")}
-                </p>
+                <p className="font-heading text-sm font-extrabold">{t("waTitle")}</p>
                 <p className="flex items-center gap-1 text-[11px] font-bold text-foreground/70">
                   <span className="size-1.5 rounded-full bg-success" />
                   {t("waOnline")}
@@ -75,9 +86,7 @@ export function WhatsAppWidget() {
             {/* Chat preview */}
             <div className="bg-accent-lime/20 p-4">
               <div className="max-w-[85%] rounded-base rounded-tl-none border-2 border-border bg-background p-3 shadow-shadow-sm">
-                <p className="text-xs leading-relaxed text-foreground/80">
-                  {t("waGreeting")}
-                </p>
+                <p className="text-xs leading-relaxed text-foreground/80">{t("waGreeting")}</p>
               </div>
               <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-foreground/50">
                 <Clock className="size-3" /> {t("waTypical")}

@@ -49,22 +49,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry("/privasi", "yearly", 0.2),
   ]
 
-  const categoryRoutes = categories.map((c) =>
-    entry(`/kategori/${c.slug}`, "weekly", 0.7),
-  )
+  const categoryRoutes = categories.map((c) => entry(`/kategori/${c.slug}`, "weekly", 0.7))
 
-  const productRoutes = products.map((p) =>
-    entry(`/produk/${p.slug}`, "weekly", 0.8),
-  )
+  const productRoutes = products.map((p) => entry(`/produk/${p.slug}`, "weekly", 0.8))
 
-  const articleRoutes = articles.map((a) =>
-    entry(`/artikel/${a.slug}`, "monthly", 0.6, a.date),
-  )
+  const articleRoutes = articles.map((a) => entry(`/artikel/${a.slug}`, "monthly", 0.6, a.date))
 
-  return [
-    ...staticRoutes,
-    ...categoryRoutes,
-    ...productRoutes,
-    ...articleRoutes,
-  ]
+  return [...staticRoutes, ...categoryRoutes, ...productRoutes, ...articleRoutes]
 }

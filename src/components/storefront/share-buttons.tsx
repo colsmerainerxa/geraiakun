@@ -3,16 +3,10 @@
 import { Copy, MessageCircle, Send, Share2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import { SITE_URL } from "@/lib/seo/site"
+import { cn } from "@/lib/utils"
 
-export function ShareButtons({
-  path,
-  title,
-}: {
-  path: string
-  title: string
-}) {
+export function ShareButtons({ path, title }: { path: string; title: string }) {
   const t = useTranslations("blog")
   const tt = useTranslations("track")
   const url = `${SITE_URL}${path}`

@@ -1,7 +1,7 @@
 "use client"
 
-import { useMounted } from "@/hooks/use-mounted"
 import { AdminTicketsSkeleton, AdminTicketsView } from "@/components/admin/admin-tickets-view"
+import { useMounted } from "@/hooks/use-mounted"
 
 export default function AdminTicketsPage() {
   const mounted = useMounted()

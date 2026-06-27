@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  CheckCircle2,
-  MessageCircleQuestion,
-  Reply,
-  Star,
-  Trash2,
-} from "lucide-react"
+import { CheckCircle2, MessageCircleQuestion, Reply, Star, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -16,8 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { cn, formatDate, initials } from "@/lib/utils"
 import { products } from "@/lib/mock/products"
+import { cn, formatDate, initials } from "@/lib/utils"
 import { useReviewsStore } from "@/stores/reviews"
 
 const productName = (id: string) =>
@@ -56,24 +50,15 @@ export function AdminReviewsView() {
       ),
     [questions, qSearch],
   )
-  const answeredQ = useMemo(
-    () => questions.filter((q) => q.answer),
-    [questions],
-  )
+  const answeredQ = useMemo(() => questions.filter((q) => q.answer), [questions])
 
   return (
     <div className="flex flex-col gap-6">
       <Tabs defaultValue="reviews">
         <TabsList>
-          <TabsTrigger value="reviews">
-            Ulasan Pembeli ({reviews.length})
-          </TabsTrigger>
-          <TabsTrigger value="pending">
-            Tanya: Belum Dijawab ({pendingQ.length})
-          </TabsTrigger>
-          <TabsTrigger value="answered">
-            Tanya: Terjawab ({answeredQ.length})
-          </TabsTrigger>
+          <TabsTrigger value="reviews">Ulasan Pembeli ({reviews.length})</TabsTrigger>
+          <TabsTrigger value="pending">Tanya: Belum Dijawab ({pendingQ.length})</TabsTrigger>
+          <TabsTrigger value="answered">Tanya: Terjawab ({answeredQ.length})</TabsTrigger>
         </TabsList>
 
         {/* ---- Reviews ---- */}
@@ -105,9 +90,7 @@ export function AdminReviewsView() {
                         </Avatar>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-heading text-sm font-bold">
-                              {r.author}
-                            </span>
+                            <span className="font-heading text-sm font-bold">{r.author}</span>
                             {r.verified && (
                               <Badge variant="success" className="gap-1 px-1.5 py-0 text-[10px]">
                                 <CheckCircle2 className="size-3" /> Verified
@@ -144,17 +127,11 @@ export function AdminReviewsView() {
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
-                    {r.title && (
-                      <p className="mt-2.5 font-heading text-sm font-bold">
-                        {r.title}
-                      </p>
-                    )}
+                    {r.title && <p className="mt-2.5 font-heading text-sm font-bold">{r.title}</p>}
                     <p className="mt-1 text-sm text-foreground/80">{r.comment}</p>
                     <div className="mt-3 flex items-center justify-between border-t-2 border-dashed border-border pt-2.5">
                       <Badge variant="neutral">{productName(r.productId)}</Badge>
-                      <span className="text-[10px] text-foreground/40">
-                        {r.id}
-                      </span>
+                      <span className="text-[10px] text-foreground/40">{r.id}</span>
                     </div>
                   </div>
                 ))}
@@ -204,9 +181,7 @@ export function AdminReviewsView() {
                       <Textarea
                         rows={2}
                         value={draft[q.id] ?? ""}
-                        onChange={(e) =>
-                          setDraft((d) => ({ ...d, [q.id]: e.target.value }))
-                        }
+                        onChange={(e) => setDraft((d) => ({ ...d, [q.id]: e.target.value }))}
                         placeholder="Tulis jawaban untuk pembeli..."
                         className="text-sm"
                       />
@@ -224,7 +199,7 @@ export function AdminReviewsView() {
                       </Button>
                       <Button
                         size="sm"
-                        disabled={!(draft[q.id]?.trim())}
+                        disabled={!draft[q.id]?.trim()}
                         onClick={() => {
                           answerQuestion(q.id, draft[q.id].trim())
                           setDraft((d) => {
@@ -287,8 +262,7 @@ export function AdminReviewsView() {
                   <p className="mt-2.5 text-sm font-semibold">{q.question}</p>
                   <div className="mt-2 rounded-base border-2 border-border bg-background p-3">
                     <p className="text-xs font-bold text-foreground/60">
-                      {q.answeredBy} ·{" "}
-                      {q.answeredAt ? formatDate(q.answeredAt) : ""}
+                      {q.answeredBy} · {q.answeredAt ? formatDate(q.answeredAt) : ""}
                     </p>
                     <p className="mt-1 text-sm text-foreground/80">{q.answer}</p>
                   </div>

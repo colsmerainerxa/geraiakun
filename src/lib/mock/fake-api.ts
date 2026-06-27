@@ -1,7 +1,7 @@
 import type { CategorySlug, Product } from "@/types"
 import { categories } from "./categories"
 import { banners, testimonials } from "./content"
-import { credentials, credentialStats } from "./credentials"
+import { credentialStats, credentials } from "./credentials"
 import { customers } from "./customers"
 import { orders } from "./orders"
 import { productMinPrice, products } from "./products"
@@ -80,9 +80,7 @@ export const fakeApi = {
         break
       case "terbaru":
         list.sort(
-          (a, b) =>
-            (b.badges.includes("baru") ? 1 : 0) -
-            (a.badges.includes("baru") ? 1 : 0),
+          (a, b) => (b.badges.includes("baru") ? 1 : 0) - (a.badges.includes("baru") ? 1 : 0),
         )
         break
       default:
@@ -107,9 +105,7 @@ export const fakeApi = {
     await delay(150)
     const product = products.find((p) => p.slug === slug)
     if (!product) return []
-    return products
-      .filter((p) => p.category === product.category && p.slug !== slug)
-      .slice(0, 4)
+    return products.filter((p) => p.category === product.category && p.slug !== slug).slice(0, 4)
   },
 
   async getTestimonials() {
@@ -129,9 +125,7 @@ export const fakeApi = {
   },
   async getOrder(invoice: string) {
     await delay(200)
-    return orders.find(
-      (o) => o.invoice.toLowerCase() === invoice.toLowerCase(),
-    ) ?? null
+    return orders.find((o) => o.invoice.toLowerCase() === invoice.toLowerCase()) ?? null
   },
   async getCustomers() {
     await delay(250)
@@ -159,8 +153,7 @@ export const fakeApi = {
       orderCount: orders.length,
       customerCount: customers.length,
       productCount: products.length,
-      pendingOrders: orders.filter((o) => o.status === "menunggu-pembayaran")
-        .length,
+      pendingOrders: orders.filter((o) => o.status === "menunggu-pembayaran").length,
       completedOrders: orders.filter((o) => o.status === "selesai").length,
       credentials: credentialStats(),
       // 7-hari revenue trend (dummy, deterministik)
@@ -186,6 +179,4 @@ export const fakeApi = {
   },
 }
 
-export type DashboardStats = Awaited<
-  ReturnType<typeof fakeApi.getDashboardStats>
->
+export type DashboardStats = Awaited<ReturnType<typeof fakeApi.getDashboardStats>>

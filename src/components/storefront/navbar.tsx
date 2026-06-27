@@ -1,29 +1,16 @@
 "use client"
 
-import {
-  Heart,
-  LayoutDashboard,
-  Menu,
-  ShoppingCart,
-  Sparkles,
-  User,
-} from "lucide-react"
+import { Heart, LayoutDashboard, Menu, ShoppingCart, Sparkles, User } from "lucide-react"
 import { motion } from "motion/react"
 import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Container } from "@/components/shared/container"
 import { LocaleSwitcher } from "@/components/shared/locale-switcher"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { Button } from "@/components/ui/button"
 import { NotificationCenter } from "@/components/storefront/notification-center"
 import { SearchBar as SearchBarAutocomplete } from "@/components/storefront/search-bar"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useCart } from "@/stores/cart"
@@ -110,12 +97,7 @@ export function Navbar() {
             </Link>
           </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="hidden sm:inline-flex"
-            asChild
-          >
+          <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
             <Link href="/masuk">{t("login")}</Link>
           </Button>
 
@@ -154,12 +136,7 @@ export function Navbar() {
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="neutral"
-                size="icon-sm"
-                className="lg:hidden"
-                aria-label="Menu"
-              >
+              <Button variant="neutral" size="icon-sm" className="lg:hidden" aria-label="Menu">
                 <Menu className="size-4" />
               </Button>
             </SheetTrigger>

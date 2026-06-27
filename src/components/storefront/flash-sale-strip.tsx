@@ -39,9 +39,7 @@ export function FlashSaleStrip() {
               <p className="font-heading text-xs font-extrabold uppercase tracking-widest text-main-foreground/70">
                 {t("eyebrow")}
               </p>
-              <h2 className="font-heading text-2xl font-extrabold sm:text-3xl">
-                {t("title")}
-              </h2>
+              <h2 className="font-heading text-2xl font-extrabold sm:text-3xl">{t("title")}</h2>
             </div>
           </div>
           <CountdownTimer targetISO={end} isEn={isEn} />

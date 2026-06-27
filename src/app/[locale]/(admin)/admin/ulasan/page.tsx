@@ -1,10 +1,7 @@
 "use client"
 
+import { AdminReviewsSkeleton, AdminReviewsView } from "@/components/admin/admin-reviews-view"
 import { useMounted } from "@/hooks/use-mounted"
-import {
-  AdminReviewsSkeleton,
-  AdminReviewsView,
-} from "@/components/admin/admin-reviews-view"
 
 export default function AdminReviewsPage() {
   const mounted = useMounted()

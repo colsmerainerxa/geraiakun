@@ -18,11 +18,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function TentangPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export default async function TentangPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations("static")
@@ -64,8 +60,16 @@ export default async function TentangPage({
   ]
 
   const stats = [
-    { value: "10rb+", label: isEn ? "Happy Customers" : "Pelanggan Puas", accent: "bg-accent-cyan" },
-    { value: "500+", label: isEn ? "Premium Products" : "Produk Premium", accent: "bg-accent-pink" },
+    {
+      value: "10rb+",
+      label: isEn ? "Happy Customers" : "Pelanggan Puas",
+      accent: "bg-accent-cyan",
+    },
+    {
+      value: "500+",
+      label: isEn ? "Premium Products" : "Produk Premium",
+      accent: "bg-accent-pink",
+    },
     { value: "4.9/5", label: isEn ? "Store Rating" : "Rating Toko", accent: "bg-accent-lime" },
     { value: "24/7", label: isEn ? "Live Support" : "Dukungan Aktif", accent: "bg-main" },
   ]
@@ -125,12 +129,8 @@ export default async function TentangPage({
               key={s.label}
               className={`flex flex-col items-center rounded-base border-2 border-border ${s.accent} p-5 text-center shadow-shadow`}
             >
-              <span className="font-heading text-3xl font-extrabold">
-                {s.value}
-              </span>
-              <span className="mt-1 text-xs font-bold text-foreground/70">
-                {s.label}
-              </span>
+              <span className="font-heading text-3xl font-extrabold">{s.value}</span>
+              <span className="mt-1 text-xs font-bold text-foreground/70">{s.label}</span>
             </div>
           ))}
         </div>

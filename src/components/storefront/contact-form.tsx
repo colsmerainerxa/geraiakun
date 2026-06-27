@@ -76,9 +76,7 @@ export function ContactForm() {
               rows={5}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={
-                isEn ? "How can we help you?" : "Ada yang bisa kami bantu?"
-              }
+              placeholder={isEn ? "How can we help you?" : "Ada yang bisa kami bantu?"}
             />
           </div>
           <Button type="submit" size="lg" className="mt-1 w-full sm:w-fit">
@@ -113,9 +111,7 @@ export function ContactForm() {
               <span className="text-xs font-bold uppercase tracking-wide text-foreground/60">
                 {item.label}
               </span>
-              <span className="font-heading text-base font-bold">
-                {item.value}
-              </span>
+              <span className="font-heading text-base font-bold">{item.value}</span>
             </div>
           </div>
         ))}

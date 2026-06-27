@@ -44,6 +44,7 @@
     "checkout": "Checkout",
     "total": "Total",
     "subtotal": "Subtotal",
+    "price": "Price",
     "discount": "Discount",
     "fee": "Service Fee",
     "qty": "Qty",

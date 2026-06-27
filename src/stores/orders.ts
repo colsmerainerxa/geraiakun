@@ -21,9 +21,7 @@ export const usePurchasedOrders = create<OrdersState>()(
           orders: [o, ...s.orders.filter((x) => x.invoice !== o.invoice)],
         })),
       getByInvoice: (invoice) =>
-        get().orders.find(
-          (o) => o.invoice.toLowerCase() === invoice.toLowerCase(),
-        ),
+        get().orders.find((o) => o.invoice.toLowerCase() === invoice.toLowerCase()),
     }),
     { name: "beliakun-orders" },
   ),

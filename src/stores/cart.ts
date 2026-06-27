@@ -21,15 +21,11 @@ export const useCart = create<CartState>()(
       items: [],
       addItem: (item) =>
         set((state) => {
-          const existing = state.items.find(
-            (i) => i.variantId === item.variantId,
-          )
+          const existing = state.items.find((i) => i.variantId === item.variantId)
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.variantId === item.variantId
-                  ? { ...i, qty: i.qty + item.qty }
-                  : i,
+                i.variantId === item.variantId ? { ...i, qty: i.qty + item.qty } : i,
               ),
             }
           }

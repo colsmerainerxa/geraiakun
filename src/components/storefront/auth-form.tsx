@@ -7,11 +7,11 @@ import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
-import { z } from "zod"
 
 type Mode = "login" | "register"
 
@@ -92,10 +92,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           {t("demoNote")}
         </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mt-5 flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-5 flex flex-col gap-4">
           {isRegister && (
             <div className="grid gap-1.5">
               <Label htmlFor="name">{t("name")}</Label>
@@ -110,10 +107,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 />
               </div>
               {errors.name && (
-                <span
-                  id="auth-name-error"
-                  className="text-xs font-bold text-danger"
-                >
+                <span id="auth-name-error" className="text-xs font-bold text-danger">
                   {errors.name.message}
                 </span>
               )}
@@ -135,10 +129,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
               />
             </div>
             {errors.email && (
-              <span
-                id="auth-email-error"
-                className="text-xs font-bold text-danger"
-              >
+              <span id="auth-email-error" className="text-xs font-bold text-danger">
                 {errors.email.message}
               </span>
             )}
@@ -153,9 +144,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 type={showPw ? "text" : "password"}
                 className="px-9"
                 aria-invalid={!!errors.password}
-                aria-describedby={
-                  errors.password ? "auth-password-error" : undefined
-                }
+                aria-describedby={errors.password ? "auth-password-error" : undefined}
                 {...register("password")}
               />
               <button
@@ -164,18 +153,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground"
                 aria-label={showPw ? "Sembunyikan sandi" : "Tampilkan sandi"}
               >
-                {showPw ? (
-                  <EyeOff className="size-4" />
-                ) : (
-                  <Eye className="size-4" />
-                )}
+                {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
             {errors.password && (
-              <span
-                id="auth-password-error"
-                className="text-xs font-bold text-danger"
-              >
+              <span id="auth-password-error" className="text-xs font-bold text-danger">
                 {errors.password.message}
               </span>
             )}
@@ -191,17 +173,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   type="password"
                   className="pl-9"
                   aria-invalid={!!errors.confirmPassword}
-                  aria-describedby={
-                    errors.confirmPassword ? "auth-confirm-error" : undefined
-                  }
+                  aria-describedby={errors.confirmPassword ? "auth-confirm-error" : undefined}
                   {...register("confirmPassword")}
                 />
               </div>
               {errors.confirmPassword && (
-                <span
-                  id="auth-confirm-error"
-                  className="text-xs font-bold text-danger"
-                >
+                <span id="auth-confirm-error" className="text-xs font-bold text-danger">
                   {errors.confirmPassword.message}
                 </span>
               )}
@@ -214,9 +191,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 <input type="checkbox" className="size-4 accent-main" />
                 {t("rememberMe")}
               </label>
-              <span className="font-bold text-foreground/50">
-                {t("forgotPassword")}
-              </span>
+              <span className="font-bold text-foreground/50">{t("forgotPassword")}</span>
             </div>
           )}
 
@@ -228,9 +203,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         {/* Social (decorative) */}
         <div className="mt-5 flex items-center gap-3">
           <span className="h-0.5 flex-1 bg-border" />
-          <span className="text-xs font-bold text-foreground/40">
-            {t("orContinue")}
-          </span>
+          <span className="text-xs font-bold text-foreground/40">{t("orContinue")}</span>
           <span className="h-0.5 flex-1 bg-border" />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">

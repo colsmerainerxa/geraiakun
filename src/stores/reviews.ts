@@ -38,10 +38,8 @@ export const useReviewsStore = create<ReviewsState>()(
         set((s) => ({ reviews: [review, ...s.reviews] }))
         return review
       },
-      reviewsForProduct: (productId) =>
-        get().reviews.filter((r) => r.productId === productId),
-      deleteReview: (id) =>
-        set((s) => ({ reviews: s.reviews.filter((r) => r.id !== id) })),
+      reviewsForProduct: (productId) => get().reviews.filter((r) => r.productId === productId),
+      deleteReview: (id) => set((s) => ({ reviews: s.reviews.filter((r) => r.id !== id) })),
 
       questions: [],
       askQuestion: (input) => {
@@ -56,8 +54,7 @@ export const useReviewsStore = create<ReviewsState>()(
         set((s) => ({ questions: [q, ...s.questions] }))
         return q
       },
-      questionsForProduct: (productId) =>
-        get().questions.filter((q) => q.productId === productId),
+      questionsForProduct: (productId) => get().questions.filter((q) => q.productId === productId),
       answerQuestion: (id, answer, answeredBy = "CS beliakun") =>
         set((s) => ({
           questions: s.questions.map((q) =>
@@ -71,8 +68,7 @@ export const useReviewsStore = create<ReviewsState>()(
               : q,
           ),
         })),
-      deleteQuestion: (id) =>
-        set((s) => ({ questions: s.questions.filter((q) => q.id !== id) })),
+      deleteQuestion: (id) => set((s) => ({ questions: s.questions.filter((q) => q.id !== id) })),
     }),
     { name: "beliakun-reviews" },
   ),

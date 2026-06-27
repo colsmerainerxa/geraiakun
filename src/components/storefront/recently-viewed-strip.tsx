@@ -7,11 +7,7 @@ import { useMounted } from "@/hooks/use-mounted"
 import { products } from "@/lib/mock/products"
 import { useRecentlyViewed } from "@/stores/recently-viewed"
 
-export function RecentlyViewedStrip({
-  excludeSlug,
-}: {
-  excludeSlug?: string
-}) {
+export function RecentlyViewedStrip({ excludeSlug }: { excludeSlug?: string }) {
   const t = useTranslations("common")
   const mounted = useMounted()
   const slugs = useRecentlyViewed((s) => s.slugs)
@@ -30,9 +26,7 @@ export function RecentlyViewedStrip({
 
   return (
     <Container className="py-12">
-      <h2 className="font-heading text-2xl font-extrabold sm:text-3xl">
-        {t("recentlyViewed")}
-      </h2>
+      <h2 className="font-heading text-2xl font-extrabold sm:text-3xl">{t("recentlyViewed")}</h2>
       <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((p) => (
           <ProductCard key={p.id} product={p} />

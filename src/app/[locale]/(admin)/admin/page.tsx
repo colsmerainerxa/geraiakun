@@ -1,17 +1,10 @@
 "use client"
 
-import {
-  Clock,
-  DollarSign,
-  Package,
-  ShoppingBag,
-  TrendingUp,
-  Users,
-} from "lucide-react"
+import { Clock, DollarSign, Package, ShoppingBag, TrendingUp, Users } from "lucide-react"
 import { StatCard } from "@/components/admin/parts"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useDashboardStats } from "@/lib/api/queries"
 import { bgFor } from "@/lib/accent"
+import { useDashboardStats } from "@/lib/api/queries"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
 export default function AdminDashboardPage() {
@@ -70,9 +63,7 @@ export default function AdminDashboardPage() {
         <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-heading text-lg font-bold">
-                Pendapatan 7 Hari
-              </h2>
+              <h2 className="font-heading text-lg font-bold">Pendapatan 7 Hari</h2>
               <p className="text-sm text-foreground/60">Minggu ini</p>
             </div>
             <span className="flex items-center gap-1 rounded-base border-2 border-border bg-accent-lime px-2.5 py-1 text-xs font-bold shadow-shadow-sm">
@@ -81,10 +72,7 @@ export default function AdminDashboardPage() {
           </div>
           <div className="mt-6 flex h-52 items-end justify-between gap-2 sm:gap-3">
             {data.trend.map((d) => (
-              <div
-                key={d.day}
-                className="flex flex-1 flex-col items-center gap-2"
-              >
+              <div key={d.day} className="flex flex-1 flex-col items-center gap-2">
                 <span className="text-[10px] font-bold text-foreground/50">
                   {formatIDR(d.value, { compact: true })}
                 </span>
@@ -92,9 +80,7 @@ export default function AdminDashboardPage() {
                   className="w-full rounded-base border-2 border-border bg-main transition-all hover:bg-accent-cyan"
                   style={{ height: `${(d.value / maxTrend) * 100}%` }}
                 />
-                <span className="text-xs font-bold text-foreground/60">
-                  {d.day}
-                </span>
+                <span className="text-xs font-bold text-foreground/60">{d.day}</span>
               </div>
             ))}
           </div>
@@ -123,9 +109,7 @@ export default function AdminDashboardPage() {
                 },
               ].map((row) => (
                 <div key={row.label} className="flex items-center gap-3">
-                  <span className="w-24 text-sm font-bold text-foreground/70">
-                    {row.label}
-                  </span>
+                  <span className="w-24 text-sm font-bold text-foreground/70">{row.label}</span>
                   <div className="h-3 flex-1 overflow-hidden rounded-full border-2 border-border bg-background">
                     <div
                       className={cn("h-full", row.accent)}
@@ -134,9 +118,7 @@ export default function AdminDashboardPage() {
                       }}
                     />
                   </div>
-                  <span className="w-8 text-right font-heading text-sm font-bold">
-                    {row.value}
-                  </span>
+                  <span className="w-8 text-right font-heading text-sm font-bold">{row.value}</span>
                 </div>
               ))}
             </div>
@@ -149,17 +131,11 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="rounded-base border-2 border-border bg-warning/20 p-3">
-                <p className="font-heading text-2xl font-extrabold">
-                  {data.pendingOrders}
-                </p>
-                <p className="text-xs font-bold text-foreground/60">
-                  Menunggu Bayar
-                </p>
+                <p className="font-heading text-2xl font-extrabold">{data.pendingOrders}</p>
+                <p className="text-xs font-bold text-foreground/60">Menunggu Bayar</p>
               </div>
               <div className="rounded-base border-2 border-border bg-success/20 p-3">
-                <p className="font-heading text-2xl font-extrabold">
-                  {data.completedOrders}
-                </p>
+                <p className="font-heading text-2xl font-extrabold">{data.completedOrders}</p>
                 <p className="text-xs font-bold text-foreground/60">Selesai</p>
               </div>
             </div>
@@ -187,9 +163,7 @@ export default function AdminDashboardPage() {
               >
                 {p.logo}
               </span>
-              <span className="flex-1 font-heading text-sm font-bold">
-                {p.name}
-              </span>
+              <span className="flex-1 font-heading text-sm font-bold">{p.name}</span>
               <span className="text-sm font-bold text-foreground/60">
                 {formatNumber(p.sold)} terjual
               </span>

@@ -10,17 +10,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Link } from "@/i18n/navigation"
+import { cn, formatDate } from "@/lib/utils"
 import { useTickets } from "@/stores/tickets"
 import type { Ticket, TicketStatus, TicketType } from "@/types"
-import { cn, formatDate } from "@/lib/utils"
 
-const STATUS_VARIANT: Record<TicketStatus, "neutral" | "warning" | "cyan" | "success" | "danger"> = {
-  baru: "warning",
-  ditinjau: "cyan",
-  diproses: "cyan",
-  selesai: "success",
-  ditolak: "danger",
-}
+const STATUS_VARIANT: Record<TicketStatus, "neutral" | "warning" | "cyan" | "success" | "danger"> =
+  {
+    baru: "warning",
+    ditinjau: "cyan",
+    diproses: "cyan",
+    selesai: "success",
+    ditolak: "danger",
+  }
 
 const TYPE_LABEL: Record<TicketType, { id: string; en: string }> = {
   garansi: { id: "Garansi / Ganti Akun", en: "Warranty / Replace" },
@@ -42,9 +43,7 @@ export function TicketTracker() {
   const initialCode = searchParams.get("code") ?? ""
   const [code, setCode] = useState(initialCode)
   // null = belum search; string = sudah search (bisa tidak ditemukan)
-  const [trackedCode, setTrackedCode] = useState<string | null>(
-    initialCode || null,
-  )
+  const [trackedCode, setTrackedCode] = useState<string | null>(initialCode || null)
 
   // Derived dari store — otomatis resync saat tickets berubah (e.g. setelah reply)
   const searched: Ticket | null | undefined = trackedCode
@@ -93,9 +92,7 @@ export function TicketTracker() {
       {/* My recent tickets (from localStorage) */}
       {tickets.length > 0 && (
         <div className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow">
-          <h3 className="font-heading text-sm font-extrabold uppercase">
-            {t("myTickets")}
-          </h3>
+          <h3 className="font-heading text-sm font-extrabold uppercase">{t("myTickets")}</h3>
           <ul className="mt-3 flex flex-col gap-2">
             {tickets.slice(0, 5).map((tk) => (
               <li key={tk.id}>
@@ -109,9 +106,7 @@ export function TicketTracker() {
                 >
                   <span className="font-heading font-bold">{tk.code}</span>
                   <span className="truncate text-foreground/70">{tk.subject}</span>
-                  <Badge variant={STATUS_VARIANT[tk.status]}>
-                    {t(`status${cap(tk.status)}`)}
-                  </Badge>
+                  <Badge variant={STATUS_VARIANT[tk.status]}>{t(`status${cap(tk.status)}`)}</Badge>
                 </button>
               </li>
             ))}
@@ -172,9 +167,23 @@ function TicketDetail({
   }
 
   const meta = [
-    { label: t("status"), value: <Badge variant={STATUS_VARIANT[ticket.status]}>{t(`status${cap(ticket.status)}`)}</Badge> },
+    {
+      label: t("status"),
+      value: (
+        <Badge variant={STATUS_VARIANT[ticket.status]}>{t(`status${cap(ticket.status)}`)}</Badge>
+      ),
+    },
     { label: t("type"), value: TYPE_LABEL[ticket.type][isEn ? "en" : "id"] },
-    { label: t("priority"), value: tw(ticket.priority === "rendah" ? "priorityLow" : ticket.priority === "tinggi" ? "priorityHigh" : "priorityNormal") },
+    {
+      label: t("priority"),
+      value: tw(
+        ticket.priority === "rendah"
+          ? "priorityLow"
+          : ticket.priority === "tinggi"
+            ? "priorityHigh"
+            : "priorityNormal",
+      ),
+    },
     { label: t("created"), value: formatDate(ticket.createdAt, dateLocale) },
     { label: t("updated"), value: formatDate(ticket.updatedAt, dateLocale) },
   ]
@@ -202,17 +211,12 @@ function TicketDetail({
 
       {/* Conversation */}
       <div className="p-5">
-        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
-          {t("conversation")}
-        </h3>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">{t("conversation")}</h3>
         <div ref={scrollRef} className="flex max-h-80 flex-col gap-3 overflow-y-auto pr-1">
           {ticket.messages.map((m) => {
             const isAgent = m.role === "agen"
             return (
-              <div
-                key={m.id}
-                className={cn("flex", isAgent ? "justify-start" : "justify-end")}
-              >
+              <div key={m.id} className={cn("flex", isAgent ? "justify-start" : "justify-end")}>
                 <div
                   className={cn(
                     "max-w-[80%] rounded-base border-2 border-border p-3 shadow-shadow-sm",
@@ -245,7 +249,9 @@ function TicketDetail({
         )}
 
         <div className="mt-4 flex items-center justify-between text-xs text-foreground/50">
-          <span>{ticket.customerEmail} · {ticket.whatsapp}</span>
+          <span>
+            {ticket.customerEmail} · {ticket.whatsapp}
+          </span>
           <Link href="/bantuan" className="hover:underline">
             {t("openNew")}
           </Link>

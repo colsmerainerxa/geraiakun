@@ -22,11 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { downloadCsv } from "@/lib/csv"
-import {
-  productMinPrice,
-  products,
-  productTotalStock,
-} from "@/lib/mock/products"
+import { productMinPrice, products, productTotalStock } from "@/lib/mock/products"
 import { formatPrice } from "@/lib/utils"
 import { useAdminOverlay } from "@/stores/admin-overlay"
 
@@ -51,10 +47,7 @@ export default function AdminProductsPage() {
         }
       })
       .filter(
-        (r) =>
-          !q ||
-          r.p.name.toLowerCase().includes(q) ||
-          r.p.brand.toLowerCase().includes(q),
+        (r) => !q || r.p.name.toLowerCase().includes(q) || r.p.brand.toLowerCase().includes(q),
       )
   }, [patches, search])
 
@@ -133,9 +126,7 @@ export default function AdminProductsPage() {
               <TableCell className="font-heading font-bold">
                 {formatPrice(price)}
                 {edited && (
-                  <span className="ml-1 text-xs font-bold text-accent-pink">
-                    • diubah
-                  </span>
+                  <span className="ml-1 text-xs font-bold text-accent-pink">• diubah</span>
                 )}
               </TableCell>
               <TableCell className="font-heading font-bold">{stock}</TableCell>

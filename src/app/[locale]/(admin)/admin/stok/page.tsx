@@ -23,19 +23,16 @@ import { useCredentials } from "@/lib/api/queries"
 import { formatDate } from "@/lib/utils"
 import type { CredentialStock } from "@/types"
 
-const FILTERS: { value: CredentialStock["status"] | "semua"; label: string }[] =
-  [
-    { value: "semua", label: "Semua" },
-    { value: "tersedia", label: "Tersedia" },
-    { value: "terjual", label: "Terjual" },
-    { value: "kadaluarsa", label: "Kadaluarsa" },
-  ]
+const FILTERS: { value: CredentialStock["status"] | "semua"; label: string }[] = [
+  { value: "semua", label: "Semua" },
+  { value: "tersedia", label: "Tersedia" },
+  { value: "terjual", label: "Terjual" },
+  { value: "kadaluarsa", label: "Kadaluarsa" },
+]
 
 export default function AdminStockPage() {
   const { data: credentials, isLoading } = useCredentials()
-  const [status, setStatus] = useState<CredentialStock["status"] | "semua">(
-    "semua",
-  )
+  const [status, setStatus] = useState<CredentialStock["status"] | "semua">("semua")
 
   const stats = useMemo(() => {
     const list = credentials ?? []
@@ -48,41 +45,22 @@ export default function AdminStockPage() {
 
   const filtered = useMemo(() => {
     const list = credentials ?? []
-    return status === "semua"
-      ? list
-      : list.filter((c) => c.status === status)
+    return status === "semua" ? list : list.filter((c) => c.status === status)
   }, [credentials, status])
 
   return (
     <div className="flex flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard
-          label="Total Stok"
-          value={stats.total}
-          icon={Boxes}
-          accent="bg-accent-cyan"
-        />
-        <StatCard
-          label="Tersedia"
-          value={stats.tersedia}
-          icon={CheckCircle2}
-          accent="bg-success"
-        />
-        <StatCard
-          label="Kadaluarsa"
-          value={stats.kadaluarsa}
-          icon={XCircle}
-          accent="bg-danger"
-        />
+        <StatCard label="Total Stok" value={stats.total} icon={Boxes} accent="bg-accent-cyan" />
+        <StatCard label="Tersedia" value={stats.tersedia} icon={CheckCircle2} accent="bg-success" />
+        <StatCard label="Kadaluarsa" value={stats.kadaluarsa} icon={XCircle} accent="bg-danger" />
       </div>
 
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-foreground/60">{filtered.length} akun</p>
         <Select
           value={status}
-          onValueChange={(v) =>
-            setStatus(v as CredentialStock["status"] | "semua")
-          }
+          onValueChange={(v) => setStatus(v as CredentialStock["status"] | "semua")}
         >
           <SelectTrigger className="w-44">
             <SelectValue />
@@ -114,12 +92,8 @@ export default function AdminStockPage() {
             {filtered.map((c) => (
               <TableRow key={c.id}>
                 <TableCell className="font-bold">{c.productName}</TableCell>
-                <TableCell className="text-foreground/70">
-                  {c.variantLabel}
-                </TableCell>
-                <TableCell className="font-mono text-xs text-foreground/60">
-                  {c.email}
-                </TableCell>
+                <TableCell className="text-foreground/70">{c.variantLabel}</TableCell>
+                <TableCell className="font-mono text-xs text-foreground/60">{c.email}</TableCell>
                 <TableCell className="whitespace-nowrap text-foreground/70">
                   {formatDate(c.addedAt)}
                 </TableCell>

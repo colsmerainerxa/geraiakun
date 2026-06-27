@@ -23,9 +23,7 @@ export function StatCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-bold text-foreground/60">{label}</p>
-          <p className="mt-1 truncate font-heading text-2xl font-extrabold">
-            {value}
-          </p>
+          <p className="mt-1 truncate font-heading text-2xl font-extrabold">{value}</p>
           {hint && <p className="mt-1 text-xs text-foreground/50">{hint}</p>}
         </div>
         <span
@@ -66,11 +64,7 @@ const TRX_STATUS: Record<
   gagal: { label: "Gagal", variant: "danger" },
 }
 
-export function TransactionStatusBadge({
-  status,
-}: {
-  status: Transaction["status"]
-}) {
+export function TransactionStatusBadge({ status }: { status: Transaction["status"] }) {
   const m = TRX_STATUS[status]
   return <Badge variant={m.variant}>{m.label}</Badge>
 }
@@ -84,11 +78,7 @@ const CRED_STATUS: Record<
   kadaluarsa: { label: "Kadaluarsa", variant: "danger" },
 }
 
-export function CredentialStatusBadge({
-  status,
-}: {
-  status: CredentialStock["status"]
-}) {
+export function CredentialStatusBadge({ status }: { status: CredentialStock["status"] }) {
   const m = CRED_STATUS[status]
   return <Badge variant={m.variant}>{m.label}</Badge>
 }

@@ -96,10 +96,8 @@ export const useUser = create<UserState>()(
       profile: DEFAULT_PROFILE,
       prefs: DEFAULT_PREFS,
       activity: seedActivity(),
-      updateProfile: (patch) =>
-        set((s) => ({ profile: { ...s.profile, ...patch } })),
-      updatePrefs: (patch) =>
-        set((s) => ({ prefs: { ...s.prefs, ...patch } })),
+      updateProfile: (patch) => set((s) => ({ profile: { ...s.profile, ...patch } })),
+      updatePrefs: (patch) => set((s) => ({ prefs: { ...s.prefs, ...patch } })),
       logActivity: (entry) =>
         set((s) => ({
           activity: [

@@ -76,21 +76,9 @@ export interface Review {
   verified: boolean
 }
 
-export type OrderStatus =
-  | "menunggu-pembayaran"
-  | "diproses"
-  | "selesai"
-  | "dibatalkan"
-  | "refund"
+export type OrderStatus = "menunggu-pembayaran" | "diproses" | "selesai" | "dibatalkan" | "refund"
 
-export type PaymentMethod =
-  | "qris"
-  | "gopay"
-  | "ovo"
-  | "dana"
-  | "bca-va"
-  | "bni-va"
-  | "mandiri-va"
+export type PaymentMethod = "qris" | "gopay" | "ovo" | "dana" | "bca-va" | "bni-va" | "mandiri-va"
 
 export interface OrderItem {
   productId: ID

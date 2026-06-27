@@ -205,10 +205,7 @@ export const useTickets = create<TicketsState>()(
                   ...t,
                   // Agen membalas -> tiket otomatis berlanjut ke "ditinjau"
                   // kecuali sudah selesai/ditolak.
-                  status:
-                    t.status === "selesai" || t.status === "ditolak"
-                      ? t.status
-                      : "ditinjau",
+                  status: t.status === "selesai" || t.status === "ditolak" ? t.status : "ditinjau",
                   updatedAt: nowISO(),
                   messages: [
                     ...t.messages,
@@ -225,17 +222,10 @@ export const useTickets = create<TicketsState>()(
         })),
       setStatus: (id, status) =>
         set((s) => ({
-          tickets: s.tickets.map((t) =>
-            t.id === id
-              ? { ...t, status, updatedAt: nowISO() }
-              : t,
-          ),
+          tickets: s.tickets.map((t) => (t.id === id ? { ...t, status, updatedAt: nowISO() } : t)),
         })),
       getById: (id) => get().tickets.find((t) => t.id === id),
-      getByCode: (code) =>
-        get().tickets.find(
-          (t) => t.code.toLowerCase() === code.toLowerCase(),
-        ),
+      getByCode: (code) => get().tickets.find((t) => t.code.toLowerCase() === code.toLowerCase()),
       clear: () => set({ tickets: [] }),
     }),
     { name: "beliakun-tickets" },

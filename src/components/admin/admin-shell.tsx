@@ -1,5 +1,6 @@
 "use client"
 
+import type { LucideIcon } from "lucide-react"
 import {
   KeyRound,
   LayoutDashboard,
@@ -14,17 +15,10 @@ import {
   Ticket,
   Users,
 } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
 import { useState } from "react"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Link, usePathname } from "@/i18n/navigation"
 import { cn } from "@/lib/utils"
 
@@ -48,8 +42,7 @@ const NAV: NavItem[] = [
 
 function useActive() {
   const pathname = usePathname()
-  return (href: string) =>
-    href === "/admin" ? pathname === "/admin" : pathname.startsWith(href)
+  return (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href))
 }
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -115,9 +108,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const title =
-    NAV.find((n) =>
-      n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href),
-    )?.label ?? "Dashboard"
+    NAV.find((n) => (n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href)))
+      ?.label ?? "Dashboard"
 
   return (
     <div className="flex min-h-dvh bg-background">

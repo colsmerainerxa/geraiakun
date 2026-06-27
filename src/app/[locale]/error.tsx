@@ -22,9 +22,7 @@ export default function ErrorPage({
       <span className="flex size-20 items-center justify-center rounded-base border-2 border-border bg-danger text-foreground shadow-shadow">
         <TriangleAlert className="size-10" />
       </span>
-      <h1 className="mt-6 font-heading text-2xl font-extrabold sm:text-3xl">
-        Terjadi kesalahan
-      </h1>
+      <h1 className="mt-6 font-heading text-2xl font-extrabold sm:text-3xl">Terjadi kesalahan</h1>
       <p className="mt-2 max-w-md text-foreground/60">
         Maaf, ada yang tidak beres saat memuat halaman ini. Coba muat ulang.
       </p>

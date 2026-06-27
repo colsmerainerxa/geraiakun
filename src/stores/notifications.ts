@@ -41,10 +41,8 @@ export const useNotifications = create<NotificationsState>()(
         set((s) => ({
           items: s.items.map((n) => (n.id === id ? { ...n, read: true } : n)),
         })),
-      markAllRead: () =>
-        set((s) => ({ items: s.items.map((n) => ({ ...n, read: true })) })),
-      remove: (id) =>
-        set((s) => ({ items: s.items.filter((n) => n.id !== id) })),
+      markAllRead: () => set((s) => ({ items: s.items.map((n) => ({ ...n, read: true })) })),
+      remove: (id) => set((s) => ({ items: s.items.filter((n) => n.id !== id) })),
       clear: () => set({ items: [] }),
       unread: () => get().items.filter((n) => !n.read).length,
     }),

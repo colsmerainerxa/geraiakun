@@ -15,8 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { downloadCsv } from "@/lib/csv"
 import { useCustomers } from "@/lib/api/queries"
+import { downloadCsv } from "@/lib/csv"
 import { formatDate, formatIDR, initials } from "@/lib/utils"
 import type { Customer } from "@/types"
 
@@ -38,8 +38,7 @@ export default function AdminCustomersPage() {
     const q = search.toLowerCase().trim()
     if (!q) return customers
     return customers.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q),
+      (c) => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q),
     )
   }, [customers, search])
 
@@ -102,28 +101,18 @@ export default function AdminCustomersPage() {
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="font-bold">{c.name}</span>
-                      <span className="text-xs text-foreground/50">
-                        {c.email}
-                      </span>
+                      <span className="text-xs text-foreground/50">{c.email}</span>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="whitespace-nowrap text-foreground/70">
-                  {c.whatsapp}
-                </TableCell>
+                <TableCell className="whitespace-nowrap text-foreground/70">{c.whatsapp}</TableCell>
                 <TableCell className="whitespace-nowrap text-foreground/70">
                   {formatDate(c.joinedAt)}
                 </TableCell>
-                <TableCell className="font-heading font-bold">
-                  {c.orderCount}
-                </TableCell>
-                <TableCell className="font-heading font-bold">
-                  {formatIDR(c.totalSpent)}
-                </TableCell>
+                <TableCell className="font-heading font-bold">{c.orderCount}</TableCell>
+                <TableCell className="font-heading font-bold">{formatIDR(c.totalSpent)}</TableCell>
                 <TableCell>
-                  <Badge variant={STATUS[c.status].variant}>
-                    {STATUS[c.status].label}
-                  </Badge>
+                  <Badge variant={STATUS[c.status].variant}>{STATUS[c.status].label}</Badge>
                 </TableCell>
               </TableRow>
             ))}

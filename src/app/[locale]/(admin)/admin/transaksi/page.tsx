@@ -1,18 +1,8 @@
 "use client"
 
-import {
-  ArrowDownLeft,
-  CheckCircle2,
-  Clock,
-  Download,
-  XCircle,
-} from "lucide-react"
+import { ArrowDownLeft, CheckCircle2, Clock, Download, XCircle } from "lucide-react"
 import { useMemo } from "react"
-import {
-  paymentLabel,
-  StatCard,
-  TransactionStatusBadge,
-} from "@/components/admin/parts"
+import { paymentLabel, StatCard, TransactionStatusBadge } from "@/components/admin/parts"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -23,8 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { downloadCsv } from "@/lib/csv"
 import { useTransactions } from "@/lib/api/queries"
+import { downloadCsv } from "@/lib/csv"
 import { formatDate, formatIDR } from "@/lib/utils"
 
 export default function AdminTransactionsPage() {
@@ -36,9 +26,7 @@ export default function AdminTransactionsPage() {
       success: list.filter((t) => t.status === "berhasil"),
       pending: list.filter((t) => t.status === "pending").length,
       failed: list.filter((t) => t.status === "gagal").length,
-      revenue: list
-        .filter((t) => t.status === "berhasil")
-        .reduce((s, t) => s + t.amount, 0),
+      revenue: list.filter((t) => t.status === "berhasil").reduce((s, t) => s + t.amount, 0),
     }
   }, [transactions])
 
@@ -58,18 +46,8 @@ export default function AdminTransactionsPage() {
           icon={CheckCircle2}
           accent="bg-success"
         />
-        <StatCard
-          label="Pending"
-          value={stats.pending}
-          icon={Clock}
-          accent="bg-warning"
-        />
-        <StatCard
-          label="Gagal"
-          value={stats.failed}
-          icon={XCircle}
-          accent="bg-danger"
-        />
+        <StatCard label="Pending" value={stats.pending} icon={Clock} accent="bg-warning" />
+        <StatCard label="Gagal" value={stats.failed} icon={XCircle} accent="bg-danger" />
       </div>
 
       <div className="flex justify-end">
@@ -115,16 +93,10 @@ export default function AdminTransactionsPage() {
                 <TableCell className="font-mono text-xs text-foreground/60">
                   {t.id.toUpperCase()}
                 </TableCell>
-                <TableCell className="font-heading font-bold">
-                  {t.invoice}
-                </TableCell>
+                <TableCell className="font-heading font-bold">{t.invoice}</TableCell>
                 <TableCell>{t.customerName}</TableCell>
-                <TableCell className="text-foreground/70">
-                  {paymentLabel(t.method)}
-                </TableCell>
-                <TableCell className="font-heading font-bold">
-                  {formatIDR(t.amount)}
-                </TableCell>
+                <TableCell className="text-foreground/70">{paymentLabel(t.method)}</TableCell>
+                <TableCell className="font-heading font-bold">{formatIDR(t.amount)}</TableCell>
                 <TableCell className="whitespace-nowrap text-foreground/70">
                   {formatDate(t.createdAt)}
                 </TableCell>

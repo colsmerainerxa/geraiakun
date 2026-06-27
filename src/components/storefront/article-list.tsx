@@ -62,9 +62,7 @@ export function ArticleList() {
             </div>
             <div className="flex flex-1 flex-col gap-2 p-5">
               <div className="flex items-center gap-2 text-xs text-foreground/60">
-                <Badge variant="neutral">
-                  {isEn ? a.categoryEn : a.category}
-                </Badge>
+                <Badge variant="neutral">{isEn ? a.categoryEn : a.category}</Badge>
                 <span>
                   {a.readMinutes} {t("readTime")}
                 </span>

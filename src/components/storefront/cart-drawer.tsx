@@ -4,13 +4,7 @@ import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { cn, formatIDR } from "@/lib/utils"
@@ -42,9 +36,7 @@ export function CartDrawer() {
               <div className="flex size-20 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow">
                 <ShoppingBag className="size-9" />
               </div>
-              <p className="font-heading text-lg font-bold">
-                {tcart("empty")}
-              </p>
+              <p className="font-heading text-lg font-bold">{tcart("empty")}</p>
               <p className="text-sm text-foreground/60">{tcart("emptyDesc")}</p>
               <Button onClick={() => setCartOpen(false)} asChild className="mt-2">
                 <Link href="/katalog">{tcart("startShopping")}</Link>
@@ -84,16 +76,12 @@ export function CartDrawer() {
                           <Trash2 className="size-4" />
                         </button>
                       </div>
-                      <p className="text-xs text-foreground/60">
-                        {item.variantLabel}
-                      </p>
+                      <p className="text-xs text-foreground/60">{item.variantLabel}</p>
                       <div className="mt-1 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
-                            onClick={() =>
-                              updateQty(item.variantId, item.qty - 1)
-                            }
+                            onClick={() => updateQty(item.variantId, item.qty - 1)}
                             className="flex size-6 items-center justify-center rounded-[5px] border-2 border-border bg-secondary-background hover:bg-main"
                             aria-label={t("decrease")}
                           >
@@ -104,9 +92,7 @@ export function CartDrawer() {
                           </span>
                           <button
                             type="button"
-                            onClick={() =>
-                              updateQty(item.variantId, item.qty + 1)
-                            }
+                            onClick={() => updateQty(item.variantId, item.qty + 1)}
                             className="flex size-6 items-center justify-center rounded-[5px] border-2 border-border bg-secondary-background hover:bg-main"
                             aria-label={t("increase")}
                           >
@@ -129,24 +115,12 @@ export function CartDrawer() {
           <SheetFooter>
             <div className="flex items-center justify-between border-t-2 border-dashed border-border pt-3">
               <span className="font-heading font-bold">{t("subtotal")}</span>
-              <span className="font-heading text-xl font-extrabold">
-                {formatIDR(subtotal)}
-              </span>
+              <span className="font-heading text-xl font-extrabold">{formatIDR(subtotal)}</span>
             </div>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => setCartOpen(false)}
-              asChild
-            >
+            <Button size="lg" className="w-full" onClick={() => setCartOpen(false)} asChild>
               <Link href="/checkout">{t("checkout")}</Link>
             </Button>
-            <Button
-              variant="neutral"
-              className="w-full"
-              onClick={() => setCartOpen(false)}
-              asChild
-            >
+            <Button variant="neutral" className="w-full" onClick={() => setCartOpen(false)} asChild>
               <Link href="/keranjang">{tn("cart")}</Link>
             </Button>
           </SheetFooter>

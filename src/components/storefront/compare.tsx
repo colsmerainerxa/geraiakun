@@ -1,24 +1,19 @@
 "use client"
 
-import { GitCompare, X } from "lucide-react"
+import { GitCompare, Star, X } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
+import { usePathname } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
+import type { MouseEvent } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { getProduct } from "@/lib/mock/products"
 import { cn, formatPrice } from "@/lib/utils"
 import { COMPARE_MAX, useCompare } from "@/stores/compare"
-import { useMounted } from "@/hooks/use-mounted"
-import { Star } from "lucide-react"
 
 /* ----------------------------- Compare button ----------------------------- */
 
@@ -35,8 +30,22 @@ export function CompareButton({
 }) {
   const t = useTranslations("compare")
   const mounted = useMounted()
-  const active = useCompare((s) => s.slugs.includes(slug))
+  const compared = useCompare((s) => s.slugs.includes(slug))
   const toggle = useCompare((s) => s.toggle)
+  const active = mounted && compared
+
+  function handleToggle(e: MouseEvent<HTMLElement>) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const res = toggle(slug)
+    if (res.full) {
+      toast.error(t("limit", { max: COMPARE_MAX }))
+      return
+    }
+
+    if (mounted) toast.success(compared ? t("removed") : t("added"))
+  }
 
   if (size === "sm") {
     return (
@@ -45,11 +54,7 @@ export function CompareButton({
         variant={active ? "default" : "neutral"}
         size="sm"
         className={cn("gap-1.5", className)}
-        onClick={() => {
-          const res = toggle(slug)
-          if (res.full) toast.error(t("limit", { max: COMPARE_MAX }))
-          else toast.success(active ? t("removed") : t("added"))
-        }}
+        onClick={handleToggle}
       >
         <GitCompare className="size-4" /> {withLabel ? t("compare") : null}
         {active ? <X className="size-3" /> : null}
@@ -62,11 +67,7 @@ export function CompareButton({
       type="button"
       aria-pressed={active}
       title={t("compare")}
-      onClick={() => {
-        const res = toggle(slug)
-        if (res.full) toast.error(t("limit", { max: COMPARE_MAX }))
-        else if (mounted) toast.success(active ? t("removed") : t("added"))
-      }}
+      onClick={handleToggle}
       className={cn(
         "flex size-9 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm transition-all",
         active
@@ -89,6 +90,8 @@ export function CompareBar() {
   const remove = useCompare((s) => s.remove)
   const clear = useCompare((s) => s.clear)
   const setOpen = useCompare((s) => s.setOpen)
+  const pathname = usePathname()
+  const isProductDetail = /^(?:\/(?:id|en))?\/produk\/[^/]+\/?$/.test(pathname)
 
   if (!mounted || slugs.length === 0) return null
 
@@ -98,7 +101,10 @@ export function CompareBar() {
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
-        className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 px-4 py-3 backdrop-blur"
+        className={cn(
+          "fixed inset-x-0 z-40 border-t-2 border-border bg-background/95 px-4 py-3 backdrop-blur",
+          isProductDetail ? "bottom-[88px] lg:bottom-0" : "bottom-0",
+        )}
       >
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-2 font-heading text-sm font-extrabold">
@@ -122,9 +128,7 @@ export function CompareBar() {
                   >
                     {p.logo}
                   </span>
-                  <span className="max-w-24 truncate text-xs font-bold">
-                    {p.name}
-                  </span>
+                  <span className="max-w-24 truncate text-xs font-bold">{p.name}</span>
                   <button
                     type="button"
                     onClick={() => remove(slug)}
@@ -215,10 +219,7 @@ export function CompareDrawer() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger className="sr-only">{t("compareNow")}</SheetTrigger>
-      <SheetContent
-        side="right"
-        className="w-full overflow-y-auto sm:max-w-2xl lg:max-w-3xl"
-      >
+      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-2xl lg:max-w-3xl">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <GitCompare className="size-5 text-accent-purple" /> {t("drawerTitle")}
@@ -226,9 +227,7 @@ export function CompareDrawer() {
         </SheetHeader>
 
         {items.length === 0 ? (
-          <p className="mt-8 text-center text-sm text-foreground/60">
-            {t("empty")}
-          </p>
+          <p className="mt-8 text-center text-sm text-foreground/60">{t("empty")}</p>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full border-separate border-spacing-0">
@@ -293,8 +292,7 @@ export function CompareDrawer() {
                   <td className="sticky left-0 w-32 bg-background p-3" />
                   {items.map((p) => {
                     const min = Math.min(...p.variants.map((v) => v.price))
-                    const minV =
-                      p.variants.find((v) => v.price === min) ?? p.variants[0]
+                    const minV = p.variants.find((v) => v.price === min) ?? p.variants[0]
                     return (
                       <td key={p.id} className="border-l-2 border-border p-3">
                         <Button size="sm" asChild className="w-full">

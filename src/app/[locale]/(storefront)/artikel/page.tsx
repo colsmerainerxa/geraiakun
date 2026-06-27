@@ -21,11 +21,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function ArtikelPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export default async function ArtikelPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations("blog")
@@ -34,6 +30,7 @@ export default async function ArtikelPage({
   return (
     <Container className="py-12">
       <JsonLd
+        id="jsonld-article-list"
         data={itemListJsonLd(
           articles.map((a) => ({
             name: isEn ? a.titleEn : a.title,

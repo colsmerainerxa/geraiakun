@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next"
-import { NextIntlClientProvider, hasLocale } from "next-intl"
-import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Space_Grotesk } from "next/font/google"
 import { notFound } from "next/navigation"
+import { hasLocale, NextIntlClientProvider } from "next-intl"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Providers } from "@/app/providers"
 import { routing } from "@/i18n/routing"
-import { seoAlternates, SITE_URL } from "@/lib/seo/site"
+import { SITE_URL, seoAlternates } from "@/lib/seo/site"
 import "../globals.css"
 
 const fontSans = Space_Grotesk({

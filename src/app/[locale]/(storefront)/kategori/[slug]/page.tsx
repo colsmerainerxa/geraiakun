@@ -1,20 +1,8 @@
-import {
-  Bot,
-  Code,
-  GraduationCap,
-  type LucideIcon,
-  Palette,
-  Play,
-  Rocket,
-} from "lucide-react"
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query"
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query"
+import { Bot, Code, GraduationCap, type LucideIcon, Palette, Play, Rocket } from "lucide-react"
 import type { Metadata } from "next"
-import { getLocale, setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
+import { getLocale, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
 import { CategoryView } from "@/components/storefront/category-view"
 import {
@@ -27,10 +15,10 @@ import { Badge } from "@/components/ui/badge"
 import { routing } from "@/i18n/routing"
 import { bgFor } from "@/lib/accent"
 import { categories, categoryContent } from "@/lib/mock/categories"
-import { faqPageJsonLd, itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { fakeApi } from "@/lib/mock/fake-api"
-import { cn } from "@/lib/utils"
+import { faqPageJsonLd, itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
+import { cn } from "@/lib/utils"
 
 const icons: Record<string, LucideIcon> = {
   Bot,
@@ -42,9 +30,7 @@ const icons: Record<string, LucideIcon> = {
 }
 
 export function generateStaticParams() {
-  return routing.locales.flatMap((locale) =>
-    categories.map((c) => ({ locale, slug: c.slug })),
-  )
+  return routing.locales.flatMap((locale) => categories.map((c) => ({ locale, slug: c.slug })))
 }
 
 export async function generateMetadata({
@@ -101,6 +87,7 @@ export default async function CategoryPage({
   return (
     <Container className="py-10">
       <JsonLd
+        id={`jsonld-category-item-list-${slug}`}
         data={itemListJsonLd(
           catProducts.map((p) => ({
             name: p.name,
@@ -142,15 +129,11 @@ export default async function CategoryPage({
 
       {faqs.length > 0 && (
         <div className="mt-16 max-w-3xl">
-          <JsonLd data={faqPageJsonLd(faqs)} />
+          <JsonLd id={`jsonld-category-faq-${slug}`} data={faqPageJsonLd(faqs)} />
           <h2 className="font-heading text-2xl font-extrabold">
             {isEn ? "Frequently Asked Questions" : "Pertanyaan Umum"}
           </h2>
-          <Accordion
-            type="single"
-            collapsible
-            className="mt-6 flex flex-col gap-3"
-          >
+          <Accordion type="single" collapsible className="mt-6 flex flex-col gap-3">
             {faqs.map((f, i) => (
               <AccordionItem key={f.q} value={`faq-${i}`}>
                 <AccordionTrigger>{f.q}</AccordionTrigger>

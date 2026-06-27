@@ -11,14 +11,7 @@ import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMounted } from "@/hooks/use-mounted"
 import { formatDate, formatNumber } from "@/lib/utils"
-import {
-  getTier,
-  nextTier,
-  REWARDS,
-  TIERS,
-  useLoyalty,
-  type RewardOption,
-} from "@/stores/loyalty"
+import { getTier, nextTier, REWARDS, type RewardOption, TIERS, useLoyalty } from "@/stores/loyalty"
 
 const TIER_BG: Record<string, string> = {
   "accent-pink": "bg-accent-pink",
@@ -42,9 +35,7 @@ export function LoyaltyView() {
 
   const tier = getTier(lifetime)
   const next = nextTier(lifetime)
-  const progress = next
-    ? Math.min(100, ((lifetime - tier.min) / (next.min - tier.min)) * 100)
-    : 100
+  const progress = next ? Math.min(100, ((lifetime - tier.min) / (next.min - tier.min)) * 100) : 100
 
   function onRedeem(r: RewardOption) {
     const res = redeem(r)
@@ -66,15 +57,13 @@ export function LoyaltyView() {
 
   return (
     <Container className="py-12">
-      <SectionHeading
-        eyebrow={`🎁 ${t("eyebrow")}`}
-        title={t("title")}
-        subtitle={t("subtitle")}
-      />
+      <SectionHeading eyebrow={`🎁 ${t("eyebrow")}`} title={t("title")} subtitle={t("subtitle")} />
 
       {/* Hero: saldo poin + tier */}
       <div className="mt-8 overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
-        <div className={`flex flex-wrap items-center justify-between gap-4 ${TIER_BG[tier.color]} border-b-2 border-border p-6`}>
+        <div
+          className={`flex flex-wrap items-center justify-between gap-4 ${TIER_BG[tier.color]} border-b-2 border-border p-6`}
+        >
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wide text-foreground/60">
               {t("balanceLabel")}
@@ -150,7 +139,9 @@ export function LoyaltyView() {
                 } ${reached ? "bg-secondary-background" : "bg-background/50"}`}
               >
                 <div className="flex items-center justify-between">
-                  <span className={`flex size-9 items-center justify-center rounded-base border-2 border-border ${TIER_BG[tt.color]} shadow-shadow-sm`}>
+                  <span
+                    className={`flex size-9 items-center justify-center rounded-base border-2 border-border ${TIER_BG[tt.color]} shadow-shadow-sm`}
+                  >
                     <Sparkles className="size-4" />
                   </span>
                   {reached ? (
@@ -158,9 +149,7 @@ export function LoyaltyView() {
                       ✓
                     </Badge>
                   ) : (
-                    <span className="text-[10px] font-bold text-foreground/40">
-                      🔒
-                    </span>
+                    <span className="text-[10px] font-bold text-foreground/40">🔒</span>
                   )}
                 </div>
                 <p className="mt-2 font-heading text-sm font-bold">{tt.name}</p>
@@ -195,9 +184,7 @@ export function LoyaltyView() {
                   </Badge>
                 </div>
                 <p className="mt-3 font-heading text-sm font-bold">{r.name}</p>
-                <p className="mt-1 flex-1 text-xs text-foreground/60">
-                  {r.valueDesc}
-                </p>
+                <p className="mt-1 flex-1 text-xs text-foreground/60">{r.valueDesc}</p>
                 <Button
                   size="sm"
                   className="mt-3"
@@ -238,17 +225,11 @@ export function LoyaltyView() {
                     h.amount > 0 ? "bg-accent-lime" : "bg-warning/30"
                   }`}
                 >
-                  {h.amount > 0 ? (
-                    <TrendingUp className="size-4" />
-                  ) : (
-                    <Gift className="size-4" />
-                  )}
+                  {h.amount > 0 ? <TrendingUp className="size-4" /> : <Gift className="size-4" />}
                 </span>
                 <div>
                   <p className="text-sm font-bold">{h.reason}</p>
-                  <p className="text-xs text-foreground/50">
-                    {formatDate(h.date, dateLocale)}
-                  </p>
+                  <p className="text-xs text-foreground/50">{formatDate(h.date, dateLocale)}</p>
                 </div>
               </div>
               <span

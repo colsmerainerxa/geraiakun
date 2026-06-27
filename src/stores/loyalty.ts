@@ -152,8 +152,7 @@ export const useLoyalty = create<LoyaltyState>()(
           const next = Math.max(0, s.points + amount)
           return {
             points: next,
-            lifetimeEarned:
-              amount > 0 ? s.lifetimeEarned + amount : s.lifetimeEarned,
+            lifetimeEarned: amount > 0 ? s.lifetimeEarned + amount : s.lifetimeEarned,
             history: [
               {
                 id: `pts-${Date.now()}`,
@@ -183,8 +182,7 @@ export const useLoyalty = create<LoyaltyState>()(
         }))
         return { ok: true, code: reward.code }
       },
-      reset: () =>
-        set({ points: 405, lifetimeEarned: 405, history: seedHistory(), redeemed: [] }),
+      reset: () => set({ points: 405, lifetimeEarned: 405, history: seedHistory(), redeemed: [] }),
     }),
     { name: "beliakun-loyalty" },
   ),

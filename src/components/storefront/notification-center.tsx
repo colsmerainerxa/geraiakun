@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  Bell,
-  Info,
-  Percent,
-  Ticket as TicketIcon,
-  Truck,
-} from "lucide-react"
+import { Bell, Info, Percent, Ticket as TicketIcon, Truck } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useRef, useState } from "react"
@@ -16,17 +10,18 @@ import { cn } from "@/lib/utils"
 import { useNotifications } from "@/stores/notifications"
 import type { NotificationKind } from "@/types"
 
-const KIND_META: Record<
-  NotificationKind,
-  { icon: typeof Info; accent: string; key: string }
-> = {
+const KIND_META: Record<NotificationKind, { icon: typeof Info; accent: string; key: string }> = {
   pesanan: { icon: Truck, accent: "bg-accent-cyan", key: "kindPesanan" },
   promo: { icon: Percent, accent: "bg-accent-pink", key: "kindPromo" },
   tiket: { icon: TicketIcon, accent: "bg-accent-lime", key: "kindTiket" },
   info: { icon: Info, accent: "bg-accent-blue", key: "kindInfo" },
 }
 
-function timeAgo(iso: string, isEn: boolean, t: (k: string, v?: Record<string, string | number | Date>) => string) {
+function timeAgo(
+  iso: string,
+  isEn: boolean,
+  t: (k: string, v?: Record<string, string | number | Date>) => string,
+) {
   void isEn
   const diff = Date.now() - new Date(iso).getTime()
   const min = Math.floor(diff / 60000)
@@ -47,8 +42,7 @@ export function NotificationCenter() {
   const isEn = useLocale() === "en"
   const mounted = useMounted()
   const [open, setOpen] = useState(false)
-  const { items, unread, markAllRead, markRead, seeded, seedDemo } =
-    useNotificationsSeed(isEn)
+  const { items, unread, markAllRead, markRead, seeded, seedDemo } = useNotificationsSeed(isEn)
   const ref = useRef<HTMLDivElement>(null)
 
   // Tutup saat klik di luar
@@ -107,9 +101,7 @@ export function NotificationCenter() {
             className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-1rem)] overflow-hidden rounded-base border-2 border-border bg-background shadow-shadow-lg"
           >
             <div className="flex items-center justify-between border-b-2 border-border bg-secondary-background px-4 py-3">
-              <span className="font-heading text-sm font-extrabold">
-                {t("title")}
-              </span>
+              <span className="font-heading text-sm font-extrabold">{t("title")}</span>
               {unreadCount > 0 && (
                 <button
                   type="button"
@@ -151,9 +143,7 @@ export function NotificationCenter() {
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <p className="truncate text-xs font-bold">
-                                {n.title}
-                              </p>
+                              <p className="truncate text-xs font-bold">{n.title}</p>
                               {!n.read && (
                                 <span className="size-1.5 shrink-0 rounded-full bg-danger" />
                               )}

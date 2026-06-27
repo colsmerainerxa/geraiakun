@@ -21,8 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { downloadCsv } from "@/lib/csv"
 import { useOrders } from "@/lib/api/queries"
+import { downloadCsv } from "@/lib/csv"
 import { formatDate, formatIDR } from "@/lib/utils"
 import { useAdminOverlay } from "@/stores/admin-overlay"
 import type { OrderStatus } from "@/types"
@@ -44,8 +44,7 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<OrderStatus | "semua">("semua")
 
-  const eff = (invoice: string, fallback: OrderStatus): OrderStatus =>
-    overlay[invoice] ?? fallback
+  const eff = (invoice: string, fallback: OrderStatus): OrderStatus => overlay[invoice] ?? fallback
 
   const filtered = useMemo(() => {
     if (!orders) return []
@@ -53,10 +52,7 @@ export default function AdminOrdersPage() {
     return orders.filter((o) => {
       if (status !== "semua" && eff(o.invoice, o.status) !== status) return false
       if (!q) return true
-      return (
-        o.invoice.toLowerCase().includes(q) ||
-        o.customerName.toLowerCase().includes(q)
-      )
+      return o.invoice.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orders, search, status, overlay])
@@ -88,10 +84,7 @@ export default function AdminOrdersPage() {
             className="pl-9"
           />
         </div>
-        <Select
-          value={status}
-          onValueChange={(v) => setStatus(v as OrderStatus | "semua")}
-        >
+        <Select value={status} onValueChange={(v) => setStatus(v as OrderStatus | "semua")}>
           <SelectTrigger className="w-full sm:w-52">
             <SelectValue />
           </SelectTrigger>
@@ -128,15 +121,11 @@ export default function AdminOrdersPage() {
             <TableBody>
               {filtered.map((o) => (
                 <TableRow key={o.id}>
-                  <TableCell className="font-heading font-bold">
-                    {o.invoice}
-                  </TableCell>
+                  <TableCell className="font-heading font-bold">{o.invoice}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-bold">{o.customerName}</span>
-                      <span className="text-xs text-foreground/50">
-                        {o.customerEmail}
-                      </span>
+                      <span className="text-xs text-foreground/50">{o.customerEmail}</span>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-48">
@@ -144,9 +133,7 @@ export default function AdminOrdersPage() {
                       {o.items.map((it) => it.productName).join(", ")}
                     </span>
                   </TableCell>
-                  <TableCell className="font-heading font-bold">
-                    {formatIDR(o.total)}
-                  </TableCell>
+                  <TableCell className="font-heading font-bold">{formatIDR(o.total)}</TableCell>
                   <TableCell className="text-foreground/70">
                     {paymentLabel(o.paymentMethod)}
                   </TableCell>
@@ -157,9 +144,7 @@ export default function AdminOrdersPage() {
                     {/* Inline status editor (demo overlay) */}
                     <Select
                       value={eff(o.invoice, o.status)}
-                      onValueChange={(v) =>
-                        setOrderStatus(o.invoice, v as OrderStatus)
-                      }
+                      onValueChange={(v) => setOrderStatus(o.invoice, v as OrderStatus)}
                     >
                       <SelectTrigger className="h-9 w-40">
                         <SelectValue />
@@ -177,10 +162,7 @@ export default function AdminOrdersPage() {
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="py-12 text-center text-foreground/50"
-                  >
+                  <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
                     Tidak ada pesanan yang cocok.
                   </TableCell>
                 </TableRow>

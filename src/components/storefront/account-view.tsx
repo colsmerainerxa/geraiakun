@@ -8,26 +8,18 @@ import { ProductCard } from "@/components/storefront/product-card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useOrders } from "@/lib/api/queries"
 import { products } from "@/lib/mock/products"
 import { cn, formatDate, formatIDR, formatNumber, initials } from "@/lib/utils"
-import { useWishlist } from "@/stores/wishlist"
-import { useUser } from "@/stores/user"
 import { getTier, useLoyalty } from "@/stores/loyalty"
+import { useUser } from "@/stores/user"
+import { useWishlist } from "@/stores/wishlist"
 import type { OrderStatus } from "@/types"
 
-const statusVariant: Record<
-  OrderStatus,
-  "warning" | "cyan" | "success" | "danger"
-> = {
+const statusVariant: Record<OrderStatus, "warning" | "cyan" | "success" | "danger"> = {
   "menunggu-pembayaran": "warning",
   diproses: "cyan",
   selesai: "success",
@@ -61,9 +53,7 @@ export function AccountView() {
   const list = orders ?? []
   const totalOrders = list.length
   const activeCount = list.filter((o) => o.status === "selesai").length
-  const totalSpent = list
-    .filter((o) => o.paidAt)
-    .reduce((s, o) => s + o.total, 0)
+  const totalSpent = list.filter((o) => o.paidAt).reduce((s, o) => s + o.total, 0)
 
   const delivered = list.filter((o) => o.credentials.length > 0)
   const loyaltyPoints = useLoyalty((s) => s.points)
@@ -97,12 +87,8 @@ export function AccountView() {
       <Reveal>
         <div className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <Avatar className="size-16">
-            {mounted && profile.avatar && (
-              <AvatarImage src={profile.avatar} alt={profile.name} />
-            )}
-            <AvatarFallback>
-              {initials(mounted ? profile.name : "Rafa Pratama")}
-            </AvatarFallback>
+            {mounted && profile.avatar && <AvatarImage src={profile.avatar} alt={profile.name} />}
+            <AvatarFallback>{initials(mounted ? profile.name : "Rafa Pratama")}</AvatarFallback>
           </Avatar>
           <div>
             <p className="text-sm text-foreground/60">{t("greeting")},</p>
@@ -201,16 +187,12 @@ export function AccountView() {
                       href={`/lacak?inv=${o.invoice}`}
                       className="grid grid-cols-2 gap-3 px-5 py-4 transition-colors hover:bg-main/10 sm:grid-cols-[1.4fr_1fr_1fr_1fr] sm:items-center sm:gap-4"
                     >
-                      <span className="font-heading font-bold">
-                        {o.invoice}
-                      </span>
+                      <span className="font-heading font-bold">{o.invoice}</span>
                       <span className="text-sm text-foreground/70">
                         {formatDate(o.createdAt, dateLocale)}
                       </span>
                       <span>
-                        <Badge variant={statusVariant[o.status]}>
-                          {ts(o.status)}
-                        </Badge>
+                        <Badge variant={statusVariant[o.status]}>{ts(o.status)}</Badge>
                       </span>
                       <span className="text-right font-heading font-extrabold">
                         {formatIDR(o.total)}
@@ -250,12 +232,8 @@ export function AccountView() {
                         {item.productLogo}
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate font-heading font-bold">
-                          {item.productName}
-                        </p>
-                        <p className="truncate text-xs text-foreground/60">
-                          {item.variantLabel}
-                        </p>
+                        <p className="truncate font-heading font-bold">{item.productName}</p>
+                        <p className="truncate text-xs text-foreground/60">{item.variantLabel}</p>
                         <p className="mt-1 truncate font-mono text-xs text-foreground/70">
                           {maskEmail(cred.email)}
                         </p>

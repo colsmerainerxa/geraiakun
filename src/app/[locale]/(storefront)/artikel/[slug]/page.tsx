@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import { getTranslations, setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
 import { Reveal } from "@/components/shared/motion"
 import { ProductCard } from "@/components/storefront/product-card"
@@ -9,18 +9,12 @@ import { Badge } from "@/components/ui/badge"
 import { Link } from "@/i18n/navigation"
 import { articles, getArticle, relatedArticles } from "@/lib/mock/articles"
 import { products } from "@/lib/mock/products"
-import {
-  articleJsonLd,
-  breadcrumbJsonLd,
-  JsonLd,
-} from "@/lib/seo/json-ld"
+import { articleJsonLd, breadcrumbJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
 import { formatDate } from "@/lib/utils"
 
 export function generateStaticParams() {
-  return articles.flatMap((a) =>
-    ["id", "en"].map((locale) => ({ locale, slug: a.slug })),
-  )
+  return articles.flatMap((a) => ["id", "en"].map((locale) => ({ locale, slug: a.slug })))
 }
 
 export async function generateMetadata({
@@ -69,6 +63,7 @@ export default async function ArticlePage({
   return (
     <Container className="py-10 lg:py-12">
       <JsonLd
+        id={`jsonld-article-${slug}`}
         data={articleJsonLd({
           title,
           description: isEn ? article.excerptEn : article.excerpt,
@@ -77,6 +72,7 @@ export default async function ArticlePage({
         })}
       />
       <JsonLd
+        id={`jsonld-article-breadcrumb-${slug}`}
         data={breadcrumbJsonLd([
           { name: "Beranda", path: locale === "en" ? "/en" : "/" },
           { name: tn("blog"), path: locale === "en" ? "/en/artikel" : "/artikel" },
@@ -120,12 +116,8 @@ export default async function ArticlePage({
         <div className="mt-8 flex flex-col gap-8">
           {article.sections.map((s) => (
             <section key={s.heading}>
-              <h2 className="font-heading text-xl font-bold">
-                {isEn ? s.headingEn : s.heading}
-              </h2>
-              <p className="mt-2 leading-relaxed text-foreground/80">
-                {isEn ? s.bodyEn : s.body}
-              </p>
+              <h2 className="font-heading text-xl font-bold">{isEn ? s.headingEn : s.heading}</h2>
+              <p className="mt-2 leading-relaxed text-foreground/80">{isEn ? s.bodyEn : s.body}</p>
             </section>
           ))}
         </div>
@@ -152,9 +144,7 @@ export default async function ArticlePage({
       {/* More articles */}
       {more.length > 0 && (
         <div className="mt-16">
-          <h2 className="font-heading text-2xl font-extrabold">
-            {t("moreArticles")}
-          </h2>
+          <h2 className="font-heading text-2xl font-extrabold">{t("moreArticles")}</h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-3">
             {more.map((a) => (
               <Link

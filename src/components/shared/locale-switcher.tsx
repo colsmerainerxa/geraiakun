@@ -1,7 +1,7 @@
 "use client"
 
-import { useLocale } from "next-intl"
 import { useParams } from "next/navigation"
+import { useLocale } from "next-intl"
 import { useTransition } from "react"
 import {
   DropdownMenu,

@@ -43,8 +43,7 @@ const WARRANTY_BY_TYPE = [
     type: "Invite",
     days: 14,
     desc: "Undangan resmi ke email kamu, garansi sampai kamu berhasil join.",
-    descEn:
-      "Official invitation to your email, warranted until you successfully join.",
+    descEn: "Official invitation to your email, warranted until you successfully join.",
     accent: "bg-accent-purple",
   },
   {
@@ -134,11 +133,7 @@ export default async function WarrantyPolicyPage({
               </span>
               <h3 className="font-heading text-base font-extrabold">{w.type}</h3>
               <Badge variant="neutral" className="w-fit">
-                {w.days
-                  ? `${w.days} hari`
-                  : isEn
-                    ? "Lifetime"
-                    : "Seumur Hidup"}
+                {w.days ? `${w.days} hari` : isEn ? "Lifetime" : "Seumur Hidup"}
               </Badge>
               <p className="text-xs leading-relaxed text-foreground/70">
                 {isEn ? w.descEn : w.desc}

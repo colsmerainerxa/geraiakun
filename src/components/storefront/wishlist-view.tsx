@@ -15,11 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { products } from "@/lib/mock/products"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
-import { useMounted } from "@/hooks/use-mounted"
 import { useWishlist } from "@/stores/wishlist"
 import type { Product } from "@/types"
 
@@ -72,9 +72,7 @@ export function WishlistView() {
   }, [wished, sort])
 
   const totalValue = wished.reduce((s, p) => s + minPrice(p), 0)
-  const inStockCount = wished.filter(
-    (p) => p.variants.some((v) => v.stock > 0),
-  ).length
+  const inStockCount = wished.filter((p) => p.variants.some((v) => v.stock > 0)).length
 
   function addAllToCart() {
     if (wished.length === 0) return
@@ -108,9 +106,7 @@ export function WishlistView() {
     <Container className="py-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-heading text-3xl font-extrabold sm:text-4xl">
-            {t("pageTitle")}
-          </h1>
+          <h1 className="font-heading text-3xl font-extrabold sm:text-4xl">{t("pageTitle")}</h1>
           <p className="mt-1 text-foreground/60">{t("pageSubtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -141,9 +137,7 @@ export function WishlistView() {
             </Badge>
             <span className="text-foreground/60">
               {t("totalValue")}:{" "}
-              <strong className="text-foreground">
-                {formatPrice(totalValue, isEn)}
-              </strong>
+              <strong className="text-foreground">{formatPrice(totalValue, isEn)}</strong>
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -197,9 +191,7 @@ function EmptyWishlist() {
       </span>
       <div>
         <h3 className="font-heading text-xl font-extrabold">{t("empty")}</h3>
-        <p className="mt-1 max-w-sm text-sm text-foreground/60">
-          {t("emptyDesc")}
-        </p>
+        <p className="mt-1 max-w-sm text-sm text-foreground/60">{t("emptyDesc")}</p>
       </div>
       <Button asChild size="lg">
         <Link href="/katalog">

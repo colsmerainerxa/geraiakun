@@ -169,26 +169,18 @@ export function CheckoutView() {
         >
           <CheckCircle2 className="size-12" />
         </motion.div>
-        <h1 className="mt-6 font-heading text-3xl font-extrabold">
-          {t("successTitle")}
-        </h1>
+        <h1 className="mt-6 font-heading text-3xl font-extrabold">{t("successTitle")}</h1>
         <p className="mt-2 max-w-md text-foreground/70">{t("successDesc")}</p>
         <div className="mt-5 rounded-base border-2 border-dashed border-border bg-secondary-background px-5 py-3">
-          <span className="text-xs text-foreground/60">
-            {t("invoiceLabel")}
-          </span>
-          <p className="font-heading text-xl font-extrabold tracking-wide">
-            {done.invoice}
-          </p>
+          <span className="text-xs text-foreground/60">{t("invoiceLabel")}</span>
+          <p className="font-heading text-xl font-extrabold tracking-wide">{done.invoice}</p>
         </div>
 
         {done.credentials.length > 0 && (
           <div className="mt-6 w-full max-w-md text-left">
             <div className="mb-2 flex items-center justify-center gap-2">
               <KeyRound className="size-4" />
-              <span className="font-heading text-sm font-bold">
-                {tt("credentials")}
-              </span>
+              <span className="font-heading text-sm font-bold">{tt("credentials")}</span>
             </div>
             <div className="flex flex-col gap-2">
               {done.credentials.map((c) => (
@@ -201,9 +193,7 @@ export function CheckoutView() {
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(
-                          `${c.email} / ${c.password}`,
-                        )
+                        navigator.clipboard.writeText(`${c.email} / ${c.password}`)
                         toast.success(tt("copied"))
                       }}
                       className="flex size-7 shrink-0 items-center justify-center rounded-base border-2 border-border bg-background hover:bg-main"
@@ -212,9 +202,7 @@ export function CheckoutView() {
                       <Copy className="size-3.5" />
                     </button>
                   </div>
-                  <span className="block font-mono text-foreground/70">
-                    {c.password}
-                  </span>
+                  <span className="block font-mono text-foreground/70">{c.password}</span>
                 </div>
               ))}
             </div>
@@ -256,20 +244,13 @@ export function CheckoutView() {
       >
         <ArrowLeft className="size-4" /> {tc("back")}
       </Link>
-      <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">
-        {t("title")}
-      </h1>
+      <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">{t("title")}</h1>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid gap-8 lg:grid-cols-[1fr_380px]"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8 lg:grid-cols-[1fr_380px]">
         <div className="flex flex-col gap-8">
           {/* Contact */}
           <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">
-              {t("contactInfo")}
-            </h2>
+            <h2 className="font-heading text-lg font-bold">{t("contactInfo")}</h2>
             <div className="mt-4 grid gap-4">
               <div className="grid gap-1.5">
                 <Label htmlFor="name">{t("name")}</Label>
@@ -281,10 +262,7 @@ export function CheckoutView() {
                   {...register("name")}
                 />
                 {errors.name && (
-                  <span
-                    id="name-error"
-                    className="text-xs font-bold text-danger"
-                  >
+                  <span id="name-error" className="text-xs font-bold text-danger">
                     {errors.name.message}
                   </span>
                 )}
@@ -300,10 +278,7 @@ export function CheckoutView() {
                   {...register("email")}
                 />
                 {errors.email ? (
-                  <span
-                    id="email-error"
-                    className="text-xs font-bold text-danger"
-                  >
+                  <span id="email-error" className="text-xs font-bold text-danger">
                     {errors.email.message}
                   </span>
                 ) : (
@@ -319,16 +294,11 @@ export function CheckoutView() {
                   inputMode="tel"
                   placeholder={t("whatsappPlaceholder")}
                   aria-invalid={!!errors.whatsapp}
-                  aria-describedby={
-                    errors.whatsapp ? "whatsapp-error" : undefined
-                  }
+                  aria-describedby={errors.whatsapp ? "whatsapp-error" : undefined}
                   {...register("whatsapp")}
                 />
                 {errors.whatsapp && (
-                  <span
-                    id="whatsapp-error"
-                    className="text-xs font-bold text-danger"
-                  >
+                  <span id="whatsapp-error" className="text-xs font-bold text-danger">
                     {errors.whatsapp.message}
                   </span>
                 )}
@@ -338,9 +308,7 @@ export function CheckoutView() {
 
           {/* Payment */}
           <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">
-              {t("paymentMethod")}
-            </h2>
+            <h2 className="font-heading text-lg font-bold">{t("paymentMethod")}</h2>
             <div className="mt-4 flex flex-col gap-5">
               {PAYMENT_GROUPS.map((g) => (
                 <div key={g.group}>
@@ -369,9 +337,7 @@ export function CheckoutView() {
                               active && "bg-accent-lime",
                             )}
                           >
-                            {active && (
-                              <span className="size-1.5 rounded-full bg-foreground" />
-                            )}
+                            {active && <span className="size-1.5 rounded-full bg-foreground" />}
                           </span>
                         </button>
                       )
@@ -386,9 +352,7 @@ export function CheckoutView() {
         {/* Summary */}
         <aside className="lg:sticky lg:top-20 lg:self-start">
           <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">
-              {t("orderSummary")}
-            </h2>
+            <h2 className="font-heading text-lg font-bold">{t("orderSummary")}</h2>
             <ul className="mt-4 flex flex-col gap-3">
               {items.map((item) => (
                 <li key={item.variantId} className="flex gap-3">
@@ -436,18 +400,11 @@ export function CheckoutView() {
               </div>
               <div className="mt-1 flex items-center justify-between border-t-2 border-border pt-2">
                 <span className="font-heading font-bold">{tc("total")}</span>
-                <span className="font-heading text-2xl font-extrabold">
-                  {formatIDR(total)}
-                </span>
+                <span className="font-heading text-2xl font-extrabold">{formatIDR(total)}</span>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="mt-5 w-full"
-              disabled={processing}
-            >
+            <Button type="submit" size="lg" className="mt-5 w-full" disabled={processing}>
               {processing ? (
                 t("processing")
               ) : (

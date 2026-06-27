@@ -75,9 +75,7 @@ export function CountdownTimer({
               variant === "compact" && "px-1.5",
             )}
           >
-            <span className="font-heading text-lg font-extrabold tabular-nums">
-              --
-            </span>
+            <span className="font-heading text-lg font-extrabold tabular-nums">--</span>
           </div>
         ))}
       </div>
@@ -101,9 +99,7 @@ export function CountdownTimer({
             </span>
           </div>
           {i < UNITS.length - 1 && (
-            <span className="font-heading text-lg font-extrabold text-foreground/40">
-              :
-            </span>
+            <span className="font-heading text-lg font-extrabold text-foreground/40">:</span>
           )}
         </div>
       ))}

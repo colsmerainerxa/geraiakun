@@ -1,14 +1,11 @@
 "use client"
 
 import { SlidersHorizontal, X } from "lucide-react"
-import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
 import { Container } from "@/components/shared/container"
-import {
-  ProductCard,
-  ProductCardSkeleton,
-} from "@/components/storefront/product-card"
+import { ProductCard, ProductCardSkeleton } from "@/components/storefront/product-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -19,13 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useCategories, useProducts } from "@/lib/api/queries"
 import type { ProductQuery, SortKey } from "@/lib/mock/fake-api"
 import { cn } from "@/lib/utils"
@@ -74,9 +65,7 @@ function Filters({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
-          {t("category")}
-        </h3>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">{t("category")}</h3>
         <div className="flex flex-col gap-1">
           <button
             type="button"
@@ -110,9 +99,7 @@ function Filters({
       </div>
 
       <div>
-        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
-          {t("priceRange")}
-        </h3>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">{t("priceRange")}</h3>
         <div className="flex flex-col gap-1">
           {PRICE_RANGES.map((r, i) => (
             <button
@@ -133,9 +120,7 @@ function Filters({
       </div>
 
       <div>
-        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">
-          {t("badges")}
-        </h3>
+        <h3 className="mb-3 font-heading text-sm font-extrabold uppercase">{t("badges")}</h3>
         <div className="flex flex-col gap-2">
           {BADGE_OPTIONS.map((b) => (
             <label
@@ -179,17 +164,14 @@ export function CatalogView() {
       sort,
       badges: badges.length ? badges : undefined,
       minPrice: range?.min,
-      maxPrice:
-        range && range.max !== Number.POSITIVE_INFINITY ? range.max : undefined,
+      maxPrice: range && range.max !== Number.POSITIVE_INFINITY ? range.max : undefined,
     }
   }, [category, initialSearch, sort, badges, priceIdx])
 
   const { data: products, isLoading } = useProducts(query)
 
   function toggleBadge(b: string) {
-    setBadges((prev) =>
-      prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b],
-    )
+    setBadges((prev) => (prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]))
   }
   function reset() {
     setCategory("semua")
@@ -212,9 +194,7 @@ export function CatalogView() {
     <Container className="py-10">
       <div className="mb-6">
         <h1 className="font-heading text-3xl font-extrabold sm:text-4xl">
-          {initialSearch
-            ? `${t("searchResultsFor")} “${initialSearch}”`
-            : t("title")}
+          {initialSearch ? `${t("searchResultsFor")} “${initialSearch}”` : t("title")}
         </h1>
         <p className="mt-1 text-foreground/60">{t("subtitle")}</p>
       </div>
@@ -293,9 +273,7 @@ export function CatalogView() {
           ) : (
             <div className="flex flex-col items-center justify-center gap-3 rounded-base border-2 border-dashed border-border py-20 text-center">
               <span className="text-5xl">🔍</span>
-              <h3 className="font-heading text-lg font-bold">
-                {t("noResults")}
-              </h3>
+              <h3 className="font-heading text-lg font-bold">{t("noResults")}</h3>
               <p className="text-sm text-foreground/60">{t("noResultsDesc")}</p>
               <Button variant="neutral" onClick={reset} className="mt-2">
                 {t("reset")}

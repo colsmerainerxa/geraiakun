@@ -90,11 +90,7 @@ export function ReferralView() {
 
   return (
     <Container className="py-12">
-      <SectionHeading
-        eyebrow={`🤝 ${t("eyebrow")}`}
-        title={t("title")}
-        subtitle={t("subtitle")}
-      />
+      <SectionHeading eyebrow={`🤝 ${t("eyebrow")}`} title={t("title")} subtitle={t("subtitle")} />
 
       {/* Hero: kode + share */}
       <div className="mt-8 overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
@@ -103,14 +99,9 @@ export function ReferralView() {
             <p className="text-xs font-extrabold uppercase tracking-wide text-main-foreground/70">
               {t("yourCode")}
             </p>
-            <p className="font-heading text-3xl font-extrabold tracking-wide sm:text-4xl">
-              {code}
-            </p>
+            <p className="font-heading text-3xl font-extrabold tracking-wide sm:text-4xl">{code}</p>
           </div>
-          <Button
-            variant="neutral"
-            onClick={() => copy(code, t("codeCopiedDesc"))}
-          >
+          <Button variant="neutral" onClick={() => copy(code, t("codeCopiedDesc"))}>
             <Copy className="size-4" /> {t("copyCode")}
           </Button>
         </div>
@@ -204,17 +195,35 @@ export function ReferralView() {
 
       {/* Stats */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={Users} label={t("statInvited")} value={formatNumber(totalInvited)} accent="bg-accent-cyan" />
-        <Stat icon={TrendingUp} label={t("statConverted")} value={formatNumber(totalConverted)} accent="bg-accent-lime" />
-        <Stat icon={Gift} label={t("statPoints")} value={formatNumber(totalPoints)} accent="bg-accent-pink" />
-        <Stat icon={Ticket} label={t("statCommission")} value={formatIDR(totalCommission, { compact: true })} accent="bg-main" />
+        <Stat
+          icon={Users}
+          label={t("statInvited")}
+          value={formatNumber(totalInvited)}
+          accent="bg-accent-cyan"
+        />
+        <Stat
+          icon={TrendingUp}
+          label={t("statConverted")}
+          value={formatNumber(totalConverted)}
+          accent="bg-accent-lime"
+        />
+        <Stat
+          icon={Gift}
+          label={t("statPoints")}
+          value={formatNumber(totalPoints)}
+          accent="bg-accent-pink"
+        />
+        <Stat
+          icon={Ticket}
+          label={t("statCommission")}
+          value={formatIDR(totalCommission, { compact: true })}
+          accent="bg-main"
+        />
       </div>
 
       {/* Simulator (demo) */}
       <div className="mt-8 rounded-base border-2 border-dashed border-border bg-secondary-background p-5">
-        <h3 className="font-heading text-sm font-extrabold">
-          {t("simTitle")}
-        </h3>
+        <h3 className="font-heading text-sm font-extrabold">{t("simTitle")}</h3>
         <p className="mt-1 text-xs text-foreground/60">{t("simDesc")}</p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <Input
@@ -245,9 +254,7 @@ export function ReferralView() {
             <span className="text-right">{t("colReward")}</span>
           </div>
           {entries.length === 0 ? (
-            <p className="p-6 text-center text-sm text-foreground/60">
-              {t("empty")}
-            </p>
+            <p className="p-6 text-center text-sm text-foreground/60">{t("empty")}</p>
           ) : (
             <ul className="divide-y-2 divide-dashed divide-border">
               {entries.map((e) => (
@@ -261,9 +268,7 @@ export function ReferralView() {
                   </span>
                   <span>
                     <Badge variant={e.status === "bertransaksi" ? "success" : "warning"}>
-                      {e.status === "bertransaksi"
-                        ? t("statusConverted")
-                        : t("statusJoined")}
+                      {e.status === "bertransaksi" ? t("statusConverted") : t("statusJoined")}
                     </Badge>
                   </span>
                   <span className="text-right text-xs">
@@ -298,7 +303,12 @@ function BenefitRow({
 }) {
   return (
     <div className="flex items-start gap-3 rounded-base border-2 border-border bg-background p-3">
-      <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm", accent)}>
+      <span
+        className={cn(
+          "flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm",
+          accent,
+        )}
+      >
         <Icon className="size-4" />
       </span>
       <div>
@@ -322,13 +332,16 @@ function Stat({
 }) {
   return (
     <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
-      <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm", accent)}>
+      <span
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm",
+          accent,
+        )}
+      >
         <Icon className="size-5" />
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">
-          {label}
-        </p>
+        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">{label}</p>
         <p className="truncate font-heading text-xl font-extrabold">{value}</p>
       </div>
     </div>

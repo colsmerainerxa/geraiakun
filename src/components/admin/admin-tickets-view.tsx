@@ -42,13 +42,7 @@ const STATUS_META: Record<
   ditolak: { label: "Ditolak", variant: "danger" },
 }
 
-const STATUS_OPTIONS: TicketStatus[] = [
-  "baru",
-  "ditinjau",
-  "diproses",
-  "selesai",
-  "ditolak",
-]
+const STATUS_OPTIONS: TicketStatus[] = ["baru", "ditinjau", "diproses", "selesai", "ditolak"]
 
 const TYPE_LABEL: Record<Ticket["type"], string> = {
   garansi: "Garansi",
@@ -57,10 +51,7 @@ const TYPE_LABEL: Record<Ticket["type"], string> = {
   lainnya: "Lainnya",
 }
 
-const PRIORITY_VARIANT: Record<
-  Ticket["priority"],
-  "neutral" | "warning" | "danger"
-> = {
+const PRIORITY_VARIANT: Record<Ticket["priority"], "neutral" | "warning" | "danger"> = {
   rendah: "neutral",
   normal: "warning",
   tinggi: "danger",
@@ -88,8 +79,7 @@ export function AdminTicketsView() {
     const list = tickets
     return {
       total: list.length,
-      open: list.filter((t) => t.status === "baru" || t.status === "ditinjau")
-        .length,
+      open: list.filter((t) => t.status === "baru" || t.status === "ditinjau").length,
       processing: list.filter((t) => t.status === "diproses").length,
       done: list.filter((t) => t.status === "selesai").length,
     }
@@ -126,30 +116,15 @@ export function AdminTicketsView() {
     <div className="flex flex-col gap-6">
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MiniStat
-          icon={Inbox}
-          label="Total Tiket"
-          value={stats.total}
-          accent="bg-accent-cyan"
-        />
-        <MiniStat
-          icon={Clock}
-          label="Perlu Tindakan"
-          value={stats.open}
-          accent="bg-warning"
-        />
+        <MiniStat icon={Inbox} label="Total Tiket" value={stats.total} accent="bg-accent-cyan" />
+        <MiniStat icon={Clock} label="Perlu Tindakan" value={stats.open} accent="bg-warning" />
         <MiniStat
           icon={ArrowRight}
           label="Diproses"
           value={stats.processing}
           accent="bg-accent-purple"
         />
-        <MiniStat
-          icon={Star}
-          label="Selesai"
-          value={stats.done}
-          accent="bg-accent-lime"
-        />
+        <MiniStat icon={Star} label="Selesai" value={stats.done} accent="bg-accent-lime" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
@@ -209,9 +184,7 @@ export function AdminTicketsView() {
                       {STATUS_META[t.status].label}
                     </Badge>
                   </div>
-                  <p className="mt-1.5 line-clamp-1 font-heading text-sm font-bold">
-                    {t.subject}
-                  </p>
+                  <p className="mt-1.5 line-clamp-1 font-heading text-sm font-bold">{t.subject}</p>
                   <div className="mt-1.5 flex items-center gap-2 text-xs text-foreground/60">
                     <span className="truncate">{t.customerName}</span>
                     <span>·</span>
@@ -241,9 +214,7 @@ export function AdminTicketsView() {
                     <span className="font-heading text-xs font-extrabold text-foreground/50">
                       {active.code}
                     </span>
-                    <h2 className="font-heading text-xl font-extrabold">
-                      {active.subject}
-                    </h2>
+                    <h2 className="font-heading text-xl font-extrabold">{active.subject}</h2>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <Badge variant={STATUS_META[active.status].variant}>
                         {STATUS_META[active.status].label}
@@ -321,10 +292,7 @@ export function AdminTicketsView() {
                 {active.messages.map((m) => (
                   <div
                     key={m.id}
-                    className={cn(
-                      "flex gap-3",
-                      m.role === "agen" && "flex-row-reverse",
-                    )}
+                    className={cn("flex gap-3", m.role === "agen" && "flex-row-reverse")}
                   >
                     <Avatar className="size-9 shrink-0">
                       <AvatarFallback>
@@ -334,9 +302,7 @@ export function AdminTicketsView() {
                     <div
                       className={cn(
                         "max-w-[80%] rounded-base border-2 border-border p-3 text-sm shadow-shadow-sm",
-                        m.role === "agen"
-                          ? "bg-main"
-                          : "bg-secondary-background",
+                        m.role === "agen" ? "bg-main" : "bg-secondary-background",
                       )}
                     >
                       <div className="mb-1 flex items-center gap-2 text-xs font-bold">
@@ -382,8 +348,8 @@ export function AdminTicketsView() {
                 </div>
               ) : (
                 <div className="rounded-base border-2 border-dashed border-border bg-background p-4 text-center text-sm text-foreground/60">
-                  Tiket ini sudah <strong>{STATUS_META[active.status].label}</strong>.
-                  Ubah status di atas untuk membuka kembali percakapan.
+                  Tiket ini sudah <strong>{STATUS_META[active.status].label}</strong>. Ubah status
+                  di atas untuk membuka kembali percakapan.
                 </div>
               )}
             </div>
@@ -416,9 +382,7 @@ function MiniStat({
         <Icon className="size-5" />
       </span>
       <div>
-        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">
-          {label}
-        </p>
+        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">{label}</p>
         <p className="font-heading text-xl font-extrabold">{value}</p>
       </div>
     </div>
@@ -433,8 +397,7 @@ function EmptyDetail() {
       </span>
       <h3 className="font-heading text-lg font-bold">Pilih tiket</h3>
       <p className="max-w-xs text-sm text-foreground/60">
-        Pilih tiket dari daftar di kiri untuk membaca percakapan dan membalas
-        pelanggan.
+        Pilih tiket dari daftar di kiri untuk membaca percakapan dan membalas pelanggan.
       </p>
     </div>
   )

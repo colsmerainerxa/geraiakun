@@ -58,24 +58,13 @@ function toFlat(r: Review): FlatReview {
   }
 }
 
-function StarRow({
-  rating,
-  size = "size-3",
-}: {
-  rating: number
-  size?: string
-}) {
+function StarRow({ rating, size = "size-3" }: { rating: number; size?: string }) {
   return (
     <span className="inline-flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={cn(
-            size,
-            i < rating
-              ? "fill-warning text-warning"
-              : "text-foreground/20",
-          )}
+          className={cn(size, i < rating ? "fill-warning text-warning" : "text-foreground/20")}
         />
       ))}
     </span>
@@ -104,9 +93,7 @@ function RatingDistribution({
               className="h-2.5 flex-1 border-0 bg-foreground/10"
               indicatorClassName="bg-warning"
             />
-            <span className="w-8 text-right text-xs font-bold text-foreground/60">
-              {count}
-            </span>
+            <span className="w-8 text-right text-xs font-bold text-foreground/60">{count}</span>
           </div>
         )
       })}
@@ -114,13 +101,7 @@ function RatingDistribution({
   )
 }
 
-function ReviewForm({
-  productId,
-  productName,
-}: {
-  productId: string
-  productName: string
-}) {
+function ReviewForm({ productId, productName }: { productId: string; productName: string }) {
   const t = useTranslations("reviews")
   const tc = useTranslations("common")
   const isEn = useLocale() === "en"
@@ -189,16 +170,12 @@ function ReviewForm({
               <Star
                 className={cn(
                   "size-7 transition-transform hover:scale-110",
-                  (hover || rating) >= s
-                    ? "fill-warning text-warning"
-                    : "text-foreground/20",
+                  (hover || rating) >= s ? "fill-warning text-warning" : "text-foreground/20",
                 )}
               />
             </button>
           ))}
-          {rating > 0 && (
-            <span className="ml-2 font-heading font-bold">{rating}/5</span>
-          )}
+          {rating > 0 && <span className="ml-2 font-heading font-bold">{rating}/5</span>}
         </div>
       </div>
 
@@ -257,9 +234,7 @@ export function ReviewsSection({
   const t = useTranslations("reviews")
   const isEn = useLocale() === "en"
   const dateLocale = isEn ? "en-US" : "id-ID"
-  const userReviews = useReviewsStore((s) =>
-    s.reviewsForProduct(product.id),
-  )
+  const userReviews = useReviewsStore((s) => s.reviewsForProduct(product.id))
 
   const [sort, setSort] = useState<SortKey>("recent")
   const [filterStar, setFilterStar] = useState<number | null>(null)
@@ -308,30 +283,21 @@ export function ReviewsSection({
     return list
   }, [all, sort, filterStar])
 
-  const avg =
-    all.length > 0
-      ? all.reduce((s, r) => s + r.rating, 0) / all.length
-      : product.rating
+  const avg = all.length > 0 ? all.reduce((s, r) => s + r.rating, 0) / all.length : product.rating
 
   return (
     <div id="reviews" className="scroll-mt-20">
       {/* Summary */}
       <div className="grid gap-5 rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow sm:grid-cols-[200px_1fr]">
         <div className="flex flex-col items-center justify-center border-b-2 border-dashed border-border pb-4 text-center sm:border-b-0 sm:border-r-2 sm:pb-0 sm:pr-5">
-          <span className="font-heading text-5xl font-extrabold">
-            {avg.toFixed(1)}
-          </span>
+          <span className="font-heading text-5xl font-extrabold">{avg.toFixed(1)}</span>
           <StarRow rating={Math.round(avg)} size="size-4" />
           <span className="mt-1 text-xs text-foreground/60">
             {t("basedOn", { count: all.length })}
           </span>
         </div>
         <div className="flex flex-col gap-3">
-          <RatingDistribution
-            distribution={distribution}
-            isEn={isEn}
-            t={t}
-          />
+          <RatingDistribution distribution={distribution} isEn={isEn} t={t} />
         </div>
       </div>
 
@@ -400,17 +366,13 @@ export function ReviewsSection({
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-heading text-sm font-bold">
-                      {r.author}
-                    </span>
+                    <span className="font-heading text-sm font-bold">{r.author}</span>
                     {r.verified && (
                       <Badge variant="success" className="gap-1">
                         ✓ {isEn ? "Verified" : "Terverifikasi"}
                       </Badge>
                     )}
-                    {r.userGenerated && (
-                      <Badge variant="lime">{t("yourReview")}</Badge>
-                    )}
+                    {r.userGenerated && <Badge variant="lime">{t("yourReview")}</Badge>}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-foreground/50">
                     <StarRow rating={r.rating} />
@@ -419,9 +381,7 @@ export function ReviewsSection({
                   </div>
                 </div>
               </div>
-              {r.title && (
-                <p className="mt-2 font-heading text-sm font-bold">{r.title}</p>
-              )}
+              {r.title && <p className="mt-2 font-heading text-sm font-bold">{r.title}</p>}
               <p className="mt-1.5 text-sm text-foreground/80">{r.comment}</p>
             </motion.div>
           ))}
