@@ -1,6 +1,15 @@
 "use client"
 
-import { ArrowRight, Gift, Package, Sparkles, Wallet } from "lucide-react"
+import {
+  ArrowRight,
+  Gift,
+  KeyRound,
+  Package,
+  RefreshCcw,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
+} from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { Reveal } from "@/components/shared/motion"
 import { AccountSettingsView } from "@/components/storefront/account-settings-view"
@@ -31,7 +40,7 @@ function maskEmail(email: string) {
   const [local, domain] = email.split("@")
   if (!domain) return email
   const visible = local.slice(0, 2)
-  return `${visible}${"•".repeat(Math.max(local.length - 2, 3))}@${domain}`
+  return `${visible}${"*".repeat(Math.max(local.length - 2, 3))}@${domain}`
 }
 
 export function AccountView() {
@@ -137,7 +146,7 @@ export function AccountView() {
               </span>
               <div>
                 <p className="font-heading text-sm font-extrabold">
-                  {loyaltyTier.name} · {formatNumber(loyaltyPoints)} poin
+                  {loyaltyTier.name} - {formatNumber(loyaltyPoints)} poin
                 </p>
                 <p className="text-xs text-foreground/70">{loyaltyTier.perk}</p>
               </div>
@@ -219,30 +228,73 @@ export function AccountView() {
           ) : delivered.length === 0 ? (
             <EmptyState label={t("noOrders")} />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {delivered.flatMap((o) =>
-                o.items.map((item, idx) => {
-                  const cred = o.credentials[idx] ?? o.credentials[0]
-                  return (
-                    <div
-                      key={`${o.id}-${item.variantId}-${idx}`}
-                      className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow"
-                    >
-                      <span className="flex size-12 shrink-0 items-center justify-center rounded-base border-2 border-border bg-secondary-background text-2xl">
-                        {item.productLogo}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="truncate font-heading font-bold">{item.productName}</p>
-                        <p className="truncate text-xs text-foreground/60">{item.variantLabel}</p>
-                        <p className="mt-1 truncate font-mono text-xs text-foreground/70">
-                          {maskEmail(cred.email)}
-                        </p>
+            <>
+              <Link
+                href="/akun/vault"
+                className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-base border-2 border-border bg-main p-5 shadow-shadow transition-all hover:-translate-y-0.5 hover:shadow-shadow-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex size-11 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
+                    <KeyRound className="size-5" />
+                  </span>
+                  <div>
+                    <p className="font-heading text-sm font-extrabold">Vault akun & renewal</p>
+                    <p className="text-xs text-main-foreground/70">
+                      Lihat health check, garansi, dan jadwal perpanjangan akun digital.
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-2 rounded-base border-2 border-border bg-secondary-background px-3 py-1.5 font-heading text-xs font-bold shadow-shadow-sm">
+                  <ShieldCheck className="size-4" /> Buka Vault
+                </span>
+              </Link>
+
+              <div className="mb-4 grid gap-3 sm:grid-cols-2">
+                <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
+                  <RefreshCcw className="size-5 text-accent-purple" />
+                  <div>
+                    <p className="font-heading text-sm font-bold">Renewal siap dipantau</p>
+                    <p className="text-xs text-foreground/60">
+                      Cocok untuk langganan private, invite, dan API key.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
+                  <ShieldCheck className="size-5 text-success" />
+                  <div>
+                    <p className="font-heading text-sm font-bold">Garansi terlihat jelas</p>
+                    <p className="text-xs text-foreground/60">
+                      Status warranty dan klaim kendala mudah ditemukan.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {delivered.flatMap((o) =>
+                  o.items.map((item, idx) => {
+                    const cred = o.credentials[idx] ?? o.credentials[0]
+                    return (
+                      <div
+                        key={`${o.id}-${item.variantId}-${idx}`}
+                        className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow"
+                      >
+                        <span className="flex size-12 shrink-0 items-center justify-center rounded-base border-2 border-border bg-secondary-background text-2xl">
+                          {item.productLogo}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate font-heading font-bold">{item.productName}</p>
+                          <p className="truncate text-xs text-foreground/60">{item.variantLabel}</p>
+                          <p className="mt-1 truncate font-mono text-xs text-foreground/70">
+                            {maskEmail(cred.email)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )
-                }),
-              )}
-            </div>
+                    )
+                  }),
+                )}
+              </div>
+            </>
           )}
         </TabsContent>
 
@@ -284,7 +336,9 @@ export function AccountView() {
 function EmptyState({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-base border-2 border-dashed border-border py-20 text-center">
-      <span className="text-5xl">📦</span>
+      <span className="flex size-14 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow">
+        <Package className="size-7" />
+      </span>
       <h3 className="font-heading text-lg font-bold">{label}</h3>
     </div>
   )

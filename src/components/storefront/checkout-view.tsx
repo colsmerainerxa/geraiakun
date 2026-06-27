@@ -2,15 +2,19 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+  Activity,
   ArrowLeft,
   CheckCircle2,
   Copy,
   CreditCard,
   Download,
+  FileText,
   KeyRound,
   Lock,
   QrCode,
+  ScanLine,
   ShieldCheck,
+  TimerReset,
   Wallet,
 } from "lucide-react"
 import { motion } from "motion/react"
@@ -27,8 +31,9 @@ import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { downloadInvoice } from "@/lib/invoice"
+import { checkoutAssuranceSteps } from "@/lib/mock/enterprise"
 import { computeDiscount } from "@/lib/promo"
-import { cn, formatIDR } from "@/lib/utils"
+import { cn, formatIDR, paymentLabel } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { usePurchasedOrders } from "@/stores/orders"
 import { usePromo } from "@/stores/promo"
@@ -76,6 +81,84 @@ const PAYMENT_GROUPS: {
 ]
 
 const FEE = 1000
+
+function CheckoutAssurancePanel({ method }: { method: PaymentMethod }) {
+  const highlights = [
+    {
+      icon: FileText,
+      label: "Invoice otomatis",
+      body: "Nomor invoice dibuat sebelum credential dikirim.",
+      accent: "bg-accent-cyan",
+    },
+    {
+      icon: ScanLine,
+      label: "Payment monitor",
+      body: `${paymentLabel(method)} dipantau sebagai status pembayaran real-time.`,
+      accent: "bg-accent-lime",
+    },
+    {
+      icon: Activity,
+      label: "Risk check",
+      body: "Order dicek dari duplikasi, stok, dan pola fraud ringan.",
+      accent: "bg-accent-purple",
+    },
+    {
+      icon: TimerReset,
+      label: "SLA delivery",
+      body: "Target pengiriman credential instan setelah pembayaran aman.",
+      accent: "bg-accent-pink",
+    },
+  ]
+
+  return (
+    <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-heading text-lg font-bold">Payment Status v2</h2>
+          <p className="mt-1 text-sm text-foreground/60">
+            Ringkasan status yang nantinya bisa terhubung ke payment gateway dan fulfillment.
+          </p>
+        </div>
+        <span className="rounded-base border-2 border-border bg-main px-3 py-1 font-heading text-xs font-bold shadow-shadow-sm">
+          Mock local
+        </span>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {highlights.map((item) => (
+          <div
+            key={item.label}
+            className="flex gap-3 rounded-base border-2 border-border bg-background p-3"
+          >
+            <span
+              className={cn(
+                "flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm",
+                item.accent,
+              )}
+            >
+              <item.icon className="size-4" />
+            </span>
+            <div>
+              <p className="font-heading text-sm font-bold">{item.label}</p>
+              <p className="text-xs text-foreground/60">{item.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 grid gap-2 sm:grid-cols-4">
+        {checkoutAssuranceSteps.map((step, index) => (
+          <div key={step.label} className="rounded-base border-2 border-dashed border-border p-3">
+            <p className="font-heading text-xs font-extrabold">
+              {index + 1}. {step.label}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-foreground/60">
+              {step.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 function makeInvoice() {
   const n = Math.floor(1000 + Math.random() * 8999)
@@ -174,6 +257,36 @@ export function CheckoutView() {
         <div className="mt-5 rounded-base border-2 border-dashed border-border bg-secondary-background px-5 py-3">
           <span className="text-xs text-foreground/60">{t("invoiceLabel")}</span>
           <p className="font-heading text-xl font-extrabold tracking-wide">{done.invoice}</p>
+        </div>
+
+        <div className="mt-6 w-full max-w-2xl rounded-base border-2 border-border bg-secondary-background p-5 text-left shadow-shadow">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-lg font-extrabold">Status pembayaran</h2>
+              <p className="text-sm text-foreground/60">
+                Demo UI: pembayaran terkonfirmasi dan credential masuk antrian delivery.
+              </p>
+            </div>
+            <span className="rounded-base border-2 border-border bg-accent-lime px-3 py-1 font-heading text-xs font-bold shadow-shadow-sm">
+              Paid
+            </span>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-4">
+            {checkoutAssuranceSteps.map((step, index) => (
+              <div
+                key={step.label}
+                className="rounded-base border-2 border-border bg-background p-3"
+              >
+                <span className="flex size-8 items-center justify-center rounded-base border-2 border-border bg-main font-heading text-xs font-extrabold shadow-shadow-sm">
+                  {index + 1}
+                </span>
+                <p className="mt-2 font-heading text-xs font-bold">{step.label}</p>
+                <p className="mt-1 text-[11px] leading-relaxed text-foreground/60">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {done.credentials.length > 0 && (
@@ -347,6 +460,8 @@ export function CheckoutView() {
               ))}
             </div>
           </section>
+
+          <CheckoutAssurancePanel method={method} />
         </div>
 
         {/* Summary */}
@@ -369,7 +484,7 @@ export function CheckoutView() {
                       {item.productName}
                     </span>
                     <span className="text-xs text-foreground/60">
-                      {item.variantLabel} × {item.qty}
+                      {item.variantLabel} x {item.qty}
                     </span>
                   </div>
                   <span className="font-heading text-sm font-bold">

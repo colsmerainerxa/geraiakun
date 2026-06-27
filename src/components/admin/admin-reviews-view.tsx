@@ -53,12 +53,27 @@ export function AdminReviewsView() {
   const answeredQ = useMemo(() => questions.filter((q) => q.answer), [questions])
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex min-w-0 flex-col gap-6">
       <Tabs defaultValue="reviews">
-        <TabsList>
-          <TabsTrigger value="reviews">Ulasan Pembeli ({reviews.length})</TabsTrigger>
-          <TabsTrigger value="pending">Tanya: Belum Dijawab ({pendingQ.length})</TabsTrigger>
-          <TabsTrigger value="answered">Tanya: Terjawab ({answeredQ.length})</TabsTrigger>
+        <TabsList className="grid h-auto w-full grid-cols-1 sm:inline-flex sm:h-12 sm:w-auto">
+          <TabsTrigger
+            value="reviews"
+            className="w-full whitespace-normal sm:w-auto sm:whitespace-nowrap"
+          >
+            Ulasan Pembeli ({reviews.length})
+          </TabsTrigger>
+          <TabsTrigger
+            value="pending"
+            className="w-full whitespace-normal sm:w-auto sm:whitespace-nowrap"
+          >
+            Tanya: Belum Dijawab ({pendingQ.length})
+          </TabsTrigger>
+          <TabsTrigger
+            value="answered"
+            className="w-full whitespace-normal sm:w-auto sm:whitespace-nowrap"
+          >
+            Tanya: Terjawab ({answeredQ.length})
+          </TabsTrigger>
         </TabsList>
 
         {/* ---- Reviews ---- */}
@@ -286,7 +301,7 @@ function EmptyState({
   desc: string
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-base border-2 border-dashed border-border py-16 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-base border-2 border-dashed border-border px-6 py-16 text-center">
       <span className="flex size-14 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
         <Icon className="size-6" />
       </span>

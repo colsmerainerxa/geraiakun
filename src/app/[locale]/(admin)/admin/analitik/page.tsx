@@ -1,0 +1,11 @@
+import type { Metadata } from "next"
+import { AdminAnalyticsView } from "@/components/admin/admin-analytics-view"
+
+export const metadata: Metadata = {
+  title: "Analytics | Admin beliakun",
+  robots: { index: false, follow: false },
+}
+
+export default function AdminAnalyticsPage() {
+  return <AdminAnalyticsView />
+}

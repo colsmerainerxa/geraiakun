@@ -2,6 +2,8 @@
 
 import type { LucideIcon } from "lucide-react"
 import {
+  BarChart3,
+  ClipboardList,
   KeyRound,
   LayoutDashboard,
   Menu,
@@ -32,8 +34,10 @@ const NAV: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/produk", label: "Produk", icon: Package },
   { href: "/admin/pesanan", label: "Pesanan", icon: ShoppingBag },
+  { href: "/admin/fulfillment", label: "Fulfillment", icon: ClipboardList },
   { href: "/admin/pelanggan", label: "Pelanggan", icon: Users },
   { href: "/admin/transaksi", label: "Transaksi", icon: Receipt },
+  { href: "/admin/analitik", label: "Analitik", icon: BarChart3 },
   { href: "/admin/promo", label: "Promo", icon: Ticket },
   { href: "/admin/stok", label: "Stok Akun", icon: KeyRound },
   { href: "/admin/tiket", label: "Tiket Bantuan", icon: MessageCircleQuestion },
@@ -152,7 +156,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
       </div>
     </div>
   )

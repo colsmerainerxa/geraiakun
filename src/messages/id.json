@@ -6,6 +6,7 @@
   "nav": {
     "home": "Beranda",
     "catalog": "Katalog",
+    "reseller": "Reseller",
     "categories": "Kategori",
     "howItWorks": "Cara Kerja",
     "help": "Bantuan",
@@ -142,6 +143,9 @@
     "explore": "Jelajahi",
     "support": "Bantuan",
     "company": "Perusahaan",
+    "reseller": "Reseller",
+    "vault": "Vault Akun",
+    "refund": "Refund & Replacement",
     "about": "Tentang Kami",
     "contact": "Kontak",
     "referral": "Ajak Teman",

@@ -16,7 +16,9 @@ export function Footer() {
       title: t("explore"),
       links: [
         { href: "/katalog", label: tn("catalog") },
+        { href: "/reseller", label: t("reseller") },
         { href: "/wishlist", label: t("wishlist") },
+        { href: "/akun/vault", label: t("vault") },
         { href: "/artikel", label: tn("blog") },
         { href: "/kategori/ai-chatbot", label: "AI & Chatbot" },
         { href: "/kategori/api-developer", label: "API & Developer" },
@@ -28,6 +30,7 @@ export function Footer() {
         { href: "/lacak", label: t("track") },
         { href: "/bantuan", label: t("faq") },
         { href: "/garansi", label: t("warranty") },
+        { href: "/refund", label: t("refund") },
         { href: "/syarat", label: t("terms") },
         { href: "/privasi", label: t("privacy") },
       ],
