@@ -8,8 +8,8 @@ import {
   Share2,
   Ticket,
   TrendingUp,
-  UserPlus,
   Users,
+  Wallet,
 } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
@@ -20,11 +20,20 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMounted } from "@/hooks/use-mounted"
 import { SITE_URL } from "@/lib/seo/site"
 import { cn, formatDate, formatIDR, formatNumber } from "@/lib/utils"
 import { useReferral } from "@/stores/referral"
+
+const PAYOUT_METHODS = ["GoPay", "OVO", "DANA", "BCA", "Mandiri"] as const
 
 export function ReferralView() {
   const t = useTranslations("referral")
@@ -34,9 +43,12 @@ export function ReferralView() {
 
   const code = useReferral((s) => s.code)
   const entries = useReferral((s) => s.entries)
-  const invite = useReferral((s) => s.invite)
+  const setPayout = useReferral((s) => s.setPayout)
+  const storedMethod = useReferral((s) => s.payoutMethod)
+  const storedAccount = useReferral((s) => s.payoutAccount)
 
-  const [friendName, setFriendName] = useState("")
+  const [payoutMethod, setPayoutMethod] = useState("")
+  const [payoutAccount, setPayoutAccount] = useState("")
 
   const link = `${SITE_URL}/?ref=${code}`
   const totalInvited = entries.length
@@ -47,12 +59,6 @@ export function ReferralView() {
   function copy(text: string, label: string) {
     navigator.clipboard?.writeText(text)
     toast.success(t("copied"), { description: label })
-  }
-
-  function simulateInvite(converted: boolean) {
-    invite(friendName || (isEn ? "Friend" : "Teman"), converted)
-    toast.success(converted ? t("simConverted") : t("simInvited"))
-    setFriendName("")
   }
 
   const shareTargets = [
@@ -221,26 +227,48 @@ export function ReferralView() {
         />
       </div>
 
-      {/* Simulator (demo) */}
-      <div className="mt-8 rounded-base border-2 border-dashed border-border bg-secondary-background p-5">
-        <h3 className="font-heading text-sm font-extrabold">{t("simTitle")}</h3>
-        <p className="mt-1 text-xs text-foreground/60">{t("simDesc")}</p>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+      {/* Metode pencairan komisi */}
+      <div className="mt-8 rounded-base border-2 border-border bg-secondary-background p-5">
+        <h3 className="font-heading text-sm font-extrabold">{t("payoutTitle")}</h3>
+        <p className="mt-1 text-xs text-foreground/60">{t("payoutDesc")}</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-[200px_1fr_auto]">
+          <Select value={payoutMethod} onValueChange={setPayoutMethod}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t("payoutMethodPlaceholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              {PAYOUT_METHODS.map((m) => (
+                <SelectItem key={m} value={m}>
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
-            value={friendName}
-            onChange={(e) => setFriendName(e.target.value)}
-            placeholder={t("simNamePlaceholder")}
-            className="sm:max-w-xs"
+            value={payoutAccount}
+            onChange={(e) => setPayoutAccount(e.target.value)}
+            placeholder={t("payoutAccountPlaceholder")}
           />
-          <div className="flex gap-2">
-            <Button variant="neutral" size="sm" onClick={() => simulateInvite(false)}>
-              <UserPlus className="size-4" /> {t("simInvite")}
-            </Button>
-            <Button size="sm" onClick={() => simulateInvite(true)}>
-              <TrendingUp className="size-4" /> {t("simConvert")}
-            </Button>
-          </div>
+          <Button
+            variant="neutral"
+            className="shrink-0"
+            onClick={() => {
+              if (!payoutMethod || !payoutAccount.trim()) {
+                toast.error(t("payoutRequired"))
+                return
+              }
+              setPayout(payoutMethod, payoutAccount.trim())
+              toast.success(t("payoutSaved"))
+            }}
+          >
+            <Wallet className="size-4" /> {t("payoutSave")}
+          </Button>
         </div>
+        {storedMethod && storedAccount && (
+          <p className="mt-3 rounded-base border-2 border-dashed border-border p-2.5 text-xs text-foreground/60">
+            {t("payoutActive", { method: storedMethod, account: storedAccount })}
+          </p>
+        )}
       </div>
 
       {/* Riwayat referral */}

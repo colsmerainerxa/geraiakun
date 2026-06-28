@@ -2,6 +2,7 @@
 
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
+import { useTranslations } from "next-intl"
 import { X } from "lucide-react"
 import type * as React from "react"
 import { cn } from "@/lib/utils"
@@ -49,6 +50,7 @@ function SheetContent({
   side = "right",
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>) {
+  const t = useTranslations("common")
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -56,7 +58,7 @@ function SheetContent({
         {children}
         <SheetPrimitive.Close className="absolute right-4 top-4 flex size-7 items-center justify-center rounded-base border-2 border-border bg-main transition-all hover:translate-x-0.5 hover:translate-y-0.5">
           <X className="size-4" />
-          <span className="sr-only">Tutup</span>
+          <span className="sr-only">{t("close")}</span>
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>
     </SheetPortal>

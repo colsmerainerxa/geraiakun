@@ -1,41 +1,12 @@
-export type VaultAccountStatus = "aktif" | "akan-habis" | "ditahan" | "bermasalah"
+import type { RefundCase, VaultAccount, VaultActivity } from "@/types"
 
-export interface VaultAccount {
-  id: string
-  productName: string
-  plan: string
-  loginEmail: string
-  status: VaultAccountStatus
-  expiresAt: string
-  warrantyUntil: string
-  renewalPrice: number
-  healthScore: number
-  seats: number
-  devices: number
-  note: string
-}
-
-export interface VaultActivity {
-  id: string
-  title: string
-  body: string
-  date: string
-  tone: "lime" | "cyan" | "pink" | "warning"
-}
-
-export type RefundStatus = "draft" | "review" | "replacement" | "refund" | "closed"
-
-export interface RefundCase {
-  id: string
-  invoice: string
-  productName: string
-  reason: string
-  amount: number
-  status: RefundStatus
-  owner: string
-  updatedAt: string
-  timeline: { label: string; done: boolean }[]
-}
+export type {
+  RefundCase,
+  RefundStatus,
+  VaultAccount,
+  VaultAccountStatus,
+  VaultActivity,
+} from "@/types"
 
 export interface ResellerPlan {
   id: string
@@ -93,13 +64,17 @@ export interface CustomerSegment {
 export const vaultAccounts: VaultAccount[] = [
   {
     id: "vault-1",
+    orderInvoice: "INV-20260001",
+    productId: "prod-1",
+    productSlug: "chatgpt-plus",
+    variantId: "var-2",
     productName: "ChatGPT Plus",
     plan: "1 Bulan Private",
     loginEmail: "rafa.chatgpt@premium.mail",
     status: "aktif",
     expiresAt: "2026-07-21",
     warrantyUntil: "2026-07-21",
-    renewalPrice: 70000,
+    reorderPrice: 70000,
     healthScore: 98,
     seats: 1,
     devices: 2,
@@ -107,27 +82,35 @@ export const vaultAccounts: VaultAccount[] = [
   },
   {
     id: "vault-2",
+    orderInvoice: "INV-20260003",
+    productId: "prod-2",
+    productSlug: "gemini-pro",
+    variantId: "var-4",
     productName: "Gemini Pro",
     plan: "1 Tahun Via Invite",
     loginEmail: "rafa.workspace@gmail.com",
     status: "akan-habis",
     expiresAt: "2026-07-02",
     warrantyUntil: "2026-07-02",
-    renewalPrice: 35000,
+    reorderPrice: 35000,
     healthScore: 82,
     seats: 1,
     devices: 1,
-    note: "Perlu renewal minggu ini agar akses tidak putus.",
+    note: "Masa aktif hampir habis. Beli lagi jika masih membutuhkan akses.",
   },
   {
     id: "vault-3",
+    orderInvoice: "INV-20260007",
+    productId: "prod-3",
+    productSlug: "api-key",
+    variantId: "var-8",
     productName: "API Key",
     plan: "Pro - 5 Juta Token",
     loginEmail: "vault.api.2035@beliakun.dev",
     status: "ditahan",
     expiresAt: "2026-08-11",
     warrantyUntil: "2026-07-11",
-    renewalPrice: 10000,
+    reorderPrice: 10000,
     healthScore: 74,
     seats: 3,
     devices: 4,
@@ -145,8 +128,8 @@ export const vaultActivities: VaultActivity[] = [
   },
   {
     id: "act-2",
-    title: "Renewal reminder",
-    body: "Gemini Pro masuk jendela renewal 5 hari.",
+    title: "Pengingat masa aktif",
+    body: "Gemini Pro berakhir dalam 5 hari dan siap dibeli kembali.",
     date: "2026-06-26T16:20:00",
     tone: "warning",
   },
@@ -162,12 +145,15 @@ export const vaultActivities: VaultActivity[] = [
 export const refundCases: RefundCase[] = [
   {
     id: "RFD-2606-001",
-    invoice: "INV-20260004",
+    orderInvoice: "INV-20260004",
+    ticketId: "TKT-2606-001",
+    productId: "prod-1",
     productName: "ChatGPT Plus",
     reason: "Akun tidak bisa login setelah pengiriman.",
     amount: 70000,
     status: "replacement",
     owner: "CS Naya",
+    evidence: ["screenshot-login-error.png", "video-login.mp4"],
     updatedAt: "2026-06-27T08:45:00",
     timeline: [
       { label: "Klaim diterima", done: true },
@@ -178,12 +164,15 @@ export const refundCases: RefundCase[] = [
   },
   {
     id: "RFD-2606-002",
-    invoice: "INV-20260008",
+    orderInvoice: "INV-20260008",
+    ticketId: "TKT-2606-002",
+    productId: "prod-2",
     productName: "Gemini Pro",
     reason: "Pembayaran sukses tetapi stok belum tersedia.",
     amount: 20000,
     status: "review",
     owner: "Finance",
+    evidence: ["receipt-qris.png"],
     updatedAt: "2026-06-27T07:30:00",
     timeline: [
       { label: "Klaim diterima", done: true },
@@ -314,6 +303,13 @@ export const analyticsMetrics: AnalyticsMetric[] = [
 ]
 
 export const revenueSeries = [
+  { day: "S1", value: 6200000 },
+  { day: "S2", value: 7000000 },
+  { day: "S3", value: 6800000 },
+  { day: "S4", value: 8100000 },
+  { day: "S5", value: 7500000 },
+  { day: "S6", value: 9000000 },
+  { day: "S7", value: 8600000 },
   { day: "Sen", value: 7200000 },
   { day: "Sel", value: 8600000 },
   { day: "Rab", value: 7800000 },
@@ -331,7 +327,7 @@ export const customerSegments: CustomerSegment[] = [
     revenue: 28600000,
     conversion: 18,
     signal: "Sering beli ChatGPT, API Key, dan Perplexity.",
-    action: "Tawarkan bundle AI Pro + renewal otomatis.",
+    action: "Tawarkan bundle AI Pro untuk pembelian berikutnya.",
   },
   {
     id: "reseller",
@@ -344,12 +340,12 @@ export const customerSegments: CustomerSegment[] = [
   },
   {
     id: "at-risk",
-    name: "At-risk renewal",
+    name: "Masa aktif hampir habis",
     customers: 211,
     revenue: 9200000,
     conversion: 6,
-    signal: "Langganan habis dalam 7 hari, belum checkout.",
-    action: "Kirim voucher renewal dan reminder WhatsApp.",
+    signal: "Akses berakhir dalam 7 hari dan belum membeli lagi.",
+    action: "Kirim voucher beli lagi dan pengingat WhatsApp.",
   },
   {
     id: "new",

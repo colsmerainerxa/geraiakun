@@ -1,14 +1,24 @@
 "use client"
 
-import { Clock, DollarSign, Package, ShoppingBag, TrendingUp, Users } from "lucide-react"
+import { ClipboardList, Clock, DollarSign, Package, Send, ShoppingBag, TrendingUp, Users } from "lucide-react"
+import { AchievementsPanel } from "@/components/admin/achievements-panel"
 import { StatCard } from "@/components/admin/parts"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { bgFor } from "@/lib/accent"
 import { useDashboardStats } from "@/lib/api/queries"
+import { fulfillmentTasks } from "@/lib/mock/enterprise"
+import { Link } from "@/i18n/navigation"
+import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
 export default function AdminDashboardPage() {
   const { data, isLoading } = useDashboardStats()
+  // Hooks must run before any early return, or the rules-of-hooks are broken
+  // when the loading skeleton resolves to the real dashboard.
+  const activeStaffId = useEnterpriseAdmin((s) => s.activeStaffId)
+  const staff = useEnterpriseAdmin((s) => s.staff)
 
   if (isLoading || !data) {
     return (
@@ -25,6 +35,12 @@ export default function AdminDashboardPage() {
 
   const maxTrend = Math.max(1, ...data.trend.map((d) => d.value))
   const credTotal = data.credentials.total || 1
+
+  // "Your queue" — fulfillment tasks waiting on the active staff member.
+  const activeStaff = staff.find((m) => m.id === activeStaffId) ?? staff[0]
+  const myQueue = fulfillmentTasks
+    .filter((t) => t.status === "siap-kirim" || t.status === "menunggu-stok")
+    .slice(0, 5)
 
   return (
     <div className="flex flex-col gap-6">
@@ -143,6 +159,61 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
+      {/* Your queue — fulfillment tasks waiting on the active staff */}
+      <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="size-5" />
+            <h2 className="font-heading text-lg font-bold">Antrian Kamu</h2>
+          </div>
+          <Badge variant="warning">{myQueue.length} perlu tindakan</Badge>
+        </div>
+        <p className="mt-1 text-sm text-foreground/60">
+          {activeStaff ? `Halo, ${activeStaff.name} — ` : ""}tugas fulfillment yang menunggu kamu.
+        </p>
+        <ul className="mt-4 flex flex-col gap-2">
+          {myQueue.map((task) => (
+            <li
+              key={task.id}
+              className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-background p-3"
+            >
+              <div className="min-w-0">
+                <p className="font-heading text-sm font-bold">{task.invoice}</p>
+                <p className="truncate text-xs text-foreground/60">
+                  {task.productName} — {task.customer}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-base border-2 border-border px-2 py-1 text-xs font-bold",
+                    task.slaMinutes <= 5 ? "bg-accent-lime" : "bg-warning",
+                  )}
+                >
+                  <Clock className="size-3.5" />
+                  {task.slaMinutes === 0 ? "done" : `${task.slaMinutes}m`}
+                </span>
+                {task.status === "siap-kirim" ? (
+                  <Badge variant="cyan">
+                    <Send className="size-3" /> Siap Kirim
+                  </Badge>
+                ) : (
+                  <Badge variant="warning">Menunggu Stok</Badge>
+                )}
+              </div>
+            </li>
+          ))}
+          {myQueue.length === 0 && (
+            <li className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
+              Antrian kosong — semua tugas selesai. 🎉
+            </li>
+          )}
+        </ul>
+        <Button variant="neutral" size="sm" asChild className="mt-4">
+          <Link href="/admin/fulfillment">Buka Fulfillment</Link>
+        </Button>
+      </div>
+
       {/* Top products */}
       <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
         <h2 className="font-heading text-lg font-bold">Produk Terlaris</h2>
@@ -171,6 +242,9 @@ export default function AdminDashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Gamification */}
+      <AchievementsPanel />
     </div>
   )
 }

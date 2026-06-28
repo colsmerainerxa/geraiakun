@@ -1,10 +1,16 @@
 "use client"
 
 import { ArrowDownLeft, CheckCircle2, Clock, Download, XCircle } from "lucide-react"
-import { useMemo } from "react"
-import { paymentLabel, StatCard, TransactionStatusBadge } from "@/components/admin/parts"
+import { useMemo, useState } from "react"
+import { paymentLabel, StatCard, TableSkeleton, TransactionStatusBadge } from "@/components/admin/parts"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Pagination, usePagination } from "@/components/ui/pagination"
+import {
+  DateRangeFilter,
+  inRange,
+  useDateRange,
+  type DateRangePreset,
+} from "@/components/ui/date-range-filter"
 import {
   Table,
   TableBody,
@@ -19,6 +25,14 @@ import { formatDate, formatIDR } from "@/lib/utils"
 
 export default function AdminTransactionsPage() {
   const { data: transactions, isLoading } = useTransactions()
+  const [rangePreset, setRangePreset] = useState<DateRangePreset>("30d")
+  const range = useDateRange(rangePreset)
+
+  const list = useMemo(
+    () => (transactions ?? []).filter((t) => inRange(t.createdAt, range)),
+    [transactions, range],
+  )
+  const { page, setPage, pageCount, paged, total, pageSize } = usePagination(list, 10)
 
   const stats = useMemo(() => {
     const list = transactions ?? []
@@ -50,13 +64,14 @@ export default function AdminTransactionsPage() {
         <StatCard label="Gagal" value={stats.failed} icon={XCircle} accent="bg-danger" />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <DateRangeFilter value={rangePreset} onChange={setRangePreset} />
         <Button
           variant="neutral"
           onClick={() =>
             downloadCsv(
               "transaksi.csv",
-              (transactions ?? []).map((tr) => ({
+              list.map((tr) => ({
                 id: tr.id,
                 invoice: tr.invoice,
                 pelanggan: tr.customerName,
@@ -73,8 +88,9 @@ export default function AdminTransactionsPage() {
       </div>
 
       {isLoading ? (
-        <Skeleton className="h-96" />
+        <TableSkeleton columns={7} rows={6} />
       ) : (
+        <>
         <Table>
           <TableHeader>
             <TableRow>
@@ -88,7 +104,7 @@ export default function AdminTransactionsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions?.map((t) => (
+            {paged.map((t) => (
               <TableRow key={t.id}>
                 <TableCell className="font-mono text-xs text-foreground/60">
                   {t.id.toUpperCase()}
@@ -105,8 +121,23 @@ export default function AdminTransactionsPage() {
                 </TableCell>
               </TableRow>
             ))}
+            {total === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
+                  Belum ada transaksi.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
+        <Pagination
+          page={page}
+          pageCount={pageCount}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+        />
+        </>
       )}
     </div>
   )

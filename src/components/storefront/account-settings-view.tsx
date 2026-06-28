@@ -3,14 +3,20 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Bell,
+  CreditCard,
   Eye,
   EyeOff,
   History,
   LogOut,
   Mail,
+  MapPin,
+  MonitorSmartphone,
   Phone,
+  Plus,
   Save,
   Shield,
+  ShieldCheck,
+  Trash2,
   User as UserIcon,
 } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
@@ -108,12 +114,23 @@ export function AccountSettingsView() {
   const profile = useUser((s) => s.profile)
   const prefs = useUser((s) => s.prefs)
   const activity = useUser((s) => s.activity)
+  const sessions = useUser((s) => s.sessions)
+  const emailVerified = useUser((s) => s.emailVerified)
   const updateProfile = useUser((s) => s.updateProfile)
   const updatePrefs = useUser((s) => s.updatePrefs)
   const logActivity = useUser((s) => s.logActivity)
+  const terminateSession = useUser((s) => s.terminateSession)
+  const terminateOtherSessions = useUser((s) => s.terminateOtherSessions)
 
   const [logoutOpen, setLogoutOpen] = useState(false)
   const [showPw, setShowPw] = useState(false)
+  const [twoFA, setTwoFA] = useState(false)
+  const [twoFACode, setTwoFACode] = useState("")
+  const [savedMethods, setSavedMethods] = useState<{ id: string; label: string; number: string }[]>(
+    [{ id: "pm-1", label: "GoPay", number: "0812****4421" }],
+  )
+  const [newMethod, setNewMethod] = useState("GoPay")
+  const [newNumber, setNewNumber] = useState("")
 
   const {
     register: regProfile,
@@ -185,7 +202,14 @@ export function AccountSettingsView() {
             </Avatar>
             <div className="text-sm">
               <p className="font-bold">{profile.name}</p>
-              <p className="text-foreground/60">{profile.email}</p>
+              <p className="flex flex-wrap items-center gap-2 text-foreground/60">
+                {profile.email}
+                {emailVerified && (
+                  <span className="rounded-base border-2 border-border bg-accent-lime px-1.5 py-0.5 text-[10px] font-bold text-foreground">
+                    Verified
+                  </span>
+                )}
+              </p>
               <p className="text-xs text-foreground/40">
                 {isEn ? "Member since" : "Bergabung sejak"}{" "}
                 {formatDate(profile.joinedAt, dateLocale)}
@@ -315,6 +339,140 @@ export function AccountSettingsView() {
             ))}
           </div>
         </section>
+
+        {/* 2FA enrollment (UI mock) */}
+        <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border bg-background shadow-shadow-sm">
+                <Shield className="size-4" />
+              </span>
+              <div>
+                <h2 className="font-heading text-lg font-bold">{t("twoFactorTitle")}</h2>
+                <p className="mt-1 text-sm text-foreground/60">{t("twoFactorDesc")}</p>
+              </div>
+            </div>
+            <Switch
+              checked={twoFA}
+              onCheckedChange={(v) => {
+                setTwoFA(v)
+                toast.success(v ? t("twoFactorOn") : t("twoFactorOff"))
+              }}
+              aria-label={t("twoFactorTitle")}
+            />
+          </div>
+          {twoFA && (
+            <div className="mt-4 rounded-base border-2 border-dashed border-border bg-background p-4">
+              <p className="text-xs font-bold text-foreground/70">{t("twoFactorVerify")}</p>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <Input
+                  value={twoFACode}
+                  onChange={(e) => setTwoFACode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  inputMode="numeric"
+                  placeholder="123456"
+                  className="font-mono sm:max-w-[160px]"
+                />
+                <Button
+                  variant="neutral"
+                  size="sm"
+                  onClick={() => {
+                    if (twoFACode.length !== 6) {
+                      toast.error(t("twoFactorCodeRequired"))
+                      return
+                    }
+                    toast.success(t("twoFactorVerified"))
+                    setTwoFACode("")
+                  }}
+                >
+                  <ShieldCheck className="size-4" /> {t("twoFactorConfirm")}
+                </Button>
+              </div>
+              <p className="mt-2 text-[11px] text-foreground/50">{t("twoFactorHint")}</p>
+            </div>
+          )}
+        </section>
+
+        {/* Saved payment methods (UI mock) */}
+        <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
+          <div className="flex items-center gap-3">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border bg-background shadow-shadow-sm">
+              <CreditCard className="size-4" />
+            </span>
+            <div>
+              <h2 className="font-heading text-lg font-bold">{t("paymentsTitle")}</h2>
+              <p className="mt-1 text-sm text-foreground/60">{t("paymentsDesc")}</p>
+            </div>
+          </div>
+          <ul className="mt-4 flex flex-col gap-2">
+            {savedMethods.map((m) => (
+              <li
+                key={m.id}
+                className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-background p-3"
+              >
+                <div className="flex items-center gap-2.5">
+                  <CreditCard className="size-4 text-foreground/50" />
+                  <div>
+                    <p className="font-heading text-sm font-bold">{m.label}</p>
+                    <p className="font-mono text-xs text-foreground/60">{m.number}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label={t("paymentsRemove")}
+                  onClick={() => setSavedMethods((prev) => prev.filter((x) => x.id !== m.id))}
+                >
+                  <Trash2 className="size-4 text-danger" />
+                </Button>
+              </li>
+            ))}
+            {savedMethods.length === 0 && (
+              <li className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
+                {t("paymentsEmpty")}
+              </li>
+            )}
+          </ul>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <select
+              value={newMethod}
+              onChange={(e) => setNewMethod(e.target.value)}
+              className="h-10 rounded-base border-2 border-border bg-background px-3 text-sm font-bold"
+              aria-label={t("paymentsMethodLabel")}
+            >
+              {["GoPay", "OVO", "DANA", "BCA", "Mandiri"].map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <Input
+              value={newNumber}
+              onChange={(e) => setNewNumber(e.target.value)}
+              placeholder={t("paymentsNumberPlaceholder")}
+              className="flex-1"
+            />
+            <Button
+              variant="neutral"
+              size="sm"
+              onClick={() => {
+                const num = newNumber.trim()
+                if (!num) {
+                  toast.error(t("paymentsNumberRequired"))
+                  return
+                }
+                const masked = num.length > 4 ? `${num.slice(0, 4)}****${num.slice(-4)}` : num
+                setSavedMethods((prev) => [
+                  ...prev,
+                  { id: `pm-${Date.now()}`, label: newMethod, number: masked },
+                ])
+                setNewNumber("")
+                toast.success(t("paymentsAdded"))
+              }}
+            >
+              <Plus className="size-4" /> {t("paymentsAdd")}
+            </Button>
+          </div>
+        </section>
       </div>
 
       {/* ---- Right: activity + danger zone ---- */}
@@ -337,6 +495,79 @@ export function AccountSettingsView() {
               )
             })}
           </ol>
+        </section>
+
+        <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-lg font-bold">
+                {isEn ? "Devices and sessions" : "Perangkat dan Sesi"}
+              </h2>
+              <p className="mt-1 text-sm text-foreground/60">
+                {isEn
+                  ? "Review where your beliakun account is currently signed in."
+                  : "Periksa perangkat yang sedang menggunakan akun beliakun Anda."}
+              </p>
+            </div>
+            {sessions.some((session) => !session.current) && (
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={() => {
+                  terminateOtherSessions()
+                  toast.success(
+                    isEn ? "Other sessions signed out" : "Sesi lain berhasil dikeluarkan",
+                  )
+                }}
+              >
+                <LogOut className="size-4" /> {isEn ? "Sign out others" : "Keluar Semua"}
+              </Button>
+            )}
+          </div>
+          <div className="mt-4 flex flex-col gap-3">
+            {sessions.map((session) => (
+              <div
+                key={session.id}
+                className="rounded-base border-2 border-border bg-background p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border bg-accent-cyan shadow-shadow-sm">
+                      <MonitorSmartphone className="size-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-heading text-sm font-bold">
+                        {session.device} - {session.browser}
+                      </p>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-foreground/60">
+                        <MapPin className="size-3" /> {session.location} - {session.ipAddress}
+                      </p>
+                      <p className="mt-1 text-xs text-foreground/45">
+                        {isEn ? "Last active" : "Aktif terakhir"}{" "}
+                        {formatDate(session.lastActiveAt, dateLocale)}
+                      </p>
+                    </div>
+                  </div>
+                  {session.current ? (
+                    <span className="rounded-base border-2 border-border bg-accent-lime px-2 py-1 text-xs font-bold">
+                      {isEn ? "Current" : "Saat ini"}
+                    </span>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="neutral"
+                      onClick={() => {
+                        terminateSession(session.id)
+                        toast.success(isEn ? "Session signed out" : "Sesi berhasil dikeluarkan")
+                      }}
+                    >
+                      {isEn ? "Sign out" : "Keluarkan"}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Danger zone */}

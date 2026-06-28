@@ -18,8 +18,12 @@ export interface ReferralEntry {
 interface ReferralState {
   code: string
   entries: ReferralEntry[]
+  /** Metode pencairan komisi (mock). */
+  payoutMethod: string
+  payoutAccount: string
   /** Simulasikan: ajak teman (demo button). */
   invite: (name: string, converted: boolean) => void
+  setPayout: (method: string, account: string) => void
   reset: () => void
 }
 
@@ -64,6 +68,8 @@ export const useReferral = create<ReferralState>()(
     (set) => ({
       code: genCode(),
       entries: seedEntries(),
+      payoutMethod: "",
+      payoutAccount: "",
       invite: (name, converted) =>
         set((s) => ({
           entries: [
@@ -78,7 +84,8 @@ export const useReferral = create<ReferralState>()(
             ...s.entries,
           ],
         })),
-      reset: () => set({ code: genCode(), entries: seedEntries() }),
+      setPayout: (method, account) => set({ payoutMethod: method, payoutAccount: account }),
+      reset: () => set({ code: genCode(), entries: seedEntries(), payoutMethod: "", payoutAccount: "" }),
     }),
     { name: "beliakun-referral" },
   ),

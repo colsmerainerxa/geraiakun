@@ -9,9 +9,11 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
+import { DEV_TOOLS } from "@/lib/dev"
 
 type Mode = "login" | "register"
 
@@ -46,6 +48,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter()
   const isRegister = mode === "register"
   const [showPw, setShowPw] = useState(false)
+  const [socialLoading, setSocialLoading] = useState(false)
 
   const {
     register,
@@ -59,7 +62,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
     toast.success(isRegister ? t("registerButton") : t("loginButton"), {
       description: t("demoNote"),
     })
-    router.push("/akun")
+    router.push(isRegister ? "/verifikasi-email" : "/akun")
+  }
+
+  function continueWithGoogle() {
+    setSocialLoading(true)
+    window.setTimeout(() => {
+      toast.success(isRegister ? "Akun Google siap diverifikasi" : "Berhasil masuk dengan Google")
+      router.push(isRegister ? "/verifikasi-email" : "/akun")
+    }, 900)
   }
 
   return (
@@ -87,10 +98,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
           {isRegister ? t("registerSubtitle") : t("loginSubtitle")}
         </p>
 
-        {/* Demo banner */}
-        <div className="mt-5 rounded-base border-2 border-dashed border-border bg-warning/20 px-3 py-2 text-center text-xs font-bold text-foreground/70">
-          {t("demoNote")}
-        </div>
+        {/* Demo banner — dev only */}
+        {DEV_TOOLS && (
+          <div className="mt-5 rounded-base border-2 border-dashed border-border bg-warning/20 px-3 py-2 text-center text-xs font-bold text-foreground/70">
+            {t("demoNote")}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-5 flex flex-col gap-4">
           {isRegister && (
@@ -187,11 +200,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
           {!isRegister && (
             <div className="flex items-center justify-between text-sm">
-              <label className="flex cursor-pointer items-center gap-2 font-bold">
-                <input type="checkbox" className="size-4 accent-main" />
-                {t("rememberMe")}
-              </label>
-              <span className="font-bold text-foreground/50">{t("forgotPassword")}</span>
+              <div className="flex items-center gap-2">
+                <Checkbox id="auth-remember" defaultChecked />
+                <label htmlFor="auth-remember" className="cursor-pointer font-bold">
+                  {t("rememberMe")}
+                </label>
+              </div>
+              <Link href="/lupa-sandi" className="font-bold text-accent-pink hover:underline">
+                {t("forgotPassword")}
+              </Link>
             </div>
           )}
 
@@ -206,12 +223,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <span className="text-xs font-bold text-foreground/40">{t("orContinue")}</span>
           <span className="h-0.5 flex-1 bg-border" />
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <Button variant="neutral" type="button">
-            Google
-          </Button>
-          <Button variant="neutral" type="button">
-            Apple
+        <div className="mt-4">
+          <Button
+            variant="neutral"
+            type="button"
+            className="w-full"
+            disabled={socialLoading}
+            onClick={continueWithGoogle}
+          >
+            {socialLoading ? "Menghubungkan Google..." : "Google"}
           </Button>
         </div>
 

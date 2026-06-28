@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
+import { FilterPresetsBar } from "@/components/admin/filter-presets-bar"
 import { CredentialStatusBadge, StatCard } from "@/components/admin/parts"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -37,7 +38,9 @@ import {
   type FulfillmentTask,
   type RiskLevel,
 } from "@/lib/mock/enterprise"
-import { credentials } from "@/lib/mock/credentials"
+import { useFilterState } from "@/lib/hooks/use-filter-state"
+import { useAdminGamification } from "@/stores/admin-gamification"
+import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import { cn, formatDate } from "@/lib/utils"
 
 const STATUS_META: Record<
@@ -58,8 +61,16 @@ const RISK_META: Record<RiskLevel, { label: string; variant: "success" | "warnin
 
 export function AdminFulfillmentView() {
   const [tasks, setTasks] = useState<FulfillmentTask[]>(fulfillmentTasks)
-  const [query, setQuery] = useState("")
-  const [status, setStatus] = useState<FulfillmentStatus | "semua">("semua")
+  const [query, setQuery] = useFilterState<string>("fulfillment", "search", "")
+  const [status, setStatus] = useFilterState<FulfillmentStatus | "semua">(
+    "fulfillment",
+    "status",
+    "semua",
+  )
+  const credentials = useEnterpriseAdmin((state) => state.credentials)
+  const updateCredential = useEnterpriseAdmin((state) => state.updateCredential)
+  const logAudit = useEnterpriseAdmin((state) => state.logAudit)
+  const award = useAdminGamification((state) => state.award)
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -90,6 +101,38 @@ export function AdminFulfillmentView() {
     toast.success(`Status fulfillment diubah: ${STATUS_META[nextStatus].label}`)
   }
 
+  // F3.8a — "Kirim" consumes a credential: flip tersedia → terjual (logged via store),
+  // then mark the task terkirim. Mirrors how real fulfillment releases a vault credential.
+  function consumeAndSend(task: FulfillmentTask) {
+    const match =
+      credentials.find(
+        (c) =>
+          c.status === "tersedia" &&
+          c.productName === task.productName &&
+          c.variantLabel === task.variant,
+      ) ?? credentials.find((c) => c.status === "tersedia")
+
+    if (!match) {
+      toast.error("Stok credential habis — tidak bisa kirim.")
+      return
+    }
+
+    updateCredential(match.id, { status: "terjual" })
+    logAudit({
+      action: "fulfillment.kirim",
+      module: "fulfillment",
+      targetId: task.invoice,
+      targetLabel: `${task.productName} — ${match.email}`,
+      outcome: "success",
+      detail: `Credential ${match.email} dikirim ke ${task.customer}.`,
+    })
+    award("fulfillment.kirim")
+    setTasks((current) =>
+      current.map((item) => (item.id === task.id ? { ...item, status: "terkirim" } : item)),
+    )
+    toast.success(`Credential ${match.email} terkirim untuk ${task.invoice}.`)
+  }
+
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -111,7 +154,7 @@ export function AdminFulfillmentView() {
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)]">
         <section className="flex min-w-0 flex-col gap-4">
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative min-w-0 flex-1">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
               <Input
@@ -138,6 +181,15 @@ export function AdminFulfillmentView() {
               </SelectContent>
             </Select>
           </div>
+
+          <FilterPresetsBar
+            module="fulfillment"
+            current={{ search: query, status }}
+            onApply={(snap) => {
+              setQuery(snap.search ?? "")
+              setStatus((snap.status as FulfillmentStatus | "semua") ?? "semua")
+            }}
+          />
 
           <div className="grid gap-3 md:hidden">
             {filtered.map((task) => (
@@ -182,7 +234,7 @@ export function AdminFulfillmentView() {
                   <Button
                     size="sm"
                     className="w-full"
-                    onClick={() => updateTask(task.id, "terkirim")}
+                    onClick={() => consumeAndSend(task)}
                   >
                     <Send className="size-4" /> Kirim Credential
                   </Button>
@@ -251,7 +303,7 @@ export function AdminFulfillmentView() {
                     </TableCell>
                     <TableCell className="text-right">
                       {task.status === "siap-kirim" ? (
-                        <Button size="sm" onClick={() => updateTask(task.id, "terkirim")}>
+                        <Button size="sm" onClick={() => consumeAndSend(task)}>
                           <Send className="size-4" /> Kirim
                         </Button>
                       ) : task.status === "review-risiko" ? (

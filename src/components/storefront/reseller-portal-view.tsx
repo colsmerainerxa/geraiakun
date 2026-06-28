@@ -11,6 +11,7 @@ import {
   Wallet,
 } from "lucide-react"
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { Badge } from "@/components/ui/badge"
@@ -21,13 +22,19 @@ import { Progress } from "@/components/ui/progress"
 import { resellerOrders, resellerPlans } from "@/lib/mock/enterprise"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
-const ORDER_STATUS = {
-  paid: { label: "Dibayar", variant: "warning" },
-  queued: { label: "Antrian", variant: "cyan" },
-  delivered: { label: "Terkirim", variant: "success" },
+const ORDER_STATUS_KEY = {
+  paid: "statusPaid",
+  queued: "statusQueued",
+  delivered: "statusDelivered",
+} as const
+const ORDER_STATUS_VARIANT = {
+  paid: "warning",
+  queued: "cyan",
+  delivered: "success",
 } as const
 
 export function ResellerPortalView() {
+  const t = useTranslations("resellerPortal")
   const [topup, setTopup] = useState(1000000)
   const [monthlyOrders, setMonthlyOrders] = useState(80)
 
@@ -42,28 +49,27 @@ export function ResellerPortalView() {
   return (
     <Container className="py-12">
       <SectionHeading
-        eyebrow="B2B / RESELLER"
-        title="Portal Reseller & Bulk Order"
-        subtitle="UI untuk reseller, agency, dan pembelian banyak seat: harga grosir, topup saldo, margin, invoice, dan SLA pengiriman."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
       />
 
       <div className="mt-8 overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
         <div className="grid gap-6 border-b-2 border-border bg-main p-6 lg:grid-cols-[1.4fr_1fr]">
           <div>
-            <Badge variant="neutral">Partner aktif</Badge>
+            <Badge variant="neutral">{t("partnerActive")}</Badge>
             <h2 className="mt-3 font-heading text-3xl font-extrabold">{selectedPlan.name}</h2>
             <p className="mt-2 max-w-2xl text-sm font-bold text-main-foreground/70">
-              Saldo dan volume order menentukan tier reseller. Semua angka di sini mock untuk
-              eksplorasi UI/UX sebelum backend dibuat.
+              {t("planDesc")}
             </p>
           </div>
           <div className="rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
-            <p className="text-xs font-bold uppercase text-foreground/50">Estimasi margin/bulan</p>
+            <p className="text-xs font-bold uppercase text-foreground/50">{t("estMargin")}</p>
             <p className="mt-1 font-heading text-3xl font-extrabold">
               {formatIDR(estimatedMargin)}
             </p>
             <p className="text-xs text-foreground/60">
-              Simulasi {formatNumber(monthlyOrders)} order x margin rata-rata.
+              {t("estMarginHint", { orders: formatNumber(monthlyOrders) })}
             </p>
           </div>
         </div>
@@ -87,7 +93,7 @@ export function ResellerPortalView() {
                   <Building2 className="size-5" />
                 </span>
                 <h3 className="mt-3 font-heading text-base font-extrabold">{plan.name}</h3>
-                <p className="text-xs text-foreground/60">Min. topup {formatIDR(plan.minTopup)}</p>
+                <p className="text-xs text-foreground/60">{t("minTopup", { amount: formatIDR(plan.minTopup) })}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Badge variant="cyan">{plan.discount}</Badge>
                   <Badge variant="neutral">{plan.margin}</Badge>
@@ -105,11 +111,11 @@ export function ResellerPortalView() {
 
           <aside className="rounded-base border-2 border-border bg-background p-5 shadow-shadow-sm">
             <h3 className="flex items-center gap-2 font-heading text-lg font-extrabold">
-              <Calculator className="size-5" /> Kalkulator Reseller
+              <Calculator className="size-5" /> {t("calcTitle")}
             </h3>
             <div className="mt-4 grid gap-4">
               <div>
-                <Label htmlFor="topup">Saldo topup</Label>
+                <Label htmlFor="topup">{t("fieldTopup")}</Label>
                 <Input
                   id="topup"
                   type="number"
@@ -121,7 +127,7 @@ export function ResellerPortalView() {
                 />
               </div>
               <div>
-                <Label htmlFor="orders">Order per bulan</Label>
+                <Label htmlFor="orders">{t("fieldOrders")}</Label>
                 <Input
                   id="orders"
                   type="number"
@@ -134,21 +140,21 @@ export function ResellerPortalView() {
               {nextPlan ? (
                 <div>
                   <div className="mb-2 flex justify-between gap-2 text-xs font-bold">
-                    <span>Menuju {nextPlan.name}</span>
+                    <span>{t("progressTo", { name: nextPlan.name })}</span>
                     <span>{Math.round(nextProgress)}%</span>
                   </div>
                   <Progress value={nextProgress} />
                   <p className="mt-2 text-xs text-foreground/60">
-                    Tambah {formatIDR(nextPlan.minTopup - topup)} untuk naik tier.
+                    {t("progressHint", { amount: formatIDR(nextPlan.minTopup - topup) })}
                   </p>
                 </div>
               ) : (
                 <div className="rounded-base border-2 border-border bg-accent-lime p-3 text-sm font-bold">
-                  Kamu sudah di tier tertinggi.
+                  {t("topTier")}
                 </div>
               )}
               <Button>
-                Ajukan Partnership <ArrowRight className="size-4" />
+                {t("applyPartner")} <ArrowRight className="size-4" />
               </Button>
             </div>
           </aside>
@@ -158,15 +164,15 @@ export function ResellerPortalView() {
       <div className="mt-8 grid gap-4 sm:grid-cols-4">
         <PartnerStat
           icon={Wallet}
-          label="Saldo reseller"
+          label={t("statBalance")}
           value={formatIDR(topup)}
           accent="bg-main"
         />
-        <PartnerStat icon={Users} label="Seat dipesan" value="40" accent="bg-accent-cyan" />
-        <PartnerStat icon={PackageCheck} label="SLA bulk" value="< 30m" accent="bg-accent-lime" />
+        <PartnerStat icon={Users} label={t("statSeats")} value="40" accent="bg-accent-cyan" />
+        <PartnerStat icon={PackageCheck} label={t("statSla")} value="< 30m" accent="bg-accent-lime" />
         <PartnerStat
           icon={CreditCard}
-          label="Invoice"
+          label={t("statInvoice")}
           value="White-label"
           accent="bg-accent-pink"
         />
@@ -175,12 +181,12 @@ export function ResellerPortalView() {
       <div className="mt-8 rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-heading text-lg font-extrabold">Order reseller terbaru</h2>
+            <h2 className="font-heading text-lg font-extrabold">{t("ordersTitle")}</h2>
             <p className="text-sm text-foreground/60">
-              Mock antrian order besar yang nantinya bisa terhubung ke fulfillment.
+              {t("ordersDesc")}
             </p>
           </div>
-          <Button variant="neutral">Unduh CSV</Button>
+          <Button variant="neutral">{t("downloadCsv")}</Button>
         </div>
         <div className="mt-4 grid gap-3">
           {resellerOrders.map((order) => (
@@ -193,11 +199,11 @@ export function ResellerPortalView() {
                 <p className="text-xs text-foreground/60">{order.id}</p>
               </div>
               <p className="text-sm font-bold text-foreground/70">
-                {order.qty}x {order.product}
+                {t("orderQty", { qty: order.qty, product: order.product })}
               </p>
               <p className="font-heading text-sm font-extrabold">{formatIDR(order.margin)}</p>
-              <Badge variant={ORDER_STATUS[order.status].variant}>
-                {ORDER_STATUS[order.status].label}
+              <Badge variant={ORDER_STATUS_VARIANT[order.status]}>
+                {t(ORDER_STATUS_KEY[order.status])}
               </Badge>
             </div>
           ))}

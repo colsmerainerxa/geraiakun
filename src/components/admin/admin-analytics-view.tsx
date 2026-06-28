@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { analyticsMetrics, customerSegments, revenueSeries } from "@/lib/mock/enterprise"
+import { DateRangeFilter, type DateRangePreset } from "@/components/ui/date-range-filter"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
 const METRIC_TONE = {
@@ -38,11 +39,13 @@ const METRIC_TONE = {
   purple: "bg-accent-purple",
 }
 
-const segmentActions = ["Semua", "Renewal", "Reseller", "Retention", "First purchase"] as const
+const segmentActions = ["Semua", "Beli lagi", "Reseller", "Retention", "First purchase"] as const
 
 export function AdminAnalyticsView() {
   const [focus, setFocus] = useState<(typeof segmentActions)[number]>("Semua")
-  const maxRevenue = Math.max(...revenueSeries.map((item) => item.value))
+  const [rangePreset, setRangePreset] = useState<DateRangePreset>("30d")
+  const series = rangePreset === "7d" ? revenueSeries.slice(-7) : revenueSeries
+  const maxRevenue = Math.max(...series.map((item) => item.value))
 
   const filteredSegments = useMemo(() => {
     if (focus === "Semua") return customerSegments
@@ -103,14 +106,17 @@ export function AdminAnalyticsView() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="flex items-center gap-2 font-heading text-lg font-extrabold">
-                <LineChart className="size-5" /> Revenue 7 Hari
+                <LineChart className="size-5" /> Tren Pendapatan
               </h2>
               <p className="text-sm text-foreground/60">Visualisasi ringan tanpa library chart.</p>
             </div>
-            <Badge variant="lime">+18% WoW</Badge>
+            <div className="flex items-center gap-2">
+              <DateRangeFilter value={rangePreset} onChange={setRangePreset} />
+              <Badge variant="lime">+18% WoW</Badge>
+            </div>
           </div>
           <div className="mt-6 flex h-64 items-end justify-between gap-3">
-            {revenueSeries.map((item) => (
+            {series.map((item) => (
               <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
                 <span className="text-[10px] font-bold text-foreground/50">
                   {formatIDR(item.value, { compact: true })}

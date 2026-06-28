@@ -16,8 +16,12 @@ import { toast } from "sonner"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Pagination, usePagination } from "@/components/ui/pagination"
+import { StatCard } from "@/components/admin/parts"
+import { FilterPresetsBar } from "@/components/admin/filter-presets-bar"
 import {
   Select,
   SelectContent,
@@ -27,6 +31,8 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
+import { useFilterState } from "@/lib/hooks/use-filter-state"
+import { useAdminGamification } from "@/stores/admin-gamification"
 import { cn, formatDate, formatNumber, initials } from "@/lib/utils"
 import { useTickets } from "@/stores/tickets"
 import type { Ticket, TicketStatus } from "@/types"
@@ -70,8 +76,13 @@ export function AdminTicketsView() {
   const tickets = useTickets((s) => s.tickets)
   const setStatus = useTickets((s) => s.setStatus)
   const adminReply = useTickets((s) => s.adminReply)
-  const [search, setSearch] = useState("")
-  const [status, setStatusFilter] = useState<TicketStatus | "semua">("semua")
+  const award = useAdminGamification((s) => s.award)
+  const [search, setSearch] = useFilterState<string>("tickets", "search", "")
+  const [status, setStatusFilter] = useFilterState<TicketStatus | "semua">(
+    "tickets",
+    "status",
+    "semua",
+  )
   const [activeId, setActiveId] = useState<string | null>(null)
   const [reply, setReply] = useState("")
 
@@ -103,6 +114,39 @@ export function AdminTicketsView() {
 
   const active = activeId ? tickets.find((t) => t.id === activeId) : null
 
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const { page, setPage, pageCount, paged, total, pageSize } = usePagination(filtered, 8)
+
+  function toggleRow(id: string, checked: boolean) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (checked) next.add(id)
+      else next.delete(id)
+      return next
+    })
+  }
+
+  const pageIds = paged.map((t) => t.id)
+  const allOnPageSelected = pageIds.length > 0 && pageIds.every((id) => selected.has(id))
+  const someOnPageSelected = pageIds.some((id) => selected.has(id))
+
+  function toggleAllOnPage(checked: boolean) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (checked) pageIds.forEach((id) => next.add(id))
+      else pageIds.forEach((id) => next.delete(id))
+      return next
+    })
+  }
+
+  function bulkSetStatus(next: TicketStatus) {
+    if (selected.size === 0) return
+    selected.forEach((id) => setStatus(id, next))
+    if (next === "selesai") award("ticket.resolved")
+    toast.success(`${selected.size} tiket diubah ke "${STATUS_META[next].label}"`)
+    setSelected(new Set())
+  }
+
   function sendReply() {
     if (!active) return
     const text = reply.trim()
@@ -116,15 +160,15 @@ export function AdminTicketsView() {
     <div className="flex flex-col gap-6">
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MiniStat icon={Inbox} label="Total Tiket" value={stats.total} accent="bg-accent-cyan" />
-        <MiniStat icon={Clock} label="Perlu Tindakan" value={stats.open} accent="bg-warning" />
-        <MiniStat
+        <StatCard icon={Inbox} label="Total Tiket" value={stats.total} accent="bg-accent-cyan" />
+        <StatCard icon={Clock} label="Perlu Tindakan" value={stats.open} accent="bg-warning" />
+        <StatCard
           icon={ArrowRight}
           label="Diproses"
           value={stats.processing}
           accent="bg-accent-purple"
         />
-        <MiniStat icon={Star} label="Selesai" value={stats.done} accent="bg-accent-lime" />
+        <StatCard icon={Star} label="Selesai" value={stats.done} accent="bg-accent-lime" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
@@ -157,48 +201,106 @@ export function AdminTicketsView() {
             </Select>
           </div>
 
-          <div className="flex flex-col gap-2 lg:max-h-[70vh] lg:overflow-y-auto lg:pr-1">
-            {filtered.length === 0 ? (
+          <FilterPresetsBar
+            module="tickets"
+            current={{ search, status }}
+            onApply={(snap) => {
+              setSearch(snap.search ?? "")
+              setStatusFilter((snap.status as TicketStatus | "semua") ?? "semua")
+            }}
+          />
+
+          {selected.size > 0 && (
+            <div className="flex flex-wrap items-center gap-2 rounded-base border-2 border-border bg-main p-2.5 shadow-shadow-sm">
+              <span className="font-heading text-xs font-extrabold text-main-foreground">
+                {selected.size} terpilih
+              </span>
+              <Button size="sm" variant="neutral" onClick={() => bulkSetStatus("selesai")}>
+                Tutup (Selesai)
+              </Button>
+              <Button size="sm" variant="neutral" onClick={() => bulkSetStatus("diproses")}>
+                Proses
+              </Button>
+              <Button size="sm" variant="neutral" onClick={() => setSelected(new Set())}>
+                Batal
+              </Button>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
+            {filtered.length > 0 && (
+              <div className="flex items-center gap-2 px-1">
+                <Checkbox
+                  checked={
+                    allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false
+                  }
+                  onCheckedChange={(v) => toggleAllOnPage(!!v)}
+                  aria-label="Pilih semua di halaman ini"
+                />
+                <span className="text-[10px] font-extrabold uppercase text-foreground/40">
+                  Pilih semua
+                </span>
+              </div>
+            )}
+            {total === 0 ? (
               <div className="rounded-base border-2 border-dashed border-border py-12 text-center text-sm text-foreground/50">
                 Tidak ada tiket.
               </div>
             ) : (
-              filtered.map((t) => (
-                <button
+              paged.map((t) => (
+                <div
                   key={t.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveId(t.id)
-                    setReply("")
-                  }}
                   className={cn(
-                    "rounded-base border-2 border-border bg-secondary-background p-4 text-left shadow-shadow-sm transition-all hover:-translate-y-0.5",
+                    "flex gap-2 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm",
                     activeId === t.id && "ring-4 ring-main/40",
+                    selected.has(t.id) && "bg-main/20",
                   )}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-heading text-xs font-extrabold text-foreground/50">
-                      {t.code}
-                    </span>
-                    <Badge variant={STATUS_META[t.status].variant}>
-                      {STATUS_META[t.status].label}
-                    </Badge>
-                  </div>
-                  <p className="mt-1.5 line-clamp-1 font-heading text-sm font-bold">{t.subject}</p>
-                  <div className="mt-1.5 flex items-center gap-2 text-xs text-foreground/60">
-                    <span className="truncate">{t.customerName}</span>
-                    <span>·</span>
-                    <span>{TYPE_LABEL[t.type]}</span>
-                    {t.priority === "tinggi" && (
-                      <Badge variant="danger" className="ml-auto px-1.5 py-0 text-[10px]">
-                        Prioritas
+                  <Checkbox
+                    checked={selected.has(t.id)}
+                    onCheckedChange={(v) => toggleRow(t.id, !!v)}
+                    aria-label={`Pilih ${t.code}`}
+                    className="mt-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveId(t.id)
+                      setReply("")
+                    }}
+                    className="min-w-0 flex-1 text-left"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-heading text-xs font-extrabold text-foreground/50">
+                        {t.code}
+                      </span>
+                      <Badge variant={STATUS_META[t.status].variant}>
+                        {STATUS_META[t.status].label}
                       </Badge>
-                    )}
-                  </div>
-                </button>
+                    </div>
+                    <p className="mt-1.5 line-clamp-1 font-heading text-sm font-bold">{t.subject}</p>
+                    <div className="mt-1.5 flex items-center gap-2 text-xs text-foreground/60">
+                      <span className="truncate">{t.customerName}</span>
+                      <span>·</span>
+                      <span>{TYPE_LABEL[t.type]}</span>
+                      {t.priority === "tinggi" && (
+                        <Badge variant="danger" className="ml-auto px-1.5 py-0 text-[10px]">
+                          Prioritas
+                        </Badge>
+                      )}
+                    </div>
+                  </button>
+                </div>
               ))
             )}
           </div>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={setPage}
+          />
         </div>
 
         {/* Detail */}
@@ -238,6 +340,7 @@ export function AdminTicketsView() {
                       value={active.status}
                       onValueChange={(v) => {
                         setStatus(active.id, v as TicketStatus)
+                        if (v === "selesai") award("ticket.resolved")
                         toast.success(`Status diubah: ${STATUS_META[v as TicketStatus].label}`)
                       }}
                     >
@@ -355,35 +458,6 @@ export function AdminTicketsView() {
             </div>
           )}
         </div>
-      </div>
-    </div>
-  )
-}
-
-function MiniStat({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: typeof Inbox
-  label: string
-  value: number
-  accent: string
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
-      <span
-        className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm",
-          accent,
-        )}
-      >
-        <Icon className="size-5" />
-      </span>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">{label}</p>
-        <p className="font-heading text-xl font-extrabold">{value}</p>
       </div>
     </div>
   )

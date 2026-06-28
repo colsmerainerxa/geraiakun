@@ -21,6 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn, formatDate, initials } from "@/lib/utils"
 import { useReviewsStore } from "@/stores/reviews"
+import { REVIEW_POINTS, useLoyalty } from "@/stores/loyalty"
 import type { Product, Review } from "@/types"
 
 type SortKey = "recent" | "highest" | "lowest"
@@ -106,6 +107,7 @@ function ReviewForm({ productId, productName }: { productId: string; productName
   const tc = useTranslations("common")
   const isEn = useLocale() === "en"
   const addReview = useReviewsStore((s) => s.addReview)
+  const addPoints = useLoyalty((s) => s.add)
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
   const [title, setTitle] = useState("")
@@ -127,7 +129,11 @@ function ReviewForm({ productId, productName }: { productId: string; productName
       comment: comment.trim(),
       variantLabel: productName,
     })
-    toast.success(t("submitted"))
+    // Loyalty: reward review submission with points.
+    addPoints(REVIEW_POINTS, isEn ? "Review submission" : "Ulasan produk")
+    toast.success(t("submitted"), {
+      description: isEn ? `+${REVIEW_POINTS} points earned` : `+${REVIEW_POINTS} poin didapat`,
+    })
     setRating(0)
     setHover(0)
     setTitle("")

@@ -11,6 +11,7 @@ import {
   Wallet,
 } from "lucide-react"
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
@@ -22,18 +23,28 @@ import { Textarea } from "@/components/ui/textarea"
 import { refundCases, type RefundCase, type RefundStatus } from "@/lib/mock/enterprise"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 
-const STATUS_META: Record<
+const STATUS_KEY: Record<RefundStatus, string> = {
+  draft: "statusDraft",
+  review: "statusReview",
+  replacement: "statusReplacement",
+  refund: "statusRefund",
+  rejected: "statusRejected",
+  closed: "statusClosed",
+}
+const STATUS_VARIANT: Record<
   RefundStatus,
-  { label: string; variant: "neutral" | "warning" | "cyan" | "success" | "danger" }
+  "neutral" | "warning" | "cyan" | "success" | "danger"
 > = {
-  draft: { label: "Draft", variant: "neutral" },
-  review: { label: "Direview", variant: "warning" },
-  replacement: { label: "Ganti Akun", variant: "cyan" },
-  refund: { label: "Refund", variant: "danger" },
-  closed: { label: "Selesai", variant: "success" },
+  draft: "neutral",
+  review: "warning",
+  replacement: "cyan",
+  refund: "danger",
+  rejected: "danger",
+  closed: "success",
 }
 
 export function RefundCenterView() {
+  const t = useTranslations("refundCenter")
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState(refundCases[0]?.id ?? "")
   const selected = refundCases.find((item) => item.id === selectedId) ?? refundCases[0]
@@ -43,39 +54,41 @@ export function RefundCenterView() {
     return refundCases.filter(
       (item) =>
         item.id.toLowerCase().includes(q) ||
-        item.invoice.toLowerCase().includes(q) ||
+        item.orderInvoice.toLowerCase().includes(q) ||
         item.productName.toLowerCase().includes(q),
     )
   }, [query])
 
+  function statusMeta(status: RefundStatus) {
+    return { label: t(STATUS_KEY[status]), variant: STATUS_VARIANT[status] }
+  }
+
   function submitDraft(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    toast.success("Draft klaim dibuat", {
-      description: "UI demo: data belum dikirim ke backend.",
-    })
+    toast.success(t("toastDraftTitle"), { description: t("toastDraftDesc") })
     event.currentTarget.reset()
   }
 
   return (
     <Container className="py-12">
       <SectionHeading
-        eyebrow="RESOLUTION CENTER"
-        title="Refund & Replacement Center"
-        subtitle="Alur self-service untuk klaim garansi, ganti akun, refund pembayaran, dan transparansi SLA penanganan."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
       />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-4">
-        <ResolutionStat icon={FileText} label="Kasus aktif" value="2" accent="bg-accent-cyan" />
-        <ResolutionStat icon={RefreshCcw} label="Ganti akun" value="1" accent="bg-accent-purple" />
+        <ResolutionStat icon={FileText} label={t("statActive")} value="2" accent="bg-accent-cyan" />
+        <ResolutionStat icon={RefreshCcw} label={t("statReplacement")} value="1" accent="bg-accent-purple" />
         <ResolutionStat
           icon={Wallet}
-          label="Nilai refund"
+          label={t("statRefundValue")}
           value={formatIDR(90000)}
           accent="bg-accent-pink"
         />
         <ResolutionStat
           icon={Clock}
-          label="SLA rata-rata"
+          label={t("statSla")}
           value="1,4 jam"
           accent="bg-accent-lime"
         />
@@ -88,7 +101,7 @@ export function RefundCenterView() {
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari invoice atau kode klaim..."
+              placeholder={t("searchPlaceholder")}
               className="pl-9"
             />
           </div>
@@ -98,6 +111,8 @@ export function RefundCenterView() {
               <CaseButton
                 key={item.id}
                 item={item}
+                statusLabel={statusMeta(item.status).label}
+                statusVariant={statusMeta(item.status).variant}
                 active={item.id === selected?.id}
                 onClick={() => setSelectedId(item.id)}
               />
@@ -108,27 +123,27 @@ export function RefundCenterView() {
             onSubmit={submitDraft}
             className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow"
           >
-            <h3 className="font-heading text-lg font-extrabold">Buat klaim baru</h3>
+            <h3 className="font-heading text-lg font-extrabold">{t("formTitle")}</h3>
             <p className="mt-1 text-sm text-foreground/60">
-              Simulasi UI untuk refund, replacement, atau eskalasi garansi.
+              {t("formDesc")}
             </p>
             <div className="mt-4 grid gap-3">
               <div>
-                <Label htmlFor="invoice">Invoice</Label>
+                <Label htmlFor="invoice">{t("fieldInvoice")}</Label>
                 <Input id="invoice" name="invoice" placeholder="INV-20260001" className="mt-1.5" />
               </div>
               <div>
-                <Label htmlFor="reason">Masalah</Label>
+                <Label htmlFor="reason">{t("fieldReason")}</Label>
                 <Textarea
                   id="reason"
                   name="reason"
                   rows={4}
-                  placeholder="Jelaskan kendala akun atau pembayaran..."
+                  placeholder={t("reasonPlaceholder")}
                   className="mt-1.5"
                 />
               </div>
               <Button type="submit">
-                <RotateCcw className="size-4" /> Simpan Draft
+                <RotateCcw className="size-4" /> {t("submitDraft")}
               </Button>
             </div>
           </form>
@@ -139,16 +154,16 @@ export function RefundCenterView() {
             <div className="overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
               <div className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-border bg-main p-6">
                 <div>
-                  <Badge variant={STATUS_META[selected.status].variant}>
-                    {STATUS_META[selected.status].label}
+                  <Badge variant={statusMeta(selected.status).variant}>
+                    {statusMeta(selected.status).label}
                   </Badge>
                   <h2 className="mt-2 font-heading text-2xl font-extrabold">{selected.id}</h2>
                   <p className="text-sm font-bold text-main-foreground/70">
-                    {selected.invoice} - {selected.productName}
+                    {selected.orderInvoice} - {selected.productName}
                   </p>
                 </div>
                 <div className="rounded-base border-2 border-border bg-secondary-background px-4 py-3 text-right shadow-shadow-sm">
-                  <p className="text-xs font-bold uppercase text-foreground/50">Estimasi nilai</p>
+                  <p className="text-xs font-bold uppercase text-foreground/50">{t("estValue")}</p>
                   <p className="font-heading text-xl font-extrabold">
                     {formatIDR(selected.amount)}
                   </p>
@@ -157,13 +172,13 @@ export function RefundCenterView() {
 
               <div className="grid gap-5 p-6 lg:grid-cols-[1fr_260px]">
                 <div>
-                  <p className="font-heading text-sm font-extrabold">Alasan klaim</p>
+                  <p className="font-heading text-sm font-extrabold">{t("reasonTitle")}</p>
                   <p className="mt-1 rounded-base border-2 border-border bg-background p-4 text-sm text-foreground/70">
                     {selected.reason}
                   </p>
 
                   <div className="mt-5">
-                    <p className="font-heading text-sm font-extrabold">Timeline penyelesaian</p>
+                    <p className="font-heading text-sm font-extrabold">{t("timelineTitle")}</p>
                     <div className="mt-3 flex flex-col gap-3">
                       {selected.timeline.map((step, index) => (
                         <div key={step.label} className="flex gap-3">
@@ -178,7 +193,7 @@ export function RefundCenterView() {
                           <div>
                             <p className="font-heading text-sm font-bold">{step.label}</p>
                             <p className="text-xs text-foreground/50">
-                              {step.done ? "Selesai" : "Menunggu aksi berikutnya"}
+                              {step.done ? t("stepDone") : t("stepPending")}
                             </p>
                           </div>
                         </div>
@@ -188,19 +203,19 @@ export function RefundCenterView() {
                 </div>
 
                 <aside className="rounded-base border-2 border-dashed border-border bg-background p-4">
-                  <p className="font-heading text-sm font-extrabold">Owner & SLA</p>
+                  <p className="font-heading text-sm font-extrabold">{t("ownerSlaTitle")}</p>
                   <dl className="mt-3 grid gap-3 text-sm">
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">Ditangani</dt>
+                      <dt className="text-xs font-bold uppercase text-foreground/50">{t("ownerHandled")}</dt>
                       <dd className="font-bold">{selected.owner}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">Update</dt>
+                      <dt className="text-xs font-bold uppercase text-foreground/50">{t("updatedAt")}</dt>
                       <dd className="font-bold">{formatDate(selected.updatedAt)}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">Kebijakan</dt>
-                      <dd className="font-bold">Refund 1-3 hari kerja</dd>
+                      <dt className="text-xs font-bold uppercase text-foreground/50">{t("policy")}</dt>
+                      <dd className="font-bold">{t("policyRefund")}</dd>
                     </div>
                   </dl>
                 </aside>
@@ -211,20 +226,20 @@ export function RefundCenterView() {
               {[
                 {
                   icon: ShieldCheck,
-                  title: "Replacement dulu",
-                  desc: "Untuk produk digital, sistem memprioritaskan akun pengganti sebelum refund.",
+                  title: t("featureReplacementTitle"),
+                  desc: t("featureReplacementDesc"),
                   accent: "bg-accent-lime",
                 },
                 {
                   icon: Clock,
-                  title: "SLA terlihat",
-                  desc: "Pelanggan melihat siapa owner kasus dan progres setiap tahap.",
+                  title: t("featureSlaTitle"),
+                  desc: t("featureSlaDesc"),
                   accent: "bg-accent-cyan",
                 },
                 {
                   icon: Wallet,
-                  title: "Refund transparan",
-                  desc: "Nominal, metode, dan estimasi pencairan tampil sejak awal.",
+                  title: t("featureRefundTitle"),
+                  desc: t("featureRefundDesc"),
                   accent: "bg-accent-pink",
                 },
               ].map((item) => (
@@ -254,10 +269,14 @@ export function RefundCenterView() {
 
 function CaseButton({
   item,
+  statusLabel,
+  statusVariant,
   active,
   onClick,
 }: {
   item: RefundCase
+  statusLabel: string
+  statusVariant: "neutral" | "warning" | "cyan" | "success" | "danger"
   active: boolean
   onClick: () => void
 }) {
@@ -273,9 +292,9 @@ function CaseButton({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-heading text-sm font-extrabold">{item.id}</p>
-          <p className="text-xs font-bold text-foreground/60">{item.invoice}</p>
+          <p className="text-xs font-bold text-foreground/60">{item.orderInvoice}</p>
         </div>
-        <Badge variant={STATUS_META[item.status].variant}>{STATUS_META[item.status].label}</Badge>
+        <Badge variant={statusVariant}>{statusLabel}</Badge>
       </div>
       <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{item.reason}</p>
       <p className="mt-3 text-xs font-bold text-foreground/50">{item.productName}</p>

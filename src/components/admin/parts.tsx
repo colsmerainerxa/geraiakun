@@ -1,9 +1,45 @@
 import type { LucideIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn, paymentLabel } from "@/lib/utils"
 import type { CredentialStock, OrderStatus, Transaction } from "@/types"
 
 export { paymentLabel }
+
+export function TableSkeleton({
+  rows = 6,
+  columns = 5,
+}: {
+  rows?: number
+  columns?: number
+}) {
+  const grid = { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } as const
+  return (
+    <div className="flex flex-col gap-3">
+      <Skeleton className="h-5 w-32" />
+      <div className="overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
+        <div className="border-b-2 border-border px-4 py-3">
+          <div className="grid gap-4" style={grid}>
+            {Array.from({ length: columns }).map((_, i) => (
+              <Skeleton key={`h${i}`} className="h-4" />
+            ))}
+          </div>
+        </div>
+        <div className="divide-y-2 divide-border">
+          {Array.from({ length: rows }).map((_, r) => (
+            <div key={`r${r}`} className="px-4 py-3">
+              <div className="grid items-center gap-4" style={grid}>
+                {Array.from({ length: columns }).map((_, c) => (
+                  <Skeleton key={`c${c}`} className="h-4" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function StatCard({
   label,
@@ -71,11 +107,12 @@ export function TransactionStatusBadge({ status }: { status: Transaction["status
 
 const CRED_STATUS: Record<
   CredentialStock["status"],
-  { label: string; variant: "success" | "neutral" | "danger" }
+  { label: string; variant: "success" | "neutral" | "danger" | "warning" }
 > = {
   tersedia: { label: "Tersedia", variant: "success" },
   terjual: { label: "Terjual", variant: "neutral" },
   kadaluarsa: { label: "Kadaluarsa", variant: "danger" },
+  ditahan: { label: "Ditahan", variant: "warning" },
 }
 
 export function CredentialStatusBadge({ status }: { status: CredentialStock["status"] }) {

@@ -10,8 +10,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params
   return {
-    title: "Vault Akun & Renewal",
-    description: "Kelola akun digital, garansi, health check, dan renewal dari satu dashboard.",
+    title: "Account Vault & Beli Lagi",
+    description: "Kelola akun digital, masa aktif, garansi, health check, dan pembelian ulang.",
     robots: { index: false, follow: false },
     alternates: seoAlternates(locale, "/akun/vault"),
   }

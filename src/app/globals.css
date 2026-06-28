@@ -42,7 +42,9 @@
   --foreground: #f7f7f7;
   --main-foreground: #0a0a0a;
   --main: #ffd23f;
-  --border: #000000;
+  /* Off-white border so the neobrutalism hard-shadow + 2px border stay
+     visible on the dark background (pure #000 was ~1:1 contrast). */
+  --border: #f7f7f7;
   --ring: #f7f7f7;
   --overlay: rgba(0, 0, 0, 0.8);
 }

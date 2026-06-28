@@ -8,6 +8,7 @@ import { WishlistButton } from "@/components/storefront/wishlist-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { productMinPrice } from "@/lib/mock/products"
@@ -59,12 +60,6 @@ export function ProductCard({ product }: { product: Product }) {
               ))}
               {min === 0 && <Badge variant="lime">{isEn ? "Free" : "Gratis"}</Badge>}
               {off > 0 && <Badge variant="danger">-{off}%</Badge>}
-              {/* Stock urgency: tampilkan bila stok varian termurah menipis */}
-              {minVariant && minVariant.stock > 0 && minVariant.stock <= 5 && (
-                <Badge variant="warning" className="animate-pulse">
-                  {isEn ? `Only ${minVariant.stock} left` : `Sisa ${minVariant.stock}!`}
-                </Badge>
-              )}
             </div>
             <WishlistButton slug={product.slug} className="absolute right-2.5 top-2.5" />
             <CompareButton slug={product.slug} className="absolute bottom-2.5 right-2.5" />
@@ -87,6 +82,20 @@ export function ProductCard({ product }: { product: Product }) {
                 {formatNumber(product.soldCount)} {t("sold")}
               </span>
             </div>
+
+            {minVariant && minVariant.stock > 0 && minVariant.stock <= 5 && (
+              <div className="mt-1">
+                <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-warning">
+                  <span>🔥 {isEn ? "Selling fast" : "Laris"}</span>
+                  <span>{isEn ? `Only ${minVariant.stock} left` : `Sisa ${minVariant.stock}`}</span>
+                </div>
+                <Progress
+                  value={Math.min(95, 100 - (minVariant.stock / 10) * 100)}
+                  className="h-1.5 border-0 bg-warning/20"
+                  indicatorClassName="bg-warning"
+                />
+              </div>
+            )}
 
             <div className="mt-auto flex items-end justify-between pt-2">
               <div className="flex flex-col">

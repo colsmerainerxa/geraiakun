@@ -2,6 +2,7 @@
 
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import type { UserSession } from "@/types"
 
 // Demo user profile (pre-backend). Persisted so "edits" survive reloads and
 // feel real, mirroring the cart / wishlist / tickets stores.
@@ -30,11 +31,16 @@ export interface ActivityEntry {
 
 interface UserState {
   profile: UserProfile
+  emailVerified: boolean
   prefs: NotificationPrefs
   activity: ActivityEntry[]
+  sessions: UserSession[]
   updateProfile: (patch: Partial<UserProfile>) => void
+  setEmailVerified: (verified: boolean) => void
   updatePrefs: (patch: Partial<NotificationPrefs>) => void
   logActivity: (entry: Omit<ActivityEntry, "id" | "date">) => void
+  terminateSession: (id: string) => void
+  terminateOtherSessions: () => void
   reset: () => void
 }
 
@@ -90,13 +96,46 @@ function seedActivity(): ActivityEntry[] {
   ]
 }
 
+const DEFAULT_SESSIONS: UserSession[] = [
+  {
+    id: "session-current",
+    device: "Windows PC",
+    browser: "Chrome",
+    location: "Denpasar, ID",
+    ipAddress: "103.12.84.21",
+    lastActiveAt: "2026-06-28T09:30:00.000Z",
+    current: true,
+  },
+  {
+    id: "session-mobile",
+    device: "Android Phone",
+    browser: "Chrome Mobile",
+    location: "Jakarta, ID",
+    ipAddress: "180.252.91.7",
+    lastActiveAt: "2026-06-27T19:12:00.000Z",
+    current: false,
+  },
+  {
+    id: "session-tablet",
+    device: "iPad",
+    browser: "Safari",
+    location: "Surabaya, ID",
+    ipAddress: "36.82.17.44",
+    lastActiveAt: "2026-06-24T07:45:00.000Z",
+    current: false,
+  },
+]
+
 export const useUser = create<UserState>()(
   persist(
     (set) => ({
       profile: DEFAULT_PROFILE,
+      emailVerified: true,
       prefs: DEFAULT_PREFS,
       activity: seedActivity(),
+      sessions: DEFAULT_SESSIONS,
       updateProfile: (patch) => set((s) => ({ profile: { ...s.profile, ...patch } })),
+      setEmailVerified: (emailVerified) => set({ emailVerified }),
       updatePrefs: (patch) => set((s) => ({ prefs: { ...s.prefs, ...patch } })),
       logActivity: (entry) =>
         set((s) => ({
@@ -105,11 +144,19 @@ export const useUser = create<UserState>()(
             ...s.activity,
           ],
         })),
+      terminateSession: (id) =>
+        set((state) => ({
+          sessions: state.sessions.filter((session) => session.current || session.id !== id),
+        })),
+      terminateOtherSessions: () =>
+        set((state) => ({ sessions: state.sessions.filter((session) => session.current) })),
       reset: () =>
         set({
           profile: DEFAULT_PROFILE,
+          emailVerified: true,
           prefs: DEFAULT_PREFS,
           activity: seedActivity(),
+          sessions: DEFAULT_SESSIONS,
         }),
     }),
     { name: "beliakun-user" },

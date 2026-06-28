@@ -82,21 +82,21 @@ export function CartDrawer() {
                           <button
                             type="button"
                             onClick={() => updateQty(item.variantId, item.qty - 1)}
-                            className="flex size-6 items-center justify-center rounded-[5px] border-2 border-border bg-secondary-background hover:bg-main"
+                            className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background hover:bg-main"
                             aria-label={t("decrease")}
                           >
-                            <Minus className="size-3" />
+                            <Minus className="size-4" />
                           </button>
-                          <span className="w-6 text-center font-heading text-sm font-bold">
+                          <span className="w-8 text-center font-heading text-sm font-bold">
                             {item.qty}
                           </span>
                           <button
                             type="button"
                             onClick={() => updateQty(item.variantId, item.qty + 1)}
-                            className="flex size-6 items-center justify-center rounded-[5px] border-2 border-border bg-secondary-background hover:bg-main"
+                            className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background hover:bg-main"
                             aria-label={t("increase")}
                           >
-                            <Plus className="size-3" />
+                            <Plus className="size-4" />
                           </button>
                         </div>
                         <span className="font-heading text-sm font-extrabold">

@@ -1,4 +1,4 @@
-import type { CategorySlug, Product } from "@/types"
+import type { AccountType, CategorySlug, Product } from "@/types"
 import { categories } from "./categories"
 import { banners, testimonials } from "./content"
 import { credentialStats, credentials } from "./credentials"
@@ -21,7 +21,11 @@ export interface ProductQuery {
   minPrice?: number
   maxPrice?: number
   badges?: string[]
+  accountType?: AccountType
+  duration?: DurationBucket
 }
+
+export type DurationBucket = "1m" | "3m" | "1y" | "lifetime"
 
 function categoriesWithCount() {
   return categories.map((c) => ({
@@ -44,7 +48,7 @@ export const fakeApi = {
   async getProducts(query: ProductQuery = {}): Promise<Product[]> {
     await delay()
     let list = [...products]
-    const { category, search, sort, minPrice, maxPrice, badges } = query
+    const { category, search, sort, minPrice, maxPrice, badges, accountType, duration } = query
 
     if (category && category !== "semua") {
       list = list.filter((p) => p.category === category)
@@ -66,6 +70,18 @@ export const fakeApi = {
     }
     if (badges && badges.length) {
       list = list.filter((p) => p.badges.some((b) => badges.includes(b)))
+    }
+    if (accountType) {
+      list = list.filter((p) => p.variants.some((v) => v.type === accountType))
+    }
+    if (duration) {
+      list = list.filter((p) =>
+        p.variants.some((v) => {
+          if (duration === "lifetime") return v.durationDays === null
+          const cap = duration === "1m" ? 30 : duration === "3m" ? 90 : 365
+          return v.durationDays !== null && v.durationDays <= cap
+        }),
+      )
     }
 
     switch (sort) {

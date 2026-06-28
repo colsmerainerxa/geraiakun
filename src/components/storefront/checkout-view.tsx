@@ -15,6 +15,7 @@ import {
   ScanLine,
   ShieldCheck,
   TimerReset,
+  UserRound,
   Wallet,
 } from "lucide-react"
 import { motion } from "motion/react"
@@ -36,6 +37,7 @@ import { computeDiscount } from "@/lib/promo"
 import { cn, formatIDR, paymentLabel } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { usePurchasedOrders } from "@/stores/orders"
+import { usePayments } from "@/stores/payments"
 import { usePromo } from "@/stores/promo"
 import type { Order, PaymentMethod } from "@/types"
 
@@ -176,6 +178,7 @@ export function CheckoutView() {
   const promo = usePromo((s) => s.promo)
   const clearPromo = usePromo((s) => s.clear)
   const addOrder = usePurchasedOrders((s) => s.addOrder)
+  const createPaymentAttempt = usePayments((s) => s.createAttempt)
 
   const [method, setMethod] = useState<PaymentMethod>("qris")
   const [processing, setProcessing] = useState(false)
@@ -223,21 +226,18 @@ export function CheckoutView() {
         discount,
         fee: FEE,
         total,
-        status: "selesai",
+        status: "menunggu-pembayaran",
         paymentMethod: method,
         createdAt: now,
-        paidAt: now,
-        credentials: items.map((i) => ({
-          email: `akun.${i.productSlug.replace(/[^a-z0-9]/g, "")}@premium.mail`,
-          password: `Bk!${i.productName.replace(/[^A-Za-z]/g, "").slice(0, 3)}${Math.floor(1000 + Math.random() * 9000)}`,
-          note: `Login lewat aplikasi/web resmi ${i.productName}. Jangan ubah email & password.`,
-        })),
+        paidAt: null,
+        credentials: [],
       }
       addOrder(order)
+      createPaymentAttempt({ invoice, method, amount: total })
       clear()
       clearPromo()
       setProcessing(false)
-      setDone(order)
+      router.push(`/pembayaran/${invoice}`)
     }, 1600)
   }
 
@@ -359,11 +359,17 @@ export function CheckoutView() {
       </Link>
       <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">{t("title")}</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8 lg:grid-cols-[1fr_380px]">
+      <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0">
         <div className="flex flex-col gap-8">
           {/* Contact */}
           <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">{t("contactInfo")}</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-heading text-lg font-bold">{t("contactInfo")}</h2>
+              <span className="inline-flex items-center gap-1.5 rounded-base border-2 border-border bg-accent-lime px-2.5 py-1 text-[11px] font-extrabold">
+                <UserRound className="size-3.5" /> {t("guestBadge")}
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs text-foreground/60">{t("guestHint")}</p>
             <div className="mt-4 grid gap-4">
               <div className="grid gap-1.5">
                 <Label htmlFor="name">{t("name")}</Label>
@@ -534,6 +540,21 @@ export function CheckoutView() {
           </div>
         </aside>
       </form>
+
+      {/* Sticky mobile pay bar */}
+      {items.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 p-3 backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-md items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase text-foreground/50">{tc("total")}</p>
+              <p className="font-heading text-lg font-extrabold leading-none">{formatIDR(total)}</p>
+            </div>
+            <Button type="submit" form="checkout-form" size="lg" disabled={processing} className="shrink-0">
+              <Lock className="size-4" /> {t("payNow")}
+            </Button>
+          </div>
+        </div>
+      )}
     </Container>
   )
 }

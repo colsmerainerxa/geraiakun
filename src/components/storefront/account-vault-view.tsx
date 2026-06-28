@@ -6,11 +6,12 @@ import {
   Copy,
   KeyRound,
   LockKeyhole,
-  RefreshCcw,
+  ShoppingCart,
   ShieldCheck,
   Smartphone,
 } from "lucide-react"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
@@ -18,16 +19,31 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
 import { vaultAccounts, vaultActivities, type VaultAccountStatus } from "@/lib/mock/enterprise"
+import { products } from "@/lib/mock/products"
 import { cn, formatDate, formatIDR, formatNumber } from "@/lib/utils"
+import { useCart } from "@/stores/cart"
+import { useUI } from "@/stores/ui"
 
-const STATUS_META: Record<
+const STATUS_KEY: Record<VaultAccountStatus, string> = {
+  aktif: "statusActive",
+  "akan-habis": "statusExpiring",
+  ditahan: "statusHeld",
+  bermasalah: "statusIssue",
+}
+const STATUS_VARIANT: Record<
   VaultAccountStatus,
-  { label: string; variant: "success" | "warning" | "neutral" | "danger"; tone: string }
+  "success" | "warning" | "neutral" | "danger"
 > = {
-  aktif: { label: "Aktif", variant: "success", tone: "bg-accent-lime" },
-  "akan-habis": { label: "Akan Habis", variant: "warning", tone: "bg-warning" },
-  ditahan: { label: "Ditahan", variant: "neutral", tone: "bg-accent-purple" },
-  bermasalah: { label: "Bermasalah", variant: "danger", tone: "bg-danger" },
+  aktif: "success",
+  "akan-habis": "warning",
+  ditahan: "neutral",
+  bermasalah: "danger",
+}
+const STATUS_TONE: Record<VaultAccountStatus, string> = {
+  aktif: "bg-accent-lime",
+  "akan-habis": "bg-warning",
+  ditahan: "bg-accent-purple",
+  bermasalah: "bg-danger",
 }
 
 const ACTIVITY_TONE = {
@@ -38,48 +54,99 @@ const ACTIVITY_TONE = {
 }
 
 export function AccountVaultView() {
+  const t = useTranslations("vault")
+  const addItem = useCart((state) => state.addItem)
+  const setCartOpen = useUI((state) => state.setCartOpen)
   const [selectedId, setSelectedId] = useState(vaultAccounts[0]?.id ?? "")
   const selected = vaultAccounts.find((account) => account.id === selectedId) ?? vaultAccounts[0]
   const expiring = vaultAccounts.filter((account) => account.status === "akan-habis").length
-  const totalRenewal = vaultAccounts.reduce((sum, account) => sum + account.renewalPrice, 0)
+  const reorderEstimate = vaultAccounts
+    .filter((account) => account.status === "akan-habis")
+    .reduce((sum, account) => sum + account.reorderPrice, 0)
   const averageHealth = Math.round(
     vaultAccounts.reduce((sum, account) => sum + account.healthScore, 0) / vaultAccounts.length,
   )
 
+  function statusMeta(status: VaultAccountStatus) {
+    return { label: t(STATUS_KEY[status]), variant: STATUS_VARIANT[status], tone: STATUS_TONE[status] }
+  }
+
   function copyLogin(email: string) {
     navigator.clipboard?.writeText(email)
-    toast.success("Login email disalin")
+    toast.success(t("toastLoginCopied"))
+  }
+
+  function reorder() {
+    if (!selected) return
+    const product = products.find((item) => item.id === selected.productId)
+    const variant = product?.variants.find((item) => item.id === selected.variantId)
+    if (!product || !variant) {
+      toast.error(t("toastReorderError"))
+      return
+    }
+    addItem({
+      productId: product.id,
+      productName: product.name,
+      productLogo: product.logo,
+      productSlug: product.slug,
+      variantId: variant.id,
+      variantLabel: variant.label,
+      price: variant.price,
+      qty: 1,
+      accent: product.accent,
+    })
+    toast.success(t("toastReorderAdded", { name: product.name }))
+    setCartOpen(true)
   }
 
   return (
     <Container className="py-12">
       <SectionHeading
-        eyebrow="ACCOUNT VAULT"
-        title="Vault Akun & Renewal"
-        subtitle="Satu tempat untuk melihat akun digital yang sudah dibeli, status garansi, jadwal renewal, dan health check akun."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
         action={
           <Button asChild variant="neutral">
-            <Link href="/akun">Kembali ke Akun</Link>
+            <Link href="/akun">{t("backToAccount")}</Link>
           </Button>
         }
       />
 
+      {expiring > 0 && (
+        <div className="mt-6 flex flex-col gap-2 rounded-base border-2 border-warning bg-warning/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border bg-warning shadow-shadow-sm">
+              <CalendarClock className="size-5" />
+            </span>
+            <div>
+              <p className="font-heading text-sm font-extrabold">
+                {t("expiryAlertTitle", { count: expiring })}
+              </p>
+              <p className="text-xs text-foreground/70">{t("expiryAlertDesc")}</p>
+            </div>
+          </div>
+          <Button variant="neutral" size="sm" asChild className="shrink-0">
+            <Link href="/katalog">{t("expiryAlertCta")}</Link>
+          </Button>
+        </div>
+      )}
+
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <VaultStat
           icon={KeyRound}
-          label="Akun aktif"
+          label={t("statActive")}
           value={formatNumber(vaultAccounts.length)}
           accent="bg-accent-cyan"
         />
         <VaultStat
           icon={CalendarClock}
-          label="Perlu renewal"
+          label={t("statExpiring")}
           value={formatNumber(expiring)}
           accent="bg-warning"
         />
         <VaultStat
           icon={ShieldCheck}
-          label="Health rata-rata"
+          label={t("statHealth")}
           value={`${averageHealth}%`}
           accent="bg-accent-lime"
         />
@@ -89,16 +156,18 @@ export function AccountVaultView() {
         <section className="flex flex-col gap-3">
           <div className="rounded-base border-2 border-border bg-main p-4 shadow-shadow">
             <p className="text-xs font-heading font-extrabold uppercase text-main-foreground/70">
-              Renewal forecast
+              {t("reorderEstimate")}
             </p>
-            <p className="mt-1 font-heading text-2xl font-extrabold">{formatIDR(totalRenewal)}</p>
+            <p className="mt-1 font-heading text-2xl font-extrabold">
+              {formatIDR(reorderEstimate)}
+            </p>
             <p className="text-xs font-bold text-main-foreground/70">
-              Estimasi biaya perpanjangan semua akun aktif.
+              {t("reorderEstimateHint")}
             </p>
           </div>
 
           {vaultAccounts.map((account) => {
-            const meta = STATUS_META[account.status]
+            const meta = statusMeta(account.status)
             const active = selected?.id === account.id
             return (
               <button
@@ -121,7 +190,7 @@ export function AccountVaultView() {
                 </div>
                 <div className="mt-3 flex items-center gap-2 text-xs text-foreground/60">
                   <CalendarClock className="size-3.5" />
-                  Berakhir {formatDate(account.expiresAt)}
+                  {t("expiresOn", { date: formatDate(account.expiresAt) })}
                 </div>
                 <div className="mt-3 h-3 overflow-hidden rounded-full border-2 border-border bg-background">
                   <div
@@ -139,8 +208,8 @@ export function AccountVaultView() {
             <div className="overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
               <div className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-border bg-accent-cyan p-6">
                 <div>
-                  <Badge variant={STATUS_META[selected.status].variant}>
-                    {STATUS_META[selected.status].label}
+                  <Badge variant={statusMeta(selected.status).variant}>
+                    {statusMeta(selected.status).label}
                   </Badge>
                   <h2 className="mt-2 font-heading text-2xl font-extrabold">
                     {selected.productName}
@@ -148,33 +217,33 @@ export function AccountVaultView() {
                   <p className="text-sm font-bold text-foreground/70">{selected.plan}</p>
                 </div>
                 <Button variant="neutral" onClick={() => copyLogin(selected.loginEmail)}>
-                  <Copy className="size-4" /> Salin Login
+                  <Copy className="size-4" /> {t("copyLogin")}
                 </Button>
               </div>
 
               <div className="grid gap-4 p-6 md:grid-cols-2">
-                <InfoTile icon={LockKeyhole} label="Login email" value={selected.loginEmail} mono />
+                <InfoTile icon={LockKeyhole} label={t("infoLoginEmail")} value={selected.loginEmail} mono />
                 <InfoTile
-                  icon={RefreshCcw}
-                  label="Biaya renewal"
-                  value={formatIDR(selected.renewalPrice)}
+                  icon={ShoppingCart}
+                  label={t("infoReorderPrice")}
+                  value={formatIDR(selected.reorderPrice)}
                 />
                 <InfoTile
                   icon={ShieldCheck}
-                  label="Garansi sampai"
+                  label={t("infoWarrantyUntil")}
                   value={formatDate(selected.warrantyUntil)}
                 />
                 <InfoTile
                   icon={Smartphone}
-                  label="Seat & perangkat"
-                  value={`${selected.seats} seat / ${selected.devices} device`}
+                  label={t("infoSeats")}
+                  value={t("seatsValue", { seats: selected.seats, devices: selected.devices })}
                 />
               </div>
 
               <div className="border-t-2 border-dashed border-border p-6">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="font-heading text-sm font-extrabold">Health score akun</p>
+                    <p className="font-heading text-sm font-extrabold">{t("healthScore")}</p>
                     <p className="text-xs text-foreground/60">{selected.note}</p>
                   </div>
                   <span className="font-heading text-2xl font-extrabold">
@@ -188,11 +257,11 @@ export function AccountVaultView() {
                   />
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <Button>
-                    <RefreshCcw className="size-4" /> Perpanjang
+                  <Button onClick={reorder}>
+                    <ShoppingCart className="size-4" /> {t("reorder")}
                   </Button>
                   <Button asChild variant="neutral">
-                    <Link href={`/refund?invoice=${selected.id}`}>Ajukan Kendala</Link>
+                    <Link href={`/refund?invoice=${selected.orderInvoice}`}>{t("raiseIssue")}</Link>
                   </Button>
                 </div>
               </div>
@@ -200,7 +269,7 @@ export function AccountVaultView() {
 
             <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
               <h3 className="flex items-center gap-2 font-heading text-lg font-extrabold">
-                <Activity className="size-5" /> Aktivitas Vault
+                <Activity className="size-5" /> {t("activityTitle")}
               </h3>
               <div className="mt-4 flex flex-col gap-3">
                 {vaultActivities.map((activity) => (

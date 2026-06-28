@@ -5,7 +5,7 @@ import {
   Gift,
   KeyRound,
   Package,
-  RefreshCcw,
+  ShoppingCart,
   ShieldCheck,
   Sparkles,
   Wallet,
@@ -238,9 +238,9 @@ export function AccountView() {
                     <KeyRound className="size-5" />
                   </span>
                   <div>
-                    <p className="font-heading text-sm font-extrabold">Vault akun & renewal</p>
+                    <p className="font-heading text-sm font-extrabold">Account Vault & Beli Lagi</p>
                     <p className="text-xs text-main-foreground/70">
-                      Lihat health check, garansi, dan jadwal perpanjangan akun digital.
+                      Lihat health check, garansi, masa aktif, dan beli kembali akun digital.
                     </p>
                   </div>
                 </div>
@@ -251,11 +251,13 @@ export function AccountView() {
 
               <div className="mb-4 grid gap-3 sm:grid-cols-2">
                 <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
-                  <RefreshCcw className="size-5 text-accent-purple" />
+                  <ShoppingCart className="size-5 text-accent-purple" />
                   <div>
-                    <p className="font-heading text-sm font-bold">Renewal siap dipantau</p>
+                    <p className="font-heading text-sm font-bold">
+                      Pembelian ulang tanpa langganan
+                    </p>
                     <p className="text-xs text-foreground/60">
-                      Cocok untuk langganan private, invite, dan API key.
+                      Setiap pembelian membuat order baru tanpa tagihan otomatis.
                     </p>
                   </div>
                 </div>
