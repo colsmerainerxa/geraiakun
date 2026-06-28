@@ -19,12 +19,9 @@ export const useWishlist = create<WishlistState>()(
       slugs: [],
       toggle: (slug) =>
         set((s) => ({
-          slugs: s.slugs.includes(slug)
-            ? s.slugs.filter((x) => x !== slug)
-            : [slug, ...s.slugs],
+          slugs: s.slugs.includes(slug) ? s.slugs.filter((x) => x !== slug) : [slug, ...s.slugs],
         })),
-      remove: (slug) =>
-        set((s) => ({ slugs: s.slugs.filter((x) => x !== slug) })),
+      remove: (slug) => set((s) => ({ slugs: s.slugs.filter((x) => x !== slug) })),
       clear: () => set({ slugs: [] }),
     }),
     { name: "beliakun-wishlist" },

@@ -1,22 +1,15 @@
 import type { Metadata } from "next"
-import { setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
+import { setRequestLocale } from "next-intl/server"
 import { ProductDetail } from "@/components/storefront/product-detail"
 import { routing } from "@/i18n/routing"
 import { fakeApi } from "@/lib/mock/fake-api"
 import { products } from "@/lib/mock/products"
-import {
-  breadcrumbJsonLd,
-  faqPageJsonLd,
-  JsonLd,
-  productJsonLd,
-} from "@/lib/seo/json-ld"
+import { breadcrumbJsonLd, faqPageJsonLd, JsonLd, productJsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
 
 export function generateStaticParams() {
-  return routing.locales.flatMap((locale) =>
-    products.map((p) => ({ locale, slug: p.slug })),
-  )
+  return routing.locales.flatMap((locale) => products.map((p) => ({ locale, slug: p.slug })))
 }
 
 export async function generateMetadata({
@@ -53,16 +46,14 @@ export default async function ProductPage({
   const { locale, slug } = await params
   setRequestLocale(locale)
 
-  const [product, related] = await Promise.all([
-    fakeApi.getProduct(slug),
-    fakeApi.getRelated(slug),
-  ])
+  const [product, related] = await Promise.all([fakeApi.getProduct(slug), fakeApi.getRelated(slug)])
   if (!product) notFound()
 
   return (
     <>
-      <JsonLd data={productJsonLd(product)} />
+      <JsonLd id={`jsonld-product-${slug}`} data={productJsonLd(product)} />
       <JsonLd
+        id={`jsonld-product-breadcrumb-${slug}`}
         data={breadcrumbJsonLd([
           { name: "Beranda", path: locale === "en" ? "/en" : "/" },
           {
@@ -74,6 +65,7 @@ export default async function ProductPage({
       />
       {product.faqs.length > 0 && (
         <JsonLd
+          id={`jsonld-product-faq-${slug}`}
           data={faqPageJsonLd(
             product.faqs.map((f) => ({
               q: locale === "en" ? f.qEn : f.q,

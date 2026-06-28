@@ -21,24 +21,16 @@ export async function generateMetadata({
   }
 }
 
-export default async function BantuanPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export default async function BantuanPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations("static")
 
   return (
     <Container className="py-12 sm:py-16">
-      <JsonLd data={faqPageJsonLd(localizedFaqs(helpFaqs, locale === "en"))} />
+      <JsonLd id="jsonld-help-faq" data={faqPageJsonLd(localizedFaqs(helpFaqs, locale === "en"))} />
       <div className="mx-auto max-w-3xl">
-        <SectionHeading
-          eyebrow="FAQ"
-          title={t("faqTitle")}
-          subtitle={t("faqSubtitle")}
-        />
+        <SectionHeading eyebrow="FAQ" title={t("faqTitle")} subtitle={t("faqSubtitle")} />
         <FaqAccordion />
       </div>
     </Container>

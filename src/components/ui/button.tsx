@@ -9,15 +9,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-main text-main-foreground shadow-shadow brutal-press",
-        neutral:
-          "bg-secondary-background text-foreground shadow-shadow brutal-press",
-        pink: "bg-accent-pink text-foreground shadow-shadow brutal-press",
-        cyan: "bg-accent-cyan text-foreground shadow-shadow brutal-press",
-        lime: "bg-accent-lime text-foreground shadow-shadow brutal-press",
-        purple: "bg-accent-purple text-foreground shadow-shadow brutal-press",
-        danger: "bg-danger text-foreground shadow-shadow brutal-press",
-        ghost:
-          "border-transparent bg-transparent hover:bg-foreground/5 active:bg-foreground/10",
+        neutral: "bg-secondary-background text-foreground shadow-shadow brutal-press",
+        pink: "bg-accent-pink text-main-foreground shadow-shadow brutal-press",
+        cyan: "bg-accent-cyan text-main-foreground shadow-shadow brutal-press",
+        lime: "bg-accent-lime text-main-foreground shadow-shadow brutal-press",
+        purple: "bg-accent-purple text-main-foreground shadow-shadow brutal-press",
+        blue: "bg-accent-blue text-main-foreground shadow-shadow brutal-press",
+        success: "bg-success text-main-foreground shadow-shadow brutal-press",
+        warning: "bg-warning text-main-foreground shadow-shadow brutal-press",
+        danger: "bg-danger text-main-foreground shadow-shadow brutal-press",
+        ghost: "border-transparent bg-transparent hover:bg-foreground/5 active:bg-foreground/10",
         link: "border-transparent bg-transparent underline-offset-4 hover:underline",
       },
       size: {
@@ -39,8 +40,7 @@ function Button({
   size,
   asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
+}: React.ComponentProps<"button"> & VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot : "button"
   return (
     <Comp

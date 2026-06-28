@@ -24,19 +24,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
-      >
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
         {/* reducedMotion="user" makes ALL framer-motion animations respect
             prefers-reduced-motion (the CSS @media rule only covers CSS animations). */}
         <MotionConfig reducedMotion="user">{children}</MotionConfig>
       </ThemeProvider>
       <Toaster />
       {process.env.NODE_ENV === "development" && (
-        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+        <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
       )}
     </QueryClientProvider>
   )

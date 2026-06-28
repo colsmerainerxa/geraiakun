@@ -2,10 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useState } from "react"
-import {
-  ProductCard,
-  ProductCardSkeleton,
-} from "@/components/storefront/product-card"
+import { ProductCard, ProductCardSkeleton } from "@/components/storefront/product-card"
 import { Button } from "@/components/ui/button"
 import {
   Select,

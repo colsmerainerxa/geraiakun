@@ -19,7 +19,10 @@ export interface ActivationGuide {
 
 // Template umum reusable
 const commonPrereqs = [
-  { id: "Akun beliakun & nomor invoice pesananmu", en: "Your beliakun account & order invoice number" },
+  {
+    id: "Akun beliakun & nomor invoice pesananmu",
+    en: "Your beliakun account & order invoice number",
+  },
   { id: "Koneksi internet stabil", en: "A stable internet connection" },
   { id: "Email aktif untuk menerima kredensial", en: "Active email to receive credentials" },
 ]
@@ -87,8 +90,14 @@ export const activationGuides: Record<string, ActivationGuide> = {
     ],
     troubleshooting: commonTrouble,
     tips: [
-      { id: "Jangan aktifkan 2FA — gunakan akun sharing sebagaimana adanya.", en: "Don't enable 2FA — use the sharing account as-is." },
-      { id: "Logout dari perangkat lain bila terasa lambat.", en: "Log out from other devices if it feels slow." },
+      {
+        id: "Jangan aktifkan 2FA — gunakan akun sharing sebagaimana adanya.",
+        en: "Don't enable 2FA — use the sharing account as-is.",
+      },
+      {
+        id: "Logout dari perangkat lain bila terasa lambat.",
+        en: "Log out from other devices if it feels slow.",
+      },
     ],
   },
   Google: {
@@ -118,8 +127,14 @@ export const activationGuides: Record<string, ActivationGuide> = {
     ],
     troubleshooting: commonTrouble,
     tips: [
-      { id: "Jangan ubah password atau recovery info.", en: "Don't change password or recovery info." },
-      { id: "Akses dari region tertentu mungkin butuh VPN.", en: "Access from some regions may need a VPN." },
+      {
+        id: "Jangan ubah password atau recovery info.",
+        en: "Don't change password or recovery info.",
+      },
+      {
+        id: "Akses dari region tertentu mungkin butuh VPN.",
+        en: "Access from some regions may need a VPN.",
+      },
     ],
   },
   Canva: {
@@ -130,7 +145,10 @@ export const activationGuides: Record<string, ActivationGuide> = {
     steps: [
       {
         title: { id: "Buka Canva", en: "Open Canva" },
-        desc: { id: "Kunjungi canva.com atau buka aplikasinya.", en: "Visit canva.com or open the app." },
+        desc: {
+          id: "Kunjungi canva.com atau buka aplikasinya.",
+          en: "Visit canva.com or open the app.",
+        },
       },
       {
         title: { id: "Login & cek Pro", en: "Log in & check Pro" },
@@ -157,7 +175,10 @@ const categoryFallback: Record<CategorySlug, ActivationGuide> = {
     steps: [
       {
         title: { id: "Buka platform streaming", en: "Open the streaming platform" },
-        desc: { id: "Buka website/app platform streaming kamu.", en: "Open your streaming platform's website/app." },
+        desc: {
+          id: "Buka website/app platform streaming kamu.",
+          en: "Open your streaming platform's website/app.",
+        },
       },
       {
         title: { id: "Login dengan kredensial", en: "Log in with credentials" },
@@ -198,8 +219,8 @@ const categoryFallback: Record<CategorySlug, ActivationGuide> = {
       {
         title: { id: "Set sebagai env variable", en: "Set as env variable" },
         desc: {
-          id: "export API_KEY=\"sk-...\" atau simpan di .env lokal aplikasimu.",
-          en: "export API_KEY=\"sk-...\" or store in your app's local .env.",
+          id: 'export API_KEY="sk-..." atau simpan di .env lokal aplikasimu.',
+          en: 'export API_KEY="sk-..." or store in your app\'s local .env.',
         },
       },
       {
@@ -221,8 +242,14 @@ const categoryFallback: Record<CategorySlug, ActivationGuide> = {
       },
     ],
     tips: [
-      { id: "Pantau usage agar tidak melebihi quota.", en: "Monitor usage to avoid exceeding quota." },
-      { id: "Gunakan header yang benar sesuai provider.", en: "Use the correct headers per provider." },
+      {
+        id: "Pantau usage agar tidak melebihi quota.",
+        en: "Monitor usage to avoid exceeding quota.",
+      },
+      {
+        id: "Gunakan header yang benar sesuai provider.",
+        en: "Use the correct headers per provider.",
+      },
     ],
   },
   edukasi: activationGuides.Canva,

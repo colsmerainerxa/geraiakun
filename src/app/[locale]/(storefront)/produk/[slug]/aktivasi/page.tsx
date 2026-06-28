@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import { setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
+import { setRequestLocale } from "next-intl/server"
 import { ActivationGuideView } from "@/components/storefront/activation-guide-view"
 import { getActivationGuide } from "@/lib/mock/activation-guide"
 import { products } from "@/lib/mock/products"

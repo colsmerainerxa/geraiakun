@@ -1,38 +1,28 @@
 "use client"
 
-import {
-  LayoutDashboard,
-  Menu,
-  ShoppingCart,
-  Sparkles,
-  User,
-} from "lucide-react"
+import { Heart, LayoutDashboard, Menu, ShoppingCart, Sparkles, User } from "lucide-react"
 import { motion } from "motion/react"
 import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Container } from "@/components/shared/container"
 import { LocaleSwitcher } from "@/components/shared/locale-switcher"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { Button } from "@/components/ui/button"
 import { NotificationCenter } from "@/components/storefront/notification-center"
 import { SearchBar as SearchBarAutocomplete } from "@/components/storefront/search-bar"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useCart } from "@/stores/cart"
 import { useUI } from "@/stores/ui"
+import { useWishlist } from "@/stores/wishlist"
 
 function useNavLinks() {
   const t = useTranslations("nav")
   return [
     { href: "/", label: t("home") },
     { href: "/katalog", label: t("catalog") },
+    { href: "/reseller", label: t("reseller") },
     { href: "/artikel", label: t("blog") },
     { href: "/lacak", label: t("track") },
     { href: "/bantuan", label: t("help") },
@@ -49,6 +39,7 @@ export function Navbar() {
   const { setCartOpen } = useUI()
   const mounted = useMounted()
   const count = useCart((s) => s.items.reduce((a, i) => a + i.qty, 0))
+  const wishCount = useWishlist((s) => s.slugs.length)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -86,11 +77,28 @@ export function Navbar() {
           <NotificationCenter />
 
           <Button
-            variant="ghost"
-            size="sm"
-            className="hidden sm:inline-flex"
+            variant="neutral"
+            size="icon-sm"
+            className="relative hidden sm:inline-flex"
             asChild
+            aria-label={t("wishlist")}
           >
+            <Link href="/wishlist">
+              <Heart className="size-4" />
+              {mounted && wishCount > 0 && (
+                <motion.span
+                  key={wishCount}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-border bg-accent-pink text-[10px] font-extrabold text-foreground"
+                >
+                  {wishCount}
+                </motion.span>
+              )}
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
             <Link href="/masuk">{t("login")}</Link>
           </Button>
 
@@ -129,12 +137,7 @@ export function Navbar() {
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="neutral"
-                size="icon-sm"
-                className="lg:hidden"
-                aria-label="Menu"
-              >
+              <Button variant="neutral" size="icon-sm" className="lg:hidden" aria-label="Menu">
                 <Menu className="size-4" />
               </Button>
             </SheetTrigger>
@@ -167,6 +170,16 @@ export function Navbar() {
                 >
                   <Link href="/akun">
                     <User className="size-4" /> {t("account")}
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  asChild
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Link href="/wishlist">
+                    <Heart className="size-4" /> {t("wishlist")}
                   </Link>
                 </Button>
                 <Button

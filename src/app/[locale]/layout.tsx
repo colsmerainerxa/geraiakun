@@ -1,16 +1,23 @@
 import type { Metadata, Viewport } from "next"
-import { NextIntlClientProvider, hasLocale } from "next-intl"
-import { getTranslations, setRequestLocale } from "next-intl/server"
-import { Space_Grotesk } from "next/font/google"
+import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google"
 import { notFound } from "next/navigation"
+import { hasLocale, NextIntlClientProvider } from "next-intl"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Providers } from "@/app/providers"
 import { routing } from "@/i18n/routing"
-import { seoAlternates, SITE_URL } from "@/lib/seo/site"
+import { SITE_URL, seoAlternates } from "@/lib/seo/site"
 import "../globals.css"
 
 const fontSans = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+})
+
+const fontHeading = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  weight: ["700", "800"],
   display: "swap",
 })
 
@@ -78,7 +85,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} suppressHydrationWarning className={fontSans.variable}>
+    <html lang={locale} suppressHydrationWarning className={`${fontSans.variable} ${fontHeading.variable}`}>
       <body className="min-h-dvh antialiased">
         <NextIntlClientProvider>
           <Providers>{children}</Providers>

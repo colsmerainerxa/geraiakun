@@ -15,9 +15,7 @@ function Card({ item }: { item: Testimonial }) {
         </div>
         <Quote className="size-6 text-main" />
       </div>
-      <blockquote className="flex-1 text-sm text-foreground/80">
-        “{item.comment}”
-      </blockquote>
+      <blockquote className="flex-1 text-sm text-foreground/80">“{item.comment}”</blockquote>
       <figcaption className="flex items-center gap-3 border-t-2 border-dashed border-border pt-3">
         <Image
           src={item.avatar}

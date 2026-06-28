@@ -6,13 +6,7 @@ import { useMounted } from "@/hooks/use-mounted"
 import { cn } from "@/lib/utils"
 import { useWishlist } from "@/stores/wishlist"
 
-export function WishlistButton({
-  slug,
-  className,
-}: {
-  slug: string
-  className?: string
-}) {
+export function WishlistButton({ slug, className }: { slug: string; className?: string }) {
   const t = useTranslations("wishlist")
   const mounted = useMounted()
   const wished = useWishlist((s) => s.slugs.includes(slug))
@@ -36,9 +30,7 @@ export function WishlistButton({
         className,
       )}
     >
-      <Heart
-        className={cn("size-4", active && "fill-danger text-danger")}
-      />
+      <Heart className={cn("size-4", active && "fill-danger text-danger")} />
     </button>
   )
 }

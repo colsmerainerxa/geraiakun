@@ -2,18 +2,24 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+  Activity,
   ArrowLeft,
   CheckCircle2,
   Copy,
   CreditCard,
+  Download,
+  FileText,
   KeyRound,
   Lock,
   QrCode,
+  ScanLine,
   ShieldCheck,
+  TimerReset,
+  UserRound,
   Wallet,
 } from "lucide-react"
 import { motion } from "motion/react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -25,10 +31,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
+import { downloadInvoice } from "@/lib/invoice"
+import { checkoutAssuranceSteps } from "@/lib/mock/enterprise"
 import { computeDiscount } from "@/lib/promo"
-import { cn, formatIDR } from "@/lib/utils"
+import { cn, formatIDR, paymentLabel } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { usePurchasedOrders } from "@/stores/orders"
+import { usePayments } from "@/stores/payments"
 import { usePromo } from "@/stores/promo"
 import type { Order, PaymentMethod } from "@/types"
 
@@ -75,6 +84,84 @@ const PAYMENT_GROUPS: {
 
 const FEE = 1000
 
+function CheckoutAssurancePanel({ method }: { method: PaymentMethod }) {
+  const highlights = [
+    {
+      icon: FileText,
+      label: "Invoice otomatis",
+      body: "Nomor invoice dibuat sebelum credential dikirim.",
+      accent: "bg-accent-cyan",
+    },
+    {
+      icon: ScanLine,
+      label: "Payment monitor",
+      body: `${paymentLabel(method)} dipantau sebagai status pembayaran real-time.`,
+      accent: "bg-accent-lime",
+    },
+    {
+      icon: Activity,
+      label: "Risk check",
+      body: "Order dicek dari duplikasi, stok, dan pola fraud ringan.",
+      accent: "bg-accent-purple",
+    },
+    {
+      icon: TimerReset,
+      label: "SLA delivery",
+      body: "Target pengiriman credential instan setelah pembayaran aman.",
+      accent: "bg-accent-pink",
+    },
+  ]
+
+  return (
+    <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-heading text-lg font-bold">Payment Status v2</h2>
+          <p className="mt-1 text-sm text-foreground/60">
+            Ringkasan status yang nantinya bisa terhubung ke payment gateway dan fulfillment.
+          </p>
+        </div>
+        <span className="rounded-base border-2 border-border bg-main px-3 py-1 font-heading text-xs font-bold shadow-shadow-sm">
+          Mock local
+        </span>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {highlights.map((item) => (
+          <div
+            key={item.label}
+            className="flex gap-3 rounded-base border-2 border-border bg-background p-3"
+          >
+            <span
+              className={cn(
+                "flex size-9 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm",
+                item.accent,
+              )}
+            >
+              <item.icon className="size-4" />
+            </span>
+            <div>
+              <p className="font-heading text-sm font-bold">{item.label}</p>
+              <p className="text-xs text-foreground/60">{item.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 grid gap-2 sm:grid-cols-4">
+        {checkoutAssuranceSteps.map((step, index) => (
+          <div key={step.label} className="rounded-base border-2 border-dashed border-border p-3">
+            <p className="font-heading text-xs font-extrabold">
+              {index + 1}. {step.label}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-foreground/60">
+              {step.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function makeInvoice() {
   const n = Math.floor(1000 + Math.random() * 8999)
   return `INV-2026${n}`
@@ -84,12 +171,14 @@ export function CheckoutView() {
   const t = useTranslations("checkout")
   const tc = useTranslations("common")
   const tt = useTranslations("track")
+  const isEn = useLocale() === "en"
   const router = useRouter()
   const items = useCart((s) => s.items)
   const clear = useCart((s) => s.clear)
   const promo = usePromo((s) => s.promo)
   const clearPromo = usePromo((s) => s.clear)
   const addOrder = usePurchasedOrders((s) => s.addOrder)
+  const createPaymentAttempt = usePayments((s) => s.createAttempt)
 
   const [method, setMethod] = useState<PaymentMethod>("qris")
   const [processing, setProcessing] = useState(false)
@@ -137,21 +226,18 @@ export function CheckoutView() {
         discount,
         fee: FEE,
         total,
-        status: "selesai",
+        status: "menunggu-pembayaran",
         paymentMethod: method,
         createdAt: now,
-        paidAt: now,
-        credentials: items.map((i) => ({
-          email: `akun.${i.productSlug.replace(/[^a-z0-9]/g, "")}@premium.mail`,
-          password: `Bk!${i.productName.replace(/[^A-Za-z]/g, "").slice(0, 3)}${Math.floor(1000 + Math.random() * 9000)}`,
-          note: `Login lewat aplikasi/web resmi ${i.productName}. Jangan ubah email & password.`,
-        })),
+        paidAt: null,
+        credentials: [],
       }
       addOrder(order)
+      createPaymentAttempt({ invoice, method, amount: total })
       clear()
       clearPromo()
       setProcessing(false)
-      setDone(order)
+      router.push(`/pembayaran/${invoice}`)
     }, 1600)
   }
 
@@ -166,26 +252,48 @@ export function CheckoutView() {
         >
           <CheckCircle2 className="size-12" />
         </motion.div>
-        <h1 className="mt-6 font-heading text-3xl font-extrabold">
-          {t("successTitle")}
-        </h1>
+        <h1 className="mt-6 font-heading text-3xl font-extrabold">{t("successTitle")}</h1>
         <p className="mt-2 max-w-md text-foreground/70">{t("successDesc")}</p>
         <div className="mt-5 rounded-base border-2 border-dashed border-border bg-secondary-background px-5 py-3">
-          <span className="text-xs text-foreground/60">
-            {t("invoiceLabel")}
-          </span>
-          <p className="font-heading text-xl font-extrabold tracking-wide">
-            {done.invoice}
-          </p>
+          <span className="text-xs text-foreground/60">{t("invoiceLabel")}</span>
+          <p className="font-heading text-xl font-extrabold tracking-wide">{done.invoice}</p>
+        </div>
+
+        <div className="mt-6 w-full max-w-2xl rounded-base border-2 border-border bg-secondary-background p-5 text-left shadow-shadow">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-lg font-extrabold">Status pembayaran</h2>
+              <p className="text-sm text-foreground/60">
+                Demo UI: pembayaran terkonfirmasi dan credential masuk antrian delivery.
+              </p>
+            </div>
+            <span className="rounded-base border-2 border-border bg-accent-lime px-3 py-1 font-heading text-xs font-bold shadow-shadow-sm">
+              Paid
+            </span>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-4">
+            {checkoutAssuranceSteps.map((step, index) => (
+              <div
+                key={step.label}
+                className="rounded-base border-2 border-border bg-background p-3"
+              >
+                <span className="flex size-8 items-center justify-center rounded-base border-2 border-border bg-main font-heading text-xs font-extrabold shadow-shadow-sm">
+                  {index + 1}
+                </span>
+                <p className="mt-2 font-heading text-xs font-bold">{step.label}</p>
+                <p className="mt-1 text-[11px] leading-relaxed text-foreground/60">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {done.credentials.length > 0 && (
           <div className="mt-6 w-full max-w-md text-left">
             <div className="mb-2 flex items-center justify-center gap-2">
               <KeyRound className="size-4" />
-              <span className="font-heading text-sm font-bold">
-                {tt("credentials")}
-              </span>
+              <span className="font-heading text-sm font-bold">{tt("credentials")}</span>
             </div>
             <div className="flex flex-col gap-2">
               {done.credentials.map((c) => (
@@ -198,9 +306,7 @@ export function CheckoutView() {
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(
-                          `${c.email} / ${c.password}`,
-                        )
+                        navigator.clipboard.writeText(`${c.email} / ${c.password}`)
                         toast.success(tt("copied"))
                       }}
                       className="flex size-7 shrink-0 items-center justify-center rounded-base border-2 border-border bg-background hover:bg-main"
@@ -209,9 +315,7 @@ export function CheckoutView() {
                       <Copy className="size-3.5" />
                     </button>
                   </div>
-                  <span className="block font-mono text-foreground/70">
-                    {c.password}
-                  </span>
+                  <span className="block font-mono text-foreground/70">{c.password}</span>
                 </div>
               ))}
             </div>
@@ -222,7 +326,14 @@ export function CheckoutView() {
           <Button asChild size="lg">
             <Link href={`/lacak?inv=${done.invoice}`}>{t("viewOrder")}</Link>
           </Button>
-          <Button asChild variant="neutral" size="lg">
+          <Button
+            variant="neutral"
+            size="lg"
+            onClick={() => downloadInvoice(done, isEn ? "en" : "id")}
+          >
+            <Download className="size-5" /> {t("downloadInvoice")}
+          </Button>
+          <Button asChild variant="ghost" size="lg">
             <Link href="/katalog">{tc("continue")}</Link>
           </Button>
         </div>
@@ -246,20 +357,19 @@ export function CheckoutView() {
       >
         <ArrowLeft className="size-4" /> {tc("back")}
       </Link>
-      <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">
-        {t("title")}
-      </h1>
+      <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">{t("title")}</h1>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid gap-8 lg:grid-cols-[1fr_380px]"
-      >
+      <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0">
         <div className="flex flex-col gap-8">
           {/* Contact */}
           <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">
-              {t("contactInfo")}
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-heading text-lg font-bold">{t("contactInfo")}</h2>
+              <span className="inline-flex items-center gap-1.5 rounded-base border-2 border-border bg-accent-lime px-2.5 py-1 text-[11px] font-extrabold">
+                <UserRound className="size-3.5" /> {t("guestBadge")}
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs text-foreground/60">{t("guestHint")}</p>
             <div className="mt-4 grid gap-4">
               <div className="grid gap-1.5">
                 <Label htmlFor="name">{t("name")}</Label>
@@ -271,10 +381,7 @@ export function CheckoutView() {
                   {...register("name")}
                 />
                 {errors.name && (
-                  <span
-                    id="name-error"
-                    className="text-xs font-bold text-danger"
-                  >
+                  <span id="name-error" className="text-xs font-bold text-danger">
                     {errors.name.message}
                   </span>
                 )}
@@ -290,10 +397,7 @@ export function CheckoutView() {
                   {...register("email")}
                 />
                 {errors.email ? (
-                  <span
-                    id="email-error"
-                    className="text-xs font-bold text-danger"
-                  >
+                  <span id="email-error" className="text-xs font-bold text-danger">
                     {errors.email.message}
                   </span>
                 ) : (
@@ -309,16 +413,11 @@ export function CheckoutView() {
                   inputMode="tel"
                   placeholder={t("whatsappPlaceholder")}
                   aria-invalid={!!errors.whatsapp}
-                  aria-describedby={
-                    errors.whatsapp ? "whatsapp-error" : undefined
-                  }
+                  aria-describedby={errors.whatsapp ? "whatsapp-error" : undefined}
                   {...register("whatsapp")}
                 />
                 {errors.whatsapp && (
-                  <span
-                    id="whatsapp-error"
-                    className="text-xs font-bold text-danger"
-                  >
+                  <span id="whatsapp-error" className="text-xs font-bold text-danger">
                     {errors.whatsapp.message}
                   </span>
                 )}
@@ -328,9 +427,7 @@ export function CheckoutView() {
 
           {/* Payment */}
           <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">
-              {t("paymentMethod")}
-            </h2>
+            <h2 className="font-heading text-lg font-bold">{t("paymentMethod")}</h2>
             <div className="mt-4 flex flex-col gap-5">
               {PAYMENT_GROUPS.map((g) => (
                 <div key={g.group}>
@@ -359,9 +456,7 @@ export function CheckoutView() {
                               active && "bg-accent-lime",
                             )}
                           >
-                            {active && (
-                              <span className="size-1.5 rounded-full bg-foreground" />
-                            )}
+                            {active && <span className="size-1.5 rounded-full bg-foreground" />}
                           </span>
                         </button>
                       )
@@ -371,14 +466,14 @@ export function CheckoutView() {
               ))}
             </div>
           </section>
+
+          <CheckoutAssurancePanel method={method} />
         </div>
 
         {/* Summary */}
         <aside className="lg:sticky lg:top-20 lg:self-start">
           <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
-            <h2 className="font-heading text-lg font-bold">
-              {t("orderSummary")}
-            </h2>
+            <h2 className="font-heading text-lg font-bold">{t("orderSummary")}</h2>
             <ul className="mt-4 flex flex-col gap-3">
               {items.map((item) => (
                 <li key={item.variantId} className="flex gap-3">
@@ -395,7 +490,7 @@ export function CheckoutView() {
                       {item.productName}
                     </span>
                     <span className="text-xs text-foreground/60">
-                      {item.variantLabel} × {item.qty}
+                      {item.variantLabel} x {item.qty}
                     </span>
                   </div>
                   <span className="font-heading text-sm font-bold">
@@ -426,18 +521,11 @@ export function CheckoutView() {
               </div>
               <div className="mt-1 flex items-center justify-between border-t-2 border-border pt-2">
                 <span className="font-heading font-bold">{tc("total")}</span>
-                <span className="font-heading text-2xl font-extrabold">
-                  {formatIDR(total)}
-                </span>
+                <span className="font-heading text-2xl font-extrabold">{formatIDR(total)}</span>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="mt-5 w-full"
-              disabled={processing}
-            >
+            <Button type="submit" size="lg" className="mt-5 w-full" disabled={processing}>
               {processing ? (
                 t("processing")
               ) : (
@@ -452,6 +540,21 @@ export function CheckoutView() {
           </div>
         </aside>
       </form>
+
+      {/* Sticky mobile pay bar */}
+      {items.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 p-3 backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-md items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase text-foreground/50">{tc("total")}</p>
+              <p className="font-heading text-lg font-extrabold leading-none">{formatIDR(total)}</p>
+            </div>
+            <Button type="submit" form="checkout-form" size="lg" disabled={processing} className="shrink-0">
+              <Lock className="size-4" /> {t("payNow")}
+            </Button>
+          </div>
+        </div>
+      )}
     </Container>
   )
 }

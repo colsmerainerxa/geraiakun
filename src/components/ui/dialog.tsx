@@ -1,6 +1,7 @@
 "use client"
 
 import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { useTranslations } from "next-intl"
 import { X } from "lucide-react"
 import type * as React from "react"
 import { cn } from "@/lib/utils"
@@ -30,6 +31,7 @@ function DialogContent({
   children,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  const t = useTranslations("common")
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -43,7 +45,7 @@ function DialogContent({
         {children}
         <DialogPrimitive.Close className="absolute right-4 top-4 flex size-7 items-center justify-center rounded-base border-2 border-border bg-main transition-all hover:translate-x-0.5 hover:translate-y-0.5">
           <X className="size-4" />
-          <span className="sr-only">Tutup</span>
+          <span className="sr-only">{t("close")}</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPortal>
@@ -52,29 +54,20 @@ function DialogContent({
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div
-      className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}
-      {...props}
-    />
+    <div className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)} {...props} />
   )
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        className,
-      )}
+      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
       {...props}
     />
   )
 }
 
-function DialogTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       className={cn("font-heading text-lg leading-none", className)}

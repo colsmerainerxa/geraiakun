@@ -7,6 +7,7 @@ import type {
   WebSite,
   WithContext,
 } from "schema-dts"
+import Script from "next/script"
 import { SITE_URL } from "@/lib/seo/site"
 import type { Product } from "@/types"
 
@@ -93,9 +94,7 @@ export function breadcrumbJsonLd(
   }
 }
 
-export function itemListJsonLd(
-  items: { name: string; path: string }[],
-): WithContext<ItemList> {
+export function itemListJsonLd(items: { name: string; path: string }[]): WithContext<ItemList> {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -157,9 +156,10 @@ function safeJsonLd(data: object) {
     .replace(/&/g, "\\u0026")
 }
 
-export function JsonLd({ data }: { data: object }) {
+export function JsonLd({ data, id }: { data: object; id: string }) {
   return (
-    <script
+    <Script
+      id={id}
       type="application/ld+json"
       // biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD
       dangerouslySetInnerHTML={{ __html: safeJsonLd(data) }}

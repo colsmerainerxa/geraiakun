@@ -2,7 +2,7 @@
 
 import { Flame } from "lucide-react"
 import { motion } from "motion/react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Container } from "@/components/shared/container"
 import { CountdownTimer } from "@/components/shared/countdown-timer"
@@ -15,7 +15,6 @@ import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
 export function FlashSaleStrip() {
   const t = useTranslations("flashSale")
-  const isEn = useLocale() === "en"
   const items = getFlashSaleItems()
 
   // Target akhir di-set saat mount agar konsisten dengan hydration.
@@ -39,12 +38,10 @@ export function FlashSaleStrip() {
               <p className="font-heading text-xs font-extrabold uppercase tracking-widest text-main-foreground/70">
                 {t("eyebrow")}
               </p>
-              <h2 className="font-heading text-2xl font-extrabold sm:text-3xl">
-                {t("title")}
-              </h2>
+              <h2 className="font-heading text-2xl font-extrabold sm:text-3xl">{t("title")}</h2>
             </div>
           </div>
-          <CountdownTimer targetISO={end} isEn={isEn} />
+          <CountdownTimer targetISO={end} />
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

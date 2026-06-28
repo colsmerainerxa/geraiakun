@@ -38,7 +38,15 @@ export default function OpengraphImage() {
         Marketplace Akun &amp; Langganan Digital
       </div>
 
-      <div style={{ display: "flex", marginTop: "36px", fontSize: 132, fontWeight: 800, color: "#0a0a0a" }}>
+      <div
+        style={{
+          display: "flex",
+          marginTop: "36px",
+          fontSize: 132,
+          fontWeight: 800,
+          color: "#0a0a0a",
+        }}
+      >
         <span>beli</span>
         <span style={{ color: "#ff5c8a" }}>akun</span>
       </div>

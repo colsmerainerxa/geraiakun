@@ -1,8 +1,4 @@
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query"
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query"
 import type { Metadata } from "next"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Suspense } from "react"
@@ -29,11 +25,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function CatalogPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export default async function CatalogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
 
@@ -53,6 +45,7 @@ export default async function CatalogPage({
   return (
     <>
       <JsonLd
+        id="jsonld-catalog-item-list"
         data={itemListJsonLd(
           products.map((p) => ({
             name: p.name,

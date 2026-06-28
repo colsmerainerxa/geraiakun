@@ -11,13 +11,32 @@ import { formatNumber, initials } from "@/lib/utils"
 
 // Nama-nama pembeli mock untuk rotasi toast social-proof.
 const BUYERS = [
-  "Rafa Pratama", "Dewi Lestari", "Bagas Saputra", "Nabila Putri",
-  "Kevin Wijaya", "Siti Rohmah", "Dimas Arya", "Aulia Rahman",
-  "Citra Maharani", "Fajar Nugroho", "Gita Permata", "Yoga Pranata",
+  "Rafa Pratama",
+  "Dewi Lestari",
+  "Bagas Saputra",
+  "Nabila Putri",
+  "Kevin Wijaya",
+  "Siti Rohmah",
+  "Dimas Arya",
+  "Aulia Rahman",
+  "Citra Maharani",
+  "Fajar Nugroho",
+  "Gita Permata",
+  "Yoga Pranata",
 ]
 const CITIES = [
-  "Jakarta", "Bandung", "Surabaya", "Yogyakarta", "Semarang", "Malang",
-  "Medan", "Makassar", "Denpasar", "Bekasi", "Tangerang", "Depok",
+  "Jakarta",
+  "Bandung",
+  "Surabaya",
+  "Yogyakarta",
+  "Semarang",
+  "Malang",
+  "Medan",
+  "Makassar",
+  "Denpasar",
+  "Bekasi",
+  "Tangerang",
+  "Depok",
 ]
 
 interface ToastEvent {
@@ -101,9 +120,7 @@ export function SocialProofToast() {
                   src={`https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(current.buyer)}`}
                   alt={current.buyer}
                 />
-                <AvatarFallback className="text-[10px]">
-                  {initials(current.buyer)}
-                </AvatarFallback>
+                <AvatarFallback className="text-[10px]">{initials(current.buyer)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-bold leading-tight">
@@ -113,8 +130,7 @@ export function SocialProofToast() {
                   {current.productName}
                 </p>
                 <p className="text-[10px] text-foreground/50">
-                  {isEn ? current.city : current.city} · {current.minutesAgo}{" "}
-                  {t("minutesAgo")}
+                  {isEn ? current.city : current.city} · {current.minutesAgo} {t("minutesAgo")}
                 </p>
               </div>
             </Link>
@@ -131,11 +147,15 @@ export function SocialProofToast() {
  */
 export function ViewersBadge({ initial = 0 }: { initial?: number }) {
   const t = useTranslations("socialProof")
-  const [count, setCount] = useState(initial || 8 + Math.floor(Math.random() * 22))
+  const [count, setCount] = useState(initial || 18)
 
   useEffect(() => {
+    if (!initial) setCount(8 + Math.floor(Math.random() * 22))
+
     const id = setInterval(() => {
-      setCount((c) => Math.max(3, c + (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 4)))
+      setCount((c) =>
+        Math.max(3, c + (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 4)),
+      )
     }, 4000)
     return () => clearInterval(id)
   }, [])

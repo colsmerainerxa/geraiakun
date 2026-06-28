@@ -1,17 +1,7 @@
-import {
-  ArrowRight,
-  Headphones,
-  ShieldCheck,
-  Tag,
-  Zap,
-} from "lucide-react"
+import { ArrowRight, Headphones, ShieldCheck, Tag, Zap } from "lucide-react"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Container } from "@/components/shared/container"
-import {
-  Reveal,
-  RevealGroup,
-  RevealItem,
-} from "@/components/shared/motion"
+import { Reveal, RevealGroup, RevealItem } from "@/components/shared/motion"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { CategoryCard } from "@/components/storefront/category-card"
 import { FlashSaleStrip } from "@/components/storefront/flash-sale-strip"
@@ -22,17 +12,9 @@ import { TestimonialsMarquee } from "@/components/storefront/testimonials-marque
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
 import { fakeApi } from "@/lib/mock/fake-api"
-import {
-  JsonLd,
-  organizationJsonLd,
-  websiteJsonLd,
-} from "@/lib/seo/json-ld"
+import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld"
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations("home")
@@ -59,8 +41,8 @@ export default async function HomePage({
 
   return (
     <>
-      <JsonLd data={organizationJsonLd()} />
-      <JsonLd data={websiteJsonLd()} />
+      <JsonLd id="jsonld-organization" data={organizationJsonLd()} />
+      <JsonLd id="jsonld-website" data={websiteJsonLd()} />
 
       <Hero />
 
@@ -128,9 +110,7 @@ export default async function HomePage({
                 >
                   {s.n}
                 </span>
-                <h3 className="mt-4 font-heading text-lg font-bold">
-                  {s.title}
-                </h3>
+                <h3 className="mt-4 font-heading text-lg font-bold">{s.title}</h3>
                 <p className="mt-2 text-sm text-foreground/70">{s.desc}</p>
               </div>
             </Reveal>
@@ -151,9 +131,7 @@ export default async function HomePage({
                   >
                     <item.icon className="size-7" />
                   </span>
-                  <h3 className="font-heading text-base font-bold">
-                    {item.title}
-                  </h3>
+                  <h3 className="font-heading text-base font-bold">{item.title}</h3>
                   <p className="text-sm text-foreground/70">{item.desc}</p>
                 </div>
               </RevealItem>

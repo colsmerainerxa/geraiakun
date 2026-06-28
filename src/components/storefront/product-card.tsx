@@ -3,20 +3,16 @@
 import { Star } from "lucide-react"
 import { motion } from "motion/react"
 import { useLocale, useTranslations } from "next-intl"
+import { CompareButton } from "@/components/storefront/compare"
+import { WishlistButton } from "@/components/storefront/wishlist-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { WishlistButton } from "@/components/storefront/wishlist-button"
+import { Progress } from "@/components/ui/progress"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { productMinPrice } from "@/lib/mock/products"
-import {
-  cn,
-  discountPercent,
-  formatIDR,
-  formatNumber,
-  formatPrice,
-} from "@/lib/utils"
+import { cn, discountPercent, formatIDR, formatNumber, formatPrice } from "@/lib/utils"
 import type { Product, ProductBadge } from "@/types"
 
 const badgeMap: Record<
@@ -62,21 +58,11 @@ export function ProductCard({ product }: { product: Product }) {
                   {t(badgeMap[b].key)}
                 </Badge>
               ))}
-              {min === 0 && (
-                <Badge variant="lime">{isEn ? "Free" : "Gratis"}</Badge>
-              )}
+              {min === 0 && <Badge variant="lime">{isEn ? "Free" : "Gratis"}</Badge>}
               {off > 0 && <Badge variant="danger">-{off}%</Badge>}
-              {/* Stock urgency: tampilkan bila stok varian termurah menipis */}
-              {minVariant && minVariant.stock > 0 && minVariant.stock <= 5 && (
-                <Badge variant="warning" className="animate-pulse">
-                  {isEn ? `Only ${minVariant.stock} left` : `Sisa ${minVariant.stock}!`}
-                </Badge>
-              )}
             </div>
-            <WishlistButton
-              slug={product.slug}
-              className="absolute right-2.5 top-2.5"
-            />
+            <WishlistButton slug={product.slug} className="absolute right-2.5 top-2.5" />
+            <CompareButton slug={product.slug} className="absolute bottom-2.5 right-2.5" />
           </div>
 
           {/* Body */}
@@ -84,9 +70,7 @@ export function ProductCard({ product }: { product: Product }) {
             <div className="flex items-center gap-1.5 text-xs font-bold text-foreground/60">
               <span>{product.brand}</span>
             </div>
-            <h3 className="font-heading text-base font-bold leading-snug">
-              {product.name}
-            </h3>
+            <h3 className="font-heading text-base font-bold leading-snug">{product.name}</h3>
             <p className="line-clamp-2 text-xs text-foreground/70">{tagline}</p>
 
             <div className="mt-1 flex items-center gap-2 text-xs">
@@ -98,6 +82,20 @@ export function ProductCard({ product }: { product: Product }) {
                 {formatNumber(product.soldCount)} {t("sold")}
               </span>
             </div>
+
+            {minVariant && minVariant.stock > 0 && minVariant.stock <= 5 && (
+              <div className="mt-1">
+                <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-warning">
+                  <span>🔥 {isEn ? "Selling fast" : "Laris"}</span>
+                  <span>{isEn ? `Only ${minVariant.stock} left` : `Sisa ${minVariant.stock}`}</span>
+                </div>
+                <Progress
+                  value={Math.min(95, 100 - (minVariant.stock / 10) * 100)}
+                  className="h-1.5 border-0 bg-warning/20"
+                  indicatorClassName="bg-warning"
+                />
+              </div>
+            )}
 
             <div className="mt-auto flex items-end justify-between pt-2">
               <div className="flex flex-col">
@@ -114,12 +112,7 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
 
           <div className="px-4 pb-4">
-            <Button
-              className="w-full"
-              size="sm"
-              tabIndex={-1}
-              aria-hidden
-            >
+            <Button className="w-full" size="sm" tabIndex={-1} aria-hidden>
               {t("viewDetail")}
             </Button>
           </div>

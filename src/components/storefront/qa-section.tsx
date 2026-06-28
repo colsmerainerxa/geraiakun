@@ -17,7 +17,10 @@ import type { Product } from "@/types"
 function seedQuestions(product: Product) {
   const base = [
     {
-      q: { id: "Akun ini bisa dipakai di berapa device sekaligus?", en: "How many devices can use this account at once?" },
+      q: {
+        id: "Akun ini bisa dipakai di berapa device sekaligus?",
+        en: "How many devices can use this account at once?",
+      },
       a: {
         id: "Untuk akun sharing, maksimal 1-2 device aktif bersamaan agar tidak bentrok. Akun private bebas dipakai sesuai kebijakan platform.",
         en: "For sharing accounts, max 1-2 active devices at once to avoid conflicts. Private accounts are free to use per platform policy.",
@@ -47,9 +50,7 @@ export function QaSection({ product }: { product: Product }) {
   const dateLocale = isEn ? "en-US" : "id-ID"
   const lang = (s: { id: string; en: string }) => (isEn ? s.en : s.id)
 
-  const userQuestions = useReviewsStore((s) =>
-    s.questionsForProduct(product.id),
-  )
+  const userQuestions = useReviewsStore((s) => s.questionsForProduct(product.id))
   const askQuestion = useReviewsStore((s) => s.askQuestion)
 
   const seeds = seedQuestions(product)
@@ -103,9 +104,7 @@ export function QaSection({ product }: { product: Product }) {
       {/* Questions list */}
       <div className="mt-4 flex flex-col gap-3">
         {seeds.length === 0 && userQuestions.length === 0 ? (
-          <p className="py-8 text-center text-sm text-foreground/60">
-            {t("noQuestions")}
-          </p>
+          <p className="py-8 text-center text-sm text-foreground/60">{t("noQuestions")}</p>
         ) : (
           <>
             {/* User questions first */}
@@ -122,9 +121,7 @@ export function QaSection({ product }: { product: Product }) {
                       src={`https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(q.author)}`}
                       alt={q.author}
                     />
-                    <AvatarFallback className="text-[10px]">
-                      {initials(q.author)}
-                    </AvatarFallback>
+                    <AvatarFallback className="text-[10px]">{initials(q.author)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <span className="text-xs font-bold">{q.author}</span>
@@ -164,9 +161,7 @@ export function QaSection({ product }: { product: Product }) {
                       src={`https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(q.author)}`}
                       alt={q.author}
                     />
-                    <AvatarFallback className="text-[10px]">
-                      {initials(q.author)}
-                    </AvatarFallback>
+                    <AvatarFallback className="text-[10px]">{initials(q.author)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <span className="text-xs font-bold">{q.author}</span>

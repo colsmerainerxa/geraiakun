@@ -24,12 +24,7 @@ export function SectionHeading({
         className,
       )}
     >
-      <div
-        className={cn(
-          "flex flex-col gap-2",
-          align === "center" && "items-center",
-        )}
-      >
+      <div className={cn("flex flex-col gap-2", align === "center" && "items-center")}>
         {eyebrow && (
           <span className="inline-flex w-fit rounded-base border-2 border-border bg-main px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-main-foreground shadow-shadow-sm">
             {eyebrow}
@@ -38,9 +33,7 @@ export function SectionHeading({
         <h2 className="font-heading text-3xl font-extrabold leading-tight text-balance sm:text-4xl">
           {title}
         </h2>
-        {subtitle && (
-          <p className="max-w-2xl text-base text-foreground/70">{subtitle}</p>
-        )}
+        {subtitle && <p className="max-w-2xl text-base text-foreground/70">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

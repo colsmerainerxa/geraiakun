@@ -29,9 +29,7 @@ export function CartView() {
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount = computeDiscount(promo, subtotal)
   const total = subtotal - discount + FEE
-  const cross = products
-    .filter((p) => !items.some((i) => i.productSlug === p.slug))
-    .slice(0, 2)
+  const cross = products.filter((p) => !items.some((i) => i.productSlug === p.slug)).slice(0, 2)
 
   if (items.length === 0) {
     return (
@@ -39,9 +37,7 @@ export function CartView() {
         <div className="flex size-24 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow">
           <ShoppingBag className="size-11" />
         </div>
-        <h1 className="mt-6 font-heading text-2xl font-extrabold">
-          {t("empty")}
-        </h1>
+        <h1 className="mt-6 font-heading text-2xl font-extrabold">{t("empty")}</h1>
         <p className="mt-2 max-w-sm text-foreground/60">{t("emptyDesc")}</p>
         <Button asChild size="lg" className="mt-6">
           <Link href="/katalog">{t("startShopping")}</Link>
@@ -90,9 +86,7 @@ export function CartView() {
                       >
                         {item.productName}
                       </Link>
-                      <p className="mt-0.5 text-sm text-foreground/60">
-                        {item.variantLabel}
-                      </p>
+                      <p className="mt-0.5 text-sm text-foreground/60">{item.variantLabel}</p>
                     </div>
                     <button
                       type="button"
@@ -134,11 +128,7 @@ export function CartView() {
             ))}
           </AnimatePresence>
 
-          <Button
-            variant="ghost"
-            asChild
-            className="mt-1 w-fit text-foreground/60"
-          >
+          <Button variant="ghost" asChild className="mt-1 w-fit text-foreground/60">
             <Link href="/katalog">← {t("continueShopping")}</Link>
           </Button>
         </ul>
@@ -167,9 +157,7 @@ export function CartView() {
               </div>
               <div className="mt-1 flex items-center justify-between border-t-2 border-border pt-2">
                 <span className="font-heading font-bold">{tc("total")}</span>
-                <span className="font-heading text-2xl font-extrabold">
-                  {formatIDR(total)}
-                </span>
+                <span className="font-heading text-2xl font-extrabold">{formatIDR(total)}</span>
               </div>
             </div>
 
@@ -184,14 +172,11 @@ export function CartView() {
 
       {cross.length > 0 && (
         <div className="mt-12">
-          <h2 className="font-heading text-xl font-extrabold">
-            {tc("frequentlyBought")}
-          </h2>
+          <h2 className="font-heading text-xl font-extrabold">{tc("frequentlyBought")}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {cross.map((p) => {
               const pMin = Math.min(...p.variants.map((cv) => cv.price))
-              const pv =
-                p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
+              const pv = p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
               return (
                 <div
                   key={p.id}

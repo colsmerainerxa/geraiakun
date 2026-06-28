@@ -76,21 +76,9 @@ export interface Review {
   verified: boolean
 }
 
-export type OrderStatus =
-  | "menunggu-pembayaran"
-  | "diproses"
-  | "selesai"
-  | "dibatalkan"
-  | "refund"
+export type OrderStatus = "menunggu-pembayaran" | "diproses" | "selesai" | "dibatalkan" | "refund"
 
-export type PaymentMethod =
-  | "qris"
-  | "gopay"
-  | "ovo"
-  | "dana"
-  | "bca-va"
-  | "bni-va"
-  | "mandiri-va"
+export type PaymentMethod = "qris" | "gopay" | "ovo" | "dana" | "bca-va" | "bni-va" | "mandiri-va"
 
 export interface OrderItem {
   productId: ID
@@ -145,7 +133,7 @@ export interface CredentialStock {
   productName: string
   variantLabel: string
   email: string
-  status: "tersedia" | "terjual" | "kadaluarsa"
+  status: "tersedia" | "terjual" | "kadaluarsa" | "ditahan"
   addedAt: string
 }
 
@@ -163,6 +151,7 @@ export interface Promo {
   quota: number
   expiresAt: string
   active: boolean
+  scope?: string
 }
 
 export interface Transaction {
@@ -297,3 +286,27 @@ export interface AppNotification {
   read: boolean
   createdAt: string // ISO
 }
+
+export type {
+  AdminPermission,
+  AdminRole,
+  AdminStaff,
+  AuditEvent,
+  BalanceLedgerEntry,
+  BulkOrderDraft,
+  BulkOrderLine,
+  BulkOrderStatus,
+  PaymentAttempt,
+  PaymentStatus,
+  RefundCase,
+  RefundDecision,
+  RefundStatus,
+  ResellerAccount,
+  ResellerVerificationStatus,
+  RiskReview,
+  RiskReviewStatus,
+  UserSession,
+  VaultAccount,
+  VaultAccountStatus,
+  VaultActivity,
+} from "./enterprise"

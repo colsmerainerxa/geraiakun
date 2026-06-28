@@ -1,32 +1,34 @@
 "use client"
 
-import { Package, Sparkles, Wallet } from "lucide-react"
+import {
+  ArrowRight,
+  Gift,
+  KeyRound,
+  Package,
+  ShoppingCart,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
+} from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { Reveal } from "@/components/shared/motion"
+import { AccountSettingsView } from "@/components/storefront/account-settings-view"
 import { ProductCard } from "@/components/storefront/product-card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { useOrders } from "@/lib/api/queries"
 import { products } from "@/lib/mock/products"
-import { cn, formatDate, formatIDR, initials } from "@/lib/utils"
+import { cn, formatDate, formatIDR, formatNumber, initials } from "@/lib/utils"
+import { getTier, useLoyalty } from "@/stores/loyalty"
+import { useUser } from "@/stores/user"
 import { useWishlist } from "@/stores/wishlist"
 import type { OrderStatus } from "@/types"
 
-const DEMO_NAME = "Rafa Pratama"
-const DEMO_AVATAR = "https://api.dicebear.com/9.x/notionists/svg?seed=Rafa"
-
-const statusVariant: Record<
-  OrderStatus,
-  "warning" | "cyan" | "success" | "danger"
-> = {
+const statusVariant: Record<OrderStatus, "warning" | "cyan" | "success" | "danger"> = {
   "menunggu-pembayaran": "warning",
   diproses: "cyan",
   selesai: "success",
@@ -38,7 +40,7 @@ function maskEmail(email: string) {
   const [local, domain] = email.split("@")
   if (!domain) return email
   const visible = local.slice(0, 2)
-  return `${visible}${"•".repeat(Math.max(local.length - 2, 3))}@${domain}`
+  return `${visible}${"*".repeat(Math.max(local.length - 2, 3))}@${domain}`
 }
 
 export function AccountView() {
@@ -46,6 +48,7 @@ export function AccountView() {
   const ts = useTranslations("orderStatus")
   const tw = useTranslations("wishlist")
   const mounted = useMounted()
+  const profile = useUser((s) => s.profile)
   const wishedSlugs = useWishlist((s) => s.slugs)
   const wished = mounted
     ? wishedSlugs
@@ -59,11 +62,12 @@ export function AccountView() {
   const list = orders ?? []
   const totalOrders = list.length
   const activeCount = list.filter((o) => o.status === "selesai").length
-  const totalSpent = list
-    .filter((o) => o.paidAt)
-    .reduce((s, o) => s + o.total, 0)
+  const totalSpent = list.filter((o) => o.paidAt).reduce((s, o) => s + o.total, 0)
 
   const delivered = list.filter((o) => o.credentials.length > 0)
+  const loyaltyPoints = useLoyalty((s) => s.points)
+  const loyaltyLifetime = useLoyalty((s) => s.lifetimeEarned)
+  const loyaltyTier = mounted ? getTier(loyaltyLifetime) : null
 
   const stats = [
     {
@@ -92,13 +96,13 @@ export function AccountView() {
       <Reveal>
         <div className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <Avatar className="size-16">
-            <AvatarImage src={DEMO_AVATAR} alt={DEMO_NAME} />
-            <AvatarFallback>{initials(DEMO_NAME)}</AvatarFallback>
+            {mounted && profile.avatar && <AvatarImage src={profile.avatar} alt={profile.name} />}
+            <AvatarFallback>{initials(mounted ? profile.name : "Rafa Pratama")}</AvatarFallback>
           </Avatar>
           <div>
             <p className="text-sm text-foreground/60">{t("greeting")},</p>
             <h1 className="font-heading text-2xl font-extrabold sm:text-3xl">
-              {DEMO_NAME}
+              {mounted ? profile.name : "Rafa Pratama"}
             </h1>
           </div>
         </div>
@@ -129,12 +133,38 @@ export function AccountView() {
         ))}
       </div>
 
+      {/* Loyalty banner */}
+      {mounted && loyaltyTier && (
+        <Reveal>
+          <Link
+            href="/reward"
+            className="group flex flex-wrap items-center justify-between gap-4 rounded-base border-2 border-border bg-accent-purple p-5 shadow-shadow transition-all hover:-translate-y-0.5 hover:shadow-shadow-lg"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
+                <Gift className="size-5" />
+              </span>
+              <div>
+                <p className="font-heading text-sm font-extrabold">
+                  {loyaltyTier.name} - {formatNumber(loyaltyPoints)} poin
+                </p>
+                <p className="text-xs text-foreground/70">{loyaltyTier.perk}</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1 rounded-base border-2 border-border bg-secondary-background px-3 py-1.5 font-heading text-xs font-bold transition-all group-hover:bg-main">
+              {t("redeemPoints")} <ArrowRight className="size-3.5" />
+            </span>
+          </Link>
+        </Reveal>
+      )}
+
       {/* Tabs */}
       <Tabs defaultValue="orders">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="orders">{t("myOrders")}</TabsTrigger>
           <TabsTrigger value="accounts">{t("myAccounts")}</TabsTrigger>
           <TabsTrigger value="favorites">{tw("title")}</TabsTrigger>
+          <TabsTrigger value="settings">{t("settings")}</TabsTrigger>
         </TabsList>
 
         {/* Orders */}
@@ -166,16 +196,12 @@ export function AccountView() {
                       href={`/lacak?inv=${o.invoice}`}
                       className="grid grid-cols-2 gap-3 px-5 py-4 transition-colors hover:bg-main/10 sm:grid-cols-[1.4fr_1fr_1fr_1fr] sm:items-center sm:gap-4"
                     >
-                      <span className="font-heading font-bold">
-                        {o.invoice}
-                      </span>
+                      <span className="font-heading font-bold">{o.invoice}</span>
                       <span className="text-sm text-foreground/70">
                         {formatDate(o.createdAt, dateLocale)}
                       </span>
                       <span>
-                        <Badge variant={statusVariant[o.status]}>
-                          {ts(o.status)}
-                        </Badge>
+                        <Badge variant={statusVariant[o.status]}>{ts(o.status)}</Badge>
                       </span>
                       <span className="text-right font-heading font-extrabold">
                         {formatIDR(o.total)}
@@ -202,34 +228,75 @@ export function AccountView() {
           ) : delivered.length === 0 ? (
             <EmptyState label={t("noOrders")} />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {delivered.flatMap((o) =>
-                o.items.map((item, idx) => {
-                  const cred = o.credentials[idx] ?? o.credentials[0]
-                  return (
-                    <div
-                      key={`${o.id}-${item.variantId}-${idx}`}
-                      className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow"
-                    >
-                      <span className="flex size-12 shrink-0 items-center justify-center rounded-base border-2 border-border bg-secondary-background text-2xl">
-                        {item.productLogo}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="truncate font-heading font-bold">
-                          {item.productName}
-                        </p>
-                        <p className="truncate text-xs text-foreground/60">
-                          {item.variantLabel}
-                        </p>
-                        <p className="mt-1 truncate font-mono text-xs text-foreground/70">
-                          {maskEmail(cred.email)}
-                        </p>
+            <>
+              <Link
+                href="/akun/vault"
+                className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-base border-2 border-border bg-main p-5 shadow-shadow transition-all hover:-translate-y-0.5 hover:shadow-shadow-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex size-11 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
+                    <KeyRound className="size-5" />
+                  </span>
+                  <div>
+                    <p className="font-heading text-sm font-extrabold">Account Vault & Beli Lagi</p>
+                    <p className="text-xs text-main-foreground/70">
+                      Lihat health check, garansi, masa aktif, dan beli kembali akun digital.
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-2 rounded-base border-2 border-border bg-secondary-background px-3 py-1.5 font-heading text-xs font-bold shadow-shadow-sm">
+                  <ShieldCheck className="size-4" /> Buka Vault
+                </span>
+              </Link>
+
+              <div className="mb-4 grid gap-3 sm:grid-cols-2">
+                <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
+                  <ShoppingCart className="size-5 text-accent-purple" />
+                  <div>
+                    <p className="font-heading text-sm font-bold">
+                      Pembelian ulang tanpa langganan
+                    </p>
+                    <p className="text-xs text-foreground/60">
+                      Setiap pembelian membuat order baru tanpa tagihan otomatis.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
+                  <ShieldCheck className="size-5 text-success" />
+                  <div>
+                    <p className="font-heading text-sm font-bold">Garansi terlihat jelas</p>
+                    <p className="text-xs text-foreground/60">
+                      Status warranty dan klaim kendala mudah ditemukan.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {delivered.flatMap((o) =>
+                  o.items.map((item, idx) => {
+                    const cred = o.credentials[idx] ?? o.credentials[0]
+                    return (
+                      <div
+                        key={`${o.id}-${item.variantId}-${idx}`}
+                        className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow"
+                      >
+                        <span className="flex size-12 shrink-0 items-center justify-center rounded-base border-2 border-border bg-secondary-background text-2xl">
+                          {item.productLogo}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate font-heading font-bold">{item.productName}</p>
+                          <p className="truncate text-xs text-foreground/60">{item.variantLabel}</p>
+                          <p className="mt-1 truncate font-mono text-xs text-foreground/70">
+                            {maskEmail(cred.email)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )
-                }),
-              )}
-            </div>
+                    )
+                  }),
+                )}
+              </div>
+            </>
           )}
         </TabsContent>
 
@@ -238,11 +305,29 @@ export function AccountView() {
           {wished.length === 0 ? (
             <EmptyState label={tw("empty")} />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {wished.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <>
+              <div className="mb-4 flex justify-end">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/wishlist">
+                    {tw("viewAll")} <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {wished.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* Settings */}
+        <TabsContent value="settings">
+          {mounted ? (
+            <AccountSettingsView />
+          ) : (
+            <div className="h-96 animate-pulse rounded-base border-2 border-border/40 bg-secondary-background" />
           )}
         </TabsContent>
       </Tabs>
@@ -253,7 +338,9 @@ export function AccountView() {
 function EmptyState({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-base border-2 border-dashed border-border py-20 text-center">
-      <span className="text-5xl">📦</span>
+      <span className="flex size-14 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow">
+        <Package className="size-7" />
+      </span>
       <h3 className="font-heading text-lg font-bold">{label}</h3>
     </div>
   )

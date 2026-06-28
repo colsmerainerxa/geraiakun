@@ -42,7 +42,9 @@
   --foreground: #f7f7f7;
   --main-foreground: #0a0a0a;
   --main: #ffd23f;
-  --border: #000000;
+  /* Off-white border so the neobrutalism hard-shadow + 2px border stay
+     visible on the dark background (pure #000 was ~1:1 contrast). */
+  --border: #f7f7f7;
   --ring: #f7f7f7;
   --overlay: rgba(0, 0, 0, 0.8);
 }
@@ -94,7 +96,12 @@
     font-weight: var(--font-weight-base);
     font-optical-sizing: auto;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
     font-weight: var(--font-weight-heading);
     letter-spacing: -0.02em;
@@ -112,7 +119,9 @@
   }
   /* Neobrutalism "press" interaction: shadow collapses + element nudges */
   .brutal-press {
-    transition: transform 120ms ease, box-shadow 120ms ease;
+    transition:
+      transform 120ms ease,
+      box-shadow 120ms ease;
   }
   .brutal-press:hover {
     transform: translate(-2px, -2px);
@@ -134,8 +143,12 @@
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

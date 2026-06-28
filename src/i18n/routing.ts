@@ -3,7 +3,7 @@ import { defineRouting } from "next-intl/routing"
 export const routing = defineRouting({
   locales: ["id", "en"],
   defaultLocale: "id",
-  // Default locale (id) lives at "/", English at "/en" — best for Indonesian market + clean hreflang.
+  // Default locale (id) lives at "/", English at "/en" - best for Indonesian market + clean hreflang.
   localePrefix: "as-needed",
 })
 

@@ -58,10 +58,7 @@ export function ActivationGuideView({
           {tn("home")}
         </Link>
         <span>/</span>
-        <Link
-          href={`/produk/${product.slug}`}
-          className="hover:text-foreground hover:underline"
-        >
+        <Link href={`/produk/${product.slug}`} className="hover:text-foreground hover:underline">
           {product.name}
         </Link>
         <span>/</span>
@@ -80,12 +77,8 @@ export function ActivationGuideView({
         </div>
         <div className="flex-1">
           <Badge variant="cyan">{product.brand}</Badge>
-          <h1 className="mt-1.5 font-heading text-2xl font-extrabold sm:text-3xl">
-            {t("title")}
-          </h1>
-          <p className="mt-1 text-foreground/60">
-            {t("subtitle", { brand: product.brand })}
-          </p>
+          <h1 className="mt-1.5 font-heading text-2xl font-extrabold sm:text-3xl">{t("title")}</h1>
+          <p className="mt-1 text-foreground/60">{t("subtitle", { brand: product.brand })}</p>
         </div>
       </div>
 
@@ -140,9 +133,7 @@ export function ActivationGuideView({
                   <h3 className="font-heading text-base font-bold">
                     {t("step", { n: i + 1 })}: {lang(step.title)}
                   </h3>
-                  <p className="mt-1 text-sm text-foreground/70">
-                    {lang(step.desc)}
-                  </p>
+                  <p className="mt-1 text-sm text-foreground/70">{lang(step.desc)}</p>
                 </div>
               </div>
             </Reveal>
@@ -180,16 +171,18 @@ export function ActivationGuideView({
             defaultValue="trouble-0"
           >
             {guide.troubleshooting.map((item, i) => (
-              <AccordionItem key={i} value={`trouble-${i}`} className="rounded-base border-2 border-border bg-secondary-background px-4 shadow-shadow-sm">
+              <AccordionItem
+                key={i}
+                value={`trouble-${i}`}
+                className="rounded-base border-2 border-border bg-secondary-background px-4 shadow-shadow-sm"
+              >
                 <AccordionTrigger className="text-left">
                   <span className="flex items-center gap-2">
                     <HelpCircle className="size-4 text-foreground/50" />
                     {lang(item.q)}
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="text-foreground/70">
-                  {lang(item.a)}
-                </AccordionContent>
+                <AccordionContent className="text-foreground/70">{lang(item.a)}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

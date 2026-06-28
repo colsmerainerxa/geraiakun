@@ -49,9 +49,7 @@ export default async function Image({
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 38, fontWeight: 800, color: "#0a0a0a" }}>
-          beliakun
-        </span>
+        <span style={{ fontSize: 38, fontWeight: 800, color: "#0a0a0a" }}>beliakun</span>
         <span
           style={{
             display: "flex",

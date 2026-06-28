@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  Bot,
-  Code,
-  GraduationCap,
-  type LucideIcon,
-  Palette,
-  Play,
-  Rocket,
-} from "lucide-react"
+import { Bot, Code, GraduationCap, type LucideIcon, Palette, Play, Rocket } from "lucide-react"
 import { motion } from "motion/react"
 import { useLocale } from "next-intl"
 import { Link } from "@/i18n/navigation"

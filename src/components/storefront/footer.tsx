@@ -16,6 +16,9 @@ export function Footer() {
       title: t("explore"),
       links: [
         { href: "/katalog", label: tn("catalog") },
+        { href: "/reseller", label: t("reseller") },
+        { href: "/wishlist", label: t("wishlist") },
+        { href: "/akun/vault", label: t("vault") },
         { href: "/artikel", label: tn("blog") },
         { href: "/kategori/ai-chatbot", label: "AI & Chatbot" },
         { href: "/kategori/api-developer", label: "API & Developer" },
@@ -26,6 +29,8 @@ export function Footer() {
       links: [
         { href: "/lacak", label: t("track") },
         { href: "/bantuan", label: t("faq") },
+        { href: "/garansi", label: t("warranty") },
+        { href: "/refund", label: t("refund") },
         { href: "/syarat", label: t("terms") },
         { href: "/privasi", label: t("privacy") },
       ],
@@ -34,6 +39,8 @@ export function Footer() {
       title: t("company"),
       links: [
         { href: "/tentang", label: t("about") },
+        { href: "/referensi", label: t("referral") },
+        { href: "/reward", label: t("rewards") },
         { href: "/kontak", label: t("contact") },
       ],
     },
@@ -53,13 +60,8 @@ export function Footer() {
                 beli<span className="text-accent-pink">akun</span>
               </span>
             </Link>
-            <p className="mt-3 max-w-xs text-sm text-foreground/70">
-              {t("tagline")}
-            </p>
-            <form
-              className="mt-4 flex max-w-sm gap-2"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <p className="mt-3 max-w-xs text-sm text-foreground/70">{t("tagline")}</p>
+            <form className="mt-4 flex max-w-sm gap-2" onSubmit={(e) => e.preventDefault()}>
               <Input
                 type="email"
                 placeholder={t("newsletterPlaceholder")}
@@ -93,16 +95,12 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t-2 border-dashed border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-foreground/60">
-            © 2026 beliakun. {t("rights")}
-          </p>
+          <p className="text-xs text-foreground/60">© 2026 beliakun. {t("rights")}</p>
           <span className="inline-flex items-center gap-1.5 rounded-base border-2 border-border bg-success px-2.5 py-1 text-xs font-bold text-white">
             <Shield className="size-3.5" /> {t("secure")}
           </span>
         </div>
-        <p className="mt-4 text-[11px] leading-relaxed text-foreground/40">
-          {t("disclaimer")}
-        </p>
+        <p className="mt-4 text-[11px] leading-relaxed text-foreground/40">{t("disclaimer")}</p>
       </Container>
     </footer>
   )

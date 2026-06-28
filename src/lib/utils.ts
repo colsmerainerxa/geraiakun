@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -61,4 +61,19 @@ export function initials(name: string) {
     .slice(0, 2)
     .map((n) => n[0]?.toUpperCase() ?? "")
     .join("")
+}
+
+/** Label metode pembayaran (e.g. "bca-va" -> "BCA VA"). Pure helper. */
+const PAYMENT_LABELS: Record<string, string> = {
+  qris: "QRIS",
+  gopay: "GoPay",
+  ovo: "OVO",
+  dana: "DANA",
+  "bca-va": "BCA VA",
+  "bni-va": "BNI VA",
+  "mandiri-va": "Mandiri VA",
+}
+
+export function paymentLabel(method: string) {
+  return PAYMENT_LABELS[method] ?? method.toUpperCase()
 }

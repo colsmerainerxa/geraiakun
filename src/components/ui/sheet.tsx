@@ -2,6 +2,7 @@
 
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
+import { useTranslations } from "next-intl"
 import { X } from "lucide-react"
 import type * as React from "react"
 import { cn } from "@/lib/utils"
@@ -48,19 +49,16 @@ function SheetContent({
   children,
   side = "right",
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Content> &
-  VariantProps<typeof sheetVariants>) {
+}: React.ComponentProps<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>) {
+  const t = useTranslations("common")
   return (
     <SheetPortal>
       <SheetOverlay />
-      <SheetPrimitive.Content
-        className={cn(sheetVariants({ side }), className)}
-        {...props}
-      >
+      <SheetPrimitive.Content className={cn(sheetVariants({ side }), className)} {...props}>
         {children}
         <SheetPrimitive.Close className="absolute right-4 top-4 flex size-7 items-center justify-center rounded-base border-2 border-border bg-main transition-all hover:translate-x-0.5 hover:translate-y-0.5">
           <X className="size-4" />
-          <span className="sr-only">Tutup</span>
+          <span className="sr-only">{t("close")}</span>
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>
     </SheetPortal>
@@ -72,21 +70,11 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div className={cn("mt-auto flex flex-col gap-2", className)} {...props} />
-  )
+  return <div className={cn("mt-auto flex flex-col gap-2", className)} {...props} />
 }
 
-function SheetTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Title>) {
-  return (
-    <SheetPrimitive.Title
-      className={cn("font-heading text-lg", className)}
-      {...props}
-    />
-  )
+function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {
+  return <SheetPrimitive.Title className={cn("font-heading text-lg", className)} {...props} />
 }
 
 function SheetDescription({

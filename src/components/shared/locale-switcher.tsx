@@ -1,7 +1,7 @@
 "use client"
 
-import { useLocale } from "next-intl"
 import { useParams } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { useTransition } from "react"
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ const LOCALES: { code: Locale; label: string; flag: string }[] = [
 
 export function LocaleSwitcher() {
   const locale = useLocale()
+  const t = useTranslations("common")
   const router = useRouter()
   const pathname = usePathname()
   const params = useParams()
@@ -37,7 +38,7 @@ export function LocaleSwitcher() {
       <DropdownMenuTrigger
         disabled={isPending}
         className="flex h-9 items-center gap-1.5 rounded-base border-2 border-border bg-secondary-background px-2.5 font-heading text-sm font-bold transition-all hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-60"
-        aria-label="Ganti bahasa"
+        aria-label={t("changeLanguage")}
       >
         <span className="text-base leading-none">{current.flag}</span>
         <span className="uppercase">{current.code}</span>

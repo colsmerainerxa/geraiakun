@@ -98,9 +98,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
     return () => document.removeEventListener("mousedown", onClick)
   }, [open])
 
-  const trending = TRENDING_SLUGS.map((s) => products.find((p) => p.slug === s)).filter(
-    Boolean,
-  )
+  const trending = TRENDING_SLUGS.map((s) => products.find((p) => p.slug === s)).filter(Boolean)
 
   function go(value: string) {
     router.push(`/katalog${value ? `?q=${encodeURIComponent(value)}` : ""}`)

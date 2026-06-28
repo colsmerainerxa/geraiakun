@@ -103,9 +103,7 @@ export function Hero() {
               key={s.key}
               className="rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow"
             >
-              <div className="font-heading text-2xl font-extrabold sm:text-3xl">
-                {s.value}
-              </div>
+              <div className="font-heading text-2xl font-extrabold sm:text-3xl">{s.value}</div>
               <div className="text-xs text-foreground/60">{t(s.key)}</div>
             </div>
           ))}

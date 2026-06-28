@@ -38,9 +38,7 @@ export function PromoInput({ subtotal }: { subtotal: number }) {
           <div className="min-w-0">
             <p className="font-heading text-sm font-bold">{promo.code}</p>
             <p className="truncate text-xs text-foreground/60">
-              {belowMin
-                ? `Min. belanja ${formatIDR(promo.minSpend)}`
-                : `- ${formatIDR(discount)}`}
+              {belowMin ? `Min. belanja ${formatIDR(promo.minSpend)}` : `- ${formatIDR(discount)}`}
             </p>
           </div>
         </div>
@@ -68,12 +66,7 @@ export function PromoInput({ subtotal }: { subtotal: number }) {
           aria-label={t("promoCode")}
         />
       </div>
-      <Button
-        type="button"
-        variant="neutral"
-        onClick={handleApply}
-        disabled={!code.trim()}
-      >
+      <Button type="button" variant="neutral" onClick={handleApply} disabled={!code.trim()}>
         {t("applyPromo")}
       </Button>
     </div>

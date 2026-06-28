@@ -36,9 +36,7 @@ export function getFlashSaleItems(): FlashSaleItem[] {
     product: x.p,
     salePrice: x.v.price,
     originalPrice: x.v.originalPrice ?? x.v.price,
-    off: Math.round(
-      ((x.v.originalPrice! - x.v.price) / x.v.originalPrice!) * 100,
-    ),
+    off: Math.round(((x.v.originalPrice! - x.v.price) / x.v.originalPrice!) * 100),
     claimedRatio: RATIO_SEEDS[i % RATIO_SEEDS.length],
     soldCount: Math.round(pseudoSold(x.p.slug, 40, 180)),
   }))

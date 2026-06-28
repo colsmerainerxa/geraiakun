@@ -33,8 +33,7 @@ export const usePromo = create<PromoState>()(
       // localStorage code can't inject an arbitrary discount.
       partialize: (s) => ({ code: s.code }),
       merge: (persisted, current) => {
-        const code =
-          (persisted as { code?: string | null } | undefined)?.code ?? null
+        const code = (persisted as { code?: string | null } | undefined)?.code ?? null
         const promo = code ? (getPromo(code) ?? null) : null
         return { ...current, code: promo ? code : null, promo }
       },

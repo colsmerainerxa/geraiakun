@@ -18,8 +18,9 @@ import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { Reveal } from "@/components/shared/motion"
 import { SectionHeading } from "@/components/shared/section-heading"
-import { ProductCard } from "@/components/storefront/product-card"
+import { CompareButton } from "@/components/storefront/compare"
 import { NotifyMe } from "@/components/storefront/notify-me"
+import { ProductCard } from "@/components/storefront/product-card"
 import { QaSection } from "@/components/storefront/qa-section"
 import { ReviewsSection } from "@/components/storefront/reviews-section"
 import { ShareButtons } from "@/components/storefront/share-buttons"
@@ -38,15 +39,9 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import {
-  cn,
-  discountPercent,
-  formatIDR,
-  formatNumber,
-  formatPrice,
-} from "@/lib/utils"
 import { articles } from "@/lib/mock/articles"
 import { products } from "@/lib/mock/products"
+import { cn, discountPercent, formatIDR, formatNumber, formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { useRecentlyViewed } from "@/stores/recently-viewed"
 import { useUI } from "@/stores/ui"
@@ -86,12 +81,8 @@ export function ProductDetail({
     addRecent(product.slug)
   }, [product.slug, addRecent])
 
-  const crossSell = products
-    .filter((p) => p.slug !== product.slug)
-    .slice(0, 2)
-  const relatedArticles = articles
-    .filter((a) => a.relatedSlugs.includes(product.slug))
-    .slice(0, 3)
+  const crossSell = products.filter((p) => p.slug !== product.slug).slice(0, 2)
+  const relatedArticles = articles.filter((a) => a.relatedSlugs.includes(product.slug)).slice(0, 3)
 
   // Default to the cheapest in-stock variant, else the first.
   const cheapest = [...product.variants].sort((a, b) => a.price - b.price)
@@ -100,11 +91,8 @@ export function ProductDetail({
   )
   const [qty, setQty] = useState(1)
 
-  const variant =
-    product.variants.find((v) => v.id === variantId) ?? product.variants[0]
-  const off = variant.originalPrice
-    ? discountPercent(variant.originalPrice, variant.price)
-    : 0
+  const variant = product.variants.find((v) => v.id === variantId) ?? product.variants[0]
+  const off = variant.originalPrice ? discountPercent(variant.originalPrice, variant.price) : 0
   const soldOut = variant.stock <= 0
   const features = isEn ? product.featuresEn : product.features
   const description = isEn ? product.descriptionEn : product.description
@@ -149,10 +137,7 @@ export function ProductDetail({
           {tn("home")}
         </Link>
         <span>/</span>
-        <Link
-          href="/katalog"
-          className="hover:text-foreground hover:underline"
-        >
+        <Link href="/katalog" className="hover:text-foreground hover:underline">
           {tn("catalog")}
         </Link>
         <span>/</span>
@@ -199,9 +184,7 @@ export function ProductDetail({
                 className="flex flex-col items-center gap-1.5 rounded-base border-2 border-border bg-secondary-background p-3 text-center shadow-shadow-sm"
               >
                 <item.icon className="size-5" />
-                <span className="text-xs font-bold leading-tight">
-                  {item.label}
-                </span>
+                <span className="text-xs font-bold leading-tight">{item.label}</span>
               </div>
             ))}
           </div>
@@ -221,10 +204,10 @@ export function ProductDetail({
                 {isEn ? product.taglineEn : product.tagline}
               </p>
             </div>
-            <WishlistButton
-              slug={product.slug}
-              className="mt-1 size-10 shrink-0"
-            />
+            <div className="mt-1 flex shrink-0 items-center gap-2">
+              <WishlistButton slug={product.slug} className="size-10" />
+              <CompareButton slug={product.slug} size="sm" withLabel />
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -232,10 +215,7 @@ export function ProductDetail({
               <Star className="size-4 fill-warning text-warning" />
               {product.rating}
             </span>
-            <a
-              href="#reviews"
-              className="text-foreground/60 underline-offset-2 hover:underline"
-            >
+            <a href="#reviews" className="text-foreground/60 underline-offset-2 hover:underline">
               {formatNumber(product.reviewCount)} {tc("reviews")}
             </a>
             <span className="text-foreground/40">•</span>
@@ -315,9 +295,7 @@ export function ProductDetail({
                     <span className="text-xs font-semibold">
                       {formatPrice(v.price, isEn)}
                       {vOut ? (
-                        <span className="ml-1 opacity-70">
-                          · {tc("outOfStock")}
-                        </span>
+                        <span className="ml-1 opacity-70">· {tc("outOfStock")}</span>
                       ) : (
                         <span className="ml-1 opacity-70">
                           · {v.stock} {t("stockLeft")}
@@ -337,9 +315,7 @@ export function ProductDetail({
             ) : (
               <>
                 <div className="flex items-center gap-3">
-                  <span className="font-heading text-sm font-extrabold uppercase">
-                    {tc("qty")}
-                  </span>
+                  <span className="font-heading text-sm font-extrabold uppercase">{tc("qty")}</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
@@ -355,9 +331,7 @@ export function ProductDetail({
                     </span>
                     <button
                       type="button"
-                      onClick={() =>
-                        setQty((q) => Math.min(variant.stock, q + 1))
-                      }
+                      onClick={() => setQty((q) => Math.min(variant.stock, q + 1))}
                       disabled={qty >= variant.stock}
                       className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm transition-all hover:bg-main disabled:opacity-40"
                       aria-label={tc("increase")}
@@ -390,15 +364,9 @@ export function ProductDetail({
           <div className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow-sm">
             <div className="flex items-center justify-between gap-2">
               <h2 className="font-heading text-base font-bold">{t("features")}</h2>
-              <Button
-                variant="neutral"
-                size="sm"
-                asChild
-                className="shrink-0"
-              >
+              <Button variant="neutral" size="sm" asChild className="shrink-0">
                 <Link href={`/produk/${product.slug}/aktivasi`}>
-                  <BookOpen className="size-4" />{" "}
-                  {isEn ? "Activation Guide" : "Panduan Aktivasi"}
+                  <BookOpen className="size-4" /> {isEn ? "Activation Guide" : "Panduan Aktivasi"}
                 </Link>
               </Button>
             </div>
@@ -415,11 +383,7 @@ export function ProductDetail({
           </div>
 
           <ShareButtons
-            path={
-              isEn
-                ? `/en/produk/${product.slug}`
-                : `/produk/${product.slug}`
-            }
+            path={isEn ? `/en/produk/${product.slug}` : `/produk/${product.slug}`}
             title={product.name}
           />
 
@@ -433,14 +397,11 @@ export function ProductDetail({
       {/* ---- Cross-sell ---- */}
       {crossSell.length > 0 && (
         <div className="mt-12">
-          <h2 className="font-heading text-xl font-extrabold">
-            {tc("frequentlyBought")}
-          </h2>
+          <h2 className="font-heading text-xl font-extrabold">{tc("frequentlyBought")}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {crossSell.map((p) => {
               const pMin = Math.min(...p.variants.map((cv) => cv.price))
-              const pv =
-                p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
+              const pv = p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
               return (
                 <div
                   key={p.id}
@@ -590,19 +551,12 @@ export function ProductDetail({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 px-4 py-3 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3">
           <div className="flex flex-col leading-none">
-            <span className="text-[11px] text-foreground/50">
-              {isEn ? "From" : "Mulai"}
-            </span>
+            <span className="text-[11px] text-foreground/50">{isEn ? "From" : "Mulai"}</span>
             <span className="font-heading text-lg font-extrabold">
               {formatPrice(variant.price, isEn)}
             </span>
           </div>
-          <Button
-            className="ml-auto flex-1"
-            size="lg"
-            onClick={handleBuyNow}
-            disabled={soldOut}
-          >
+          <Button className="ml-auto flex-1" size="lg" onClick={handleBuyNow} disabled={soldOut}>
             {soldOut ? tc("outOfStock") : t("buyDirectly")}
           </Button>
           <Button

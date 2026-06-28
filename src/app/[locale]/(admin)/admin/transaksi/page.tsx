@@ -1,20 +1,16 @@
 "use client"
 
-import {
-  ArrowDownLeft,
-  CheckCircle2,
-  Clock,
-  Download,
-  XCircle,
-} from "lucide-react"
-import { useMemo } from "react"
-import {
-  paymentLabel,
-  StatCard,
-  TransactionStatusBadge,
-} from "@/components/admin/parts"
+import { ArrowDownLeft, CheckCircle2, Clock, Download, XCircle } from "lucide-react"
+import { useMemo, useState } from "react"
+import { paymentLabel, StatCard, TableSkeleton, TransactionStatusBadge } from "@/components/admin/parts"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Pagination, usePagination } from "@/components/ui/pagination"
+import {
+  DateRangeFilter,
+  inRange,
+  useDateRange,
+  type DateRangePreset,
+} from "@/components/ui/date-range-filter"
 import {
   Table,
   TableBody,
@@ -23,12 +19,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { downloadCsv } from "@/lib/csv"
 import { useTransactions } from "@/lib/api/queries"
+import { downloadCsv } from "@/lib/csv"
 import { formatDate, formatIDR } from "@/lib/utils"
 
 export default function AdminTransactionsPage() {
   const { data: transactions, isLoading } = useTransactions()
+  const [rangePreset, setRangePreset] = useState<DateRangePreset>("30d")
+  const range = useDateRange(rangePreset)
+
+  const list = useMemo(
+    () => (transactions ?? []).filter((t) => inRange(t.createdAt, range)),
+    [transactions, range],
+  )
+  const { page, setPage, pageCount, paged, total, pageSize } = usePagination(list, 10)
 
   const stats = useMemo(() => {
     const list = transactions ?? []
@@ -36,9 +40,7 @@ export default function AdminTransactionsPage() {
       success: list.filter((t) => t.status === "berhasil"),
       pending: list.filter((t) => t.status === "pending").length,
       failed: list.filter((t) => t.status === "gagal").length,
-      revenue: list
-        .filter((t) => t.status === "berhasil")
-        .reduce((s, t) => s + t.amount, 0),
+      revenue: list.filter((t) => t.status === "berhasil").reduce((s, t) => s + t.amount, 0),
     }
   }, [transactions])
 
@@ -58,27 +60,18 @@ export default function AdminTransactionsPage() {
           icon={CheckCircle2}
           accent="bg-success"
         />
-        <StatCard
-          label="Pending"
-          value={stats.pending}
-          icon={Clock}
-          accent="bg-warning"
-        />
-        <StatCard
-          label="Gagal"
-          value={stats.failed}
-          icon={XCircle}
-          accent="bg-danger"
-        />
+        <StatCard label="Pending" value={stats.pending} icon={Clock} accent="bg-warning" />
+        <StatCard label="Gagal" value={stats.failed} icon={XCircle} accent="bg-danger" />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <DateRangeFilter value={rangePreset} onChange={setRangePreset} />
         <Button
           variant="neutral"
           onClick={() =>
             downloadCsv(
               "transaksi.csv",
-              (transactions ?? []).map((tr) => ({
+              list.map((tr) => ({
                 id: tr.id,
                 invoice: tr.invoice,
                 pelanggan: tr.customerName,
@@ -95,8 +88,9 @@ export default function AdminTransactionsPage() {
       </div>
 
       {isLoading ? (
-        <Skeleton className="h-96" />
+        <TableSkeleton columns={7} rows={6} />
       ) : (
+        <>
         <Table>
           <TableHeader>
             <TableRow>
@@ -110,21 +104,15 @@ export default function AdminTransactionsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions?.map((t) => (
+            {paged.map((t) => (
               <TableRow key={t.id}>
                 <TableCell className="font-mono text-xs text-foreground/60">
                   {t.id.toUpperCase()}
                 </TableCell>
-                <TableCell className="font-heading font-bold">
-                  {t.invoice}
-                </TableCell>
+                <TableCell className="font-heading font-bold">{t.invoice}</TableCell>
                 <TableCell>{t.customerName}</TableCell>
-                <TableCell className="text-foreground/70">
-                  {paymentLabel(t.method)}
-                </TableCell>
-                <TableCell className="font-heading font-bold">
-                  {formatIDR(t.amount)}
-                </TableCell>
+                <TableCell className="text-foreground/70">{paymentLabel(t.method)}</TableCell>
+                <TableCell className="font-heading font-bold">{formatIDR(t.amount)}</TableCell>
                 <TableCell className="whitespace-nowrap text-foreground/70">
                   {formatDate(t.createdAt)}
                 </TableCell>
@@ -133,8 +121,23 @@ export default function AdminTransactionsPage() {
                 </TableCell>
               </TableRow>
             ))}
+            {total === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
+                  Belum ada transaksi.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
+        <Pagination
+          page={page}
+          pageCount={pageCount}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+        />
+        </>
       )}
     </div>
   )

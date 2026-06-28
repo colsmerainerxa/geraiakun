@@ -2,11 +2,16 @@
 
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { OrderStatus } from "@/types"
 
 // Demo admin "edits" (no backend) — a localStorage overlay that the admin pages
 // merge on top of the static mock. Lets you change product price/stock, override
 // an order's status, and toggle a promo within the session.
+//
+// Order-status overrides are written to the enterprise audit log so the most
+// fraud-relevant admin action is accountable (every other admin mutation audits
+// the same way).
 
 interface ProductPatch {
   price?: number // overrides the FIRST variant's price (demo simplicity)
@@ -25,7 +30,7 @@ interface AdminOverlayState {
 
 export const useAdminOverlay = create<AdminOverlayState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       productPatches: {},
       orderStatus: {},
       promoActive: {},
@@ -36,16 +41,25 @@ export const useAdminOverlay = create<AdminOverlayState>()(
             [id]: { ...s.productPatches[id], ...patch },
           },
         })),
-      setOrderStatus: (invoice, status) =>
+      setOrderStatus: (invoice, status) => {
+        const prev = get().orderStatus[invoice]
         set((s) => ({
           orderStatus: { ...s.orderStatus, [invoice]: status },
-        })),
+        }))
+        useEnterpriseAdmin.getState().logAudit({
+          action: "status_changed",
+          module: "order",
+          targetId: invoice,
+          targetLabel: invoice,
+          outcome: "success",
+          detail: `${prev ?? "—"} → ${status}`,
+        })
+      },
       setPromoActive: (id, active) =>
         set((s) => ({
           promoActive: { ...s.promoActive, [id]: active },
         })),
-      reset: () =>
-        set({ productPatches: {}, orderStatus: {}, promoActive: {} }),
+      reset: () => set({ productPatches: {}, orderStatus: {}, promoActive: {} }),
     }),
     { name: "beliakun-admin-overlay" },
   ),

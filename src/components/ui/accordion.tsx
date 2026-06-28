@@ -53,11 +53,9 @@ function AccordionContent({
       className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
       {...props}
     >
-      <div className={cn("px-4 pb-4 pt-0 text-foreground/80", className)}>
-        {children}
-      </div>
+      <div className={cn("px-4 pb-4 pt-0 text-foreground/80", className)}>{children}</div>
     </AccordionPrimitive.Content>
   )
 }
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export { Accordion, AccordionContent, AccordionItem, AccordionTrigger }

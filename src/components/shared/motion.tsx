@@ -63,10 +63,7 @@ export function RevealItem({
   children,
   className,
   ...props
-}: { children: React.ReactNode; className?: string } & Omit<
-  HTMLMotionProps<"div">,
-  "children"
->) {
+}: { children: React.ReactNode; className?: string } & Omit<HTMLMotionProps<"div">, "children">) {
   return (
     <motion.div
       className={className}

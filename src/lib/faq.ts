@@ -46,9 +46,6 @@ export const helpFaqs: FaqItem[] = [
 ]
 
 /** Map FAQ items to plain { q, a } for the active locale. */
-export function localizedFaqs(
-  items: FaqItem[],
-  isEn: boolean,
-): { q: string; a: string }[] {
+export function localizedFaqs(items: FaqItem[], isEn: boolean): { q: string; a: string }[] {
   return items.map((f) => ({ q: isEn ? f.qEn : f.q, a: isEn ? f.aEn : f.a }))
 }

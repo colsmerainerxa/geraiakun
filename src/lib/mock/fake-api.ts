@@ -1,7 +1,7 @@
-import type { CategorySlug, Product } from "@/types"
+import type { AccountType, CategorySlug, Product } from "@/types"
 import { categories } from "./categories"
 import { banners, testimonials } from "./content"
-import { credentials, credentialStats } from "./credentials"
+import { credentialStats, credentials } from "./credentials"
 import { customers } from "./customers"
 import { orders } from "./orders"
 import { productMinPrice, products } from "./products"
@@ -21,7 +21,11 @@ export interface ProductQuery {
   minPrice?: number
   maxPrice?: number
   badges?: string[]
+  accountType?: AccountType
+  duration?: DurationBucket
 }
+
+export type DurationBucket = "1m" | "3m" | "1y" | "lifetime"
 
 function categoriesWithCount() {
   return categories.map((c) => ({
@@ -44,7 +48,7 @@ export const fakeApi = {
   async getProducts(query: ProductQuery = {}): Promise<Product[]> {
     await delay()
     let list = [...products]
-    const { category, search, sort, minPrice, maxPrice, badges } = query
+    const { category, search, sort, minPrice, maxPrice, badges, accountType, duration } = query
 
     if (category && category !== "semua") {
       list = list.filter((p) => p.category === category)
@@ -67,6 +71,18 @@ export const fakeApi = {
     if (badges && badges.length) {
       list = list.filter((p) => p.badges.some((b) => badges.includes(b)))
     }
+    if (accountType) {
+      list = list.filter((p) => p.variants.some((v) => v.type === accountType))
+    }
+    if (duration) {
+      list = list.filter((p) =>
+        p.variants.some((v) => {
+          if (duration === "lifetime") return v.durationDays === null
+          const cap = duration === "1m" ? 30 : duration === "3m" ? 90 : 365
+          return v.durationDays !== null && v.durationDays <= cap
+        }),
+      )
+    }
 
     switch (sort) {
       case "termurah":
@@ -80,9 +96,7 @@ export const fakeApi = {
         break
       case "terbaru":
         list.sort(
-          (a, b) =>
-            (b.badges.includes("baru") ? 1 : 0) -
-            (a.badges.includes("baru") ? 1 : 0),
+          (a, b) => (b.badges.includes("baru") ? 1 : 0) - (a.badges.includes("baru") ? 1 : 0),
         )
         break
       default:
@@ -107,9 +121,7 @@ export const fakeApi = {
     await delay(150)
     const product = products.find((p) => p.slug === slug)
     if (!product) return []
-    return products
-      .filter((p) => p.category === product.category && p.slug !== slug)
-      .slice(0, 4)
+    return products.filter((p) => p.category === product.category && p.slug !== slug).slice(0, 4)
   },
 
   async getTestimonials() {
@@ -129,9 +141,7 @@ export const fakeApi = {
   },
   async getOrder(invoice: string) {
     await delay(200)
-    return orders.find(
-      (o) => o.invoice.toLowerCase() === invoice.toLowerCase(),
-    ) ?? null
+    return orders.find((o) => o.invoice.toLowerCase() === invoice.toLowerCase()) ?? null
   },
   async getCustomers() {
     await delay(250)
@@ -159,8 +169,7 @@ export const fakeApi = {
       orderCount: orders.length,
       customerCount: customers.length,
       productCount: products.length,
-      pendingOrders: orders.filter((o) => o.status === "menunggu-pembayaran")
-        .length,
+      pendingOrders: orders.filter((o) => o.status === "menunggu-pembayaran").length,
       completedOrders: orders.filter((o) => o.status === "selesai").length,
       credentials: credentialStats(),
       // 7-hari revenue trend (dummy, deterministik)
@@ -186,6 +195,4 @@ export const fakeApi = {
   },
 }
 
-export type DashboardStats = Awaited<
-  ReturnType<typeof fakeApi.getDashboardStats>
->
+export type DashboardStats = Awaited<ReturnType<typeof fakeApi.getDashboardStats>>

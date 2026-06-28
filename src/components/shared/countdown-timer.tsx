@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 
@@ -44,25 +45,17 @@ const UNITS = [
   { key: "seconds", pad: 2 },
 ] as const
 
-const LABELS = {
-  days: ["Hari", "Days"],
-  hours: ["Jam", "Hours"],
-  minutes: ["Menit", "Min"],
-  seconds: ["Detik", "Sec"],
-}
-
 /** Tampilan kotak hitung mundur gaya neobrutalism. */
 export function CountdownTimer({
   targetISO,
-  isEn = false,
   variant = "default",
   className,
 }: {
   targetISO: string
-  isEn?: boolean
   variant?: "default" | "compact"
   className?: string
 }) {
+  const t = useTranslations("common.countdown")
   const left = useCountdown(targetISO)
   if (!left)
     return (
@@ -75,9 +68,7 @@ export function CountdownTimer({
               variant === "compact" && "px-1.5",
             )}
           >
-            <span className="font-heading text-lg font-extrabold tabular-nums">
-              --
-            </span>
+            <span className="font-heading text-lg font-extrabold tabular-nums">--</span>
           </div>
         ))}
       </div>
@@ -97,13 +88,11 @@ export function CountdownTimer({
               {String(left[u.key]).padStart(u.pad, "0")}
             </span>
             <span className="text-[9px] font-bold uppercase text-main-foreground/70">
-              {isEn ? LABELS[u.key][1] : LABELS[u.key][0]}
+              {t(u.key)}
             </span>
           </div>
           {i < UNITS.length - 1 && (
-            <span className="font-heading text-lg font-extrabold text-foreground/40">
-              :
-            </span>
+            <span className="font-heading text-lg font-extrabold text-foreground/40">:</span>
           )}
         </div>
       ))}
