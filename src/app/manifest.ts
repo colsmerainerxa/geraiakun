@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "beliakun — Akun Premium AI & Digital",
-    short_name: "beliakun",
+    name: "geraiakun — Akun Premium AI & Digital",
+    short_name: "geraiakun",
     description:
       "Marketplace akun & langganan digital premium yang praktis, transparan, dan bergaransi.",
     start_url: "/",

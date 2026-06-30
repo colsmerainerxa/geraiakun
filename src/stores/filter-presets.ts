@@ -53,13 +53,11 @@ export const useFilterPresets = create<FilterPresetsState>()(
         set((state) => ({
           presets: {
             ...state.presets,
-            [module]: (state.presets[module] ?? []).map((p) =>
-              p.id === id ? { ...p, name } : p,
-            ),
+            [module]: (state.presets[module] ?? []).map((p) => (p.id === id ? { ...p, name } : p)),
           },
         })),
       reset: () => set({ presets: {} }),
     }),
-    { name: "beliakun-filter-presets" },
+    { name: "geraiakun-filter-presets" },
   ),
 )

@@ -35,7 +35,6 @@ function cheapestVariant(p: Product) {
 
 export function WishlistView() {
   const t = useTranslations("wishlist")
-  const tc = useTranslations("common")
   const isEn = useLocale() === "en"
   const mounted = useMounted()
 

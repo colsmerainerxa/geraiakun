@@ -10,8 +10,8 @@ import {
   ShieldCheck,
   Wallet,
 } from "lucide-react"
-import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
+import { useMemo, useState } from "react"
 import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { refundCases, type RefundCase, type RefundStatus } from "@/lib/mock/enterprise"
+import { type RefundCase, type RefundStatus, refundCases } from "@/lib/mock/enterprise"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 
 const STATUS_KEY: Record<RefundStatus, string> = {
@@ -31,17 +31,15 @@ const STATUS_KEY: Record<RefundStatus, string> = {
   rejected: "statusRejected",
   closed: "statusClosed",
 }
-const STATUS_VARIANT: Record<
-  RefundStatus,
-  "neutral" | "warning" | "cyan" | "success" | "danger"
-> = {
-  draft: "neutral",
-  review: "warning",
-  replacement: "cyan",
-  refund: "danger",
-  rejected: "danger",
-  closed: "success",
-}
+const STATUS_VARIANT: Record<RefundStatus, "neutral" | "warning" | "cyan" | "success" | "danger"> =
+  {
+    draft: "neutral",
+    review: "warning",
+    replacement: "cyan",
+    refund: "danger",
+    rejected: "danger",
+    closed: "success",
+  }
 
 export function RefundCenterView() {
   const t = useTranslations("refundCenter")
@@ -71,27 +69,23 @@ export function RefundCenterView() {
 
   return (
     <Container className="py-12">
-      <SectionHeading
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        subtitle={t("subtitle")}
-      />
+      <SectionHeading eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-4">
         <ResolutionStat icon={FileText} label={t("statActive")} value="2" accent="bg-accent-cyan" />
-        <ResolutionStat icon={RefreshCcw} label={t("statReplacement")} value="1" accent="bg-accent-purple" />
+        <ResolutionStat
+          icon={RefreshCcw}
+          label={t("statReplacement")}
+          value="1"
+          accent="bg-accent-purple"
+        />
         <ResolutionStat
           icon={Wallet}
           label={t("statRefundValue")}
           value={formatIDR(90000)}
           accent="bg-accent-pink"
         />
-        <ResolutionStat
-          icon={Clock}
-          label={t("statSla")}
-          value="1,4 jam"
-          accent="bg-accent-lime"
-        />
+        <ResolutionStat icon={Clock} label={t("statSla")} value="1,4 jam" accent="bg-accent-lime" />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[390px_1fr]">
@@ -124,9 +118,7 @@ export function RefundCenterView() {
             className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow"
           >
             <h3 className="font-heading text-lg font-extrabold">{t("formTitle")}</h3>
-            <p className="mt-1 text-sm text-foreground/60">
-              {t("formDesc")}
-            </p>
+            <p className="mt-1 text-sm text-foreground/60">{t("formDesc")}</p>
             <div className="mt-4 grid gap-3">
               <div>
                 <Label htmlFor="invoice">{t("fieldInvoice")}</Label>
@@ -206,15 +198,21 @@ export function RefundCenterView() {
                   <p className="font-heading text-sm font-extrabold">{t("ownerSlaTitle")}</p>
                   <dl className="mt-3 grid gap-3 text-sm">
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">{t("ownerHandled")}</dt>
+                      <dt className="text-xs font-bold uppercase text-foreground/50">
+                        {t("ownerHandled")}
+                      </dt>
                       <dd className="font-bold">{selected.owner}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">{t("updatedAt")}</dt>
+                      <dt className="text-xs font-bold uppercase text-foreground/50">
+                        {t("updatedAt")}
+                      </dt>
                       <dd className="font-bold">{formatDate(selected.updatedAt)}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">{t("policy")}</dt>
+                      <dt className="text-xs font-bold uppercase text-foreground/50">
+                        {t("policy")}
+                      </dt>
                       <dd className="font-bold">{t("policyRefund")}</dd>
                     </div>
                   </dl>

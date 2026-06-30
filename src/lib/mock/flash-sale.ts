@@ -3,7 +3,7 @@ import { products } from "./products"
 
 /**
  * Produk flash sale: punya badge promo & harga coret. Diambil maksimal 6.
- * Target waktu akhir dihitung dinamis — selalu "akhir hari ini + geser" agar
+ * Target waktu akhir dihitung dinamis � selalu "akhir hari ini + geser" agar
  * countdown selalu aktif di demo.
  */
 export interface FlashSaleItem {
@@ -11,7 +11,7 @@ export interface FlashSaleItem {
   salePrice: number
   originalPrice: number
   off: number
-  // 0..1 — seberapa banyak stok "terjual" (untuk progress bar urgensi)
+  // 0..1 � seberapa banyak stok "terjual" (untuk progress bar urgensi)
   claimedRatio: number
   soldCount: number
 }
@@ -29,7 +29,7 @@ export function getFlashSaleItems(): FlashSaleItem[] {
           .sort((a, b) => a.price - b.price)[0] ?? p.variants[0]
       return { p, v }
     })
-    .filter((x) => x.v && x.v.originalPrice)
+    .filter((x) => x.v?.originalPrice)
     .slice(0, 6)
 
   return deals.map((x, i) => ({
@@ -51,7 +51,7 @@ function pseudoSold(slug: string, min: number, max: number) {
 }
 
 /**
- * Target akhir flash sale — selalu "5 jam dari sekarang" saat runtime client,
+ * Target akhir flash sale � selalu "5 jam dari sekarang" saat runtime client,
  * tapi untuk konsistensi SSR kita simpan di state komponen.
  */
 export function defaultFlashSaleEnd() {

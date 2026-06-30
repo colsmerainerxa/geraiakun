@@ -51,7 +51,7 @@ export function buildInvoiceHTML(order: Order, locale: "id" | "en" = "id"): stri
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${isEn ? "Invoice" : "Invoice"} ${escapeHtml(order.invoice)} · beliakun</title>
+<title>${isEn ? "Invoice" : "Invoice"} ${escapeHtml(order.invoice)} · geraiakun</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -167,10 +167,10 @@ export function buildInvoiceHTML(order: Order, locale: "id" | "en" = "id"): stri
         ${isEn ? "Thank you for your purchase!" : "Terima kasih atas pembelianmu!"} 🙌<br/>
         ${
           isEn
-            ? "This invoice was issued electronically by beliakun. Keep it as proof of purchase for warranty claims."
-            : "Invoice ini diterbitkan secara elektronik oleh beliakun. Simpan sebagai bukti pembelian untuk klaim garansi."
+            ? "This invoice was issued electronically by geraiakun. Keep it as proof of purchase for warranty claims."
+            : "Invoice ini diterbitkan secara elektronik oleh geraiakun. Simpan sebagai bukti pembelian untuk klaim garansi."
         }
-        <br/>© 2026 beliakun · beliakun.com
+        <br/>© 2026 geraiakun · geraiakun.com
       </div>
     </div>
   </div>
@@ -204,7 +204,7 @@ export function downloadInvoice(order: Order, locale: "id" | "en" = "id") {
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.href = url
-  a.download = `${order.invoice}-beliakun.html`
+  a.download = `${order.invoice}-geraiakun.html`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)

@@ -2,15 +2,9 @@
 
 import { Download, Mail, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { OrderStatusBadge, paymentLabel } from "@/components/admin/parts"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { formatDate, formatIDR } from "@/lib/utils"
 import type { Order } from "@/types"
 
@@ -27,7 +21,7 @@ export function OrderDetailDrawer({
 
   const invoice = order.invoice
   function reDownload(credential: { email: string; password: string; note: string }) {
-    const blob = `Login beliakun\nEmail: ${credential.email}\nPassword: ${credential.password}\n${credential.note ? `Catatan: ${credential.note}\n` : ""}Invoice: ${invoice}`
+    const blob = `Login geraiakun\nEmail: ${credential.email}\nPassword: ${credential.password}\n${credential.note ? `Catatan: ${credential.note}\n` : ""}Invoice: ${invoice}`
     navigator.clipboard?.writeText(blob).catch(() => {})
     toast.success(`Credential ${credential.email} disalin ke clipboard.`, {
       description: `Invoice ${invoice}`,
@@ -117,7 +111,12 @@ export function OrderDetailDrawer({
                   </div>
                   <p className="font-mono text-xs text-foreground/60">Password: {c.password}</p>
                   {c.note && <p className="text-xs text-foreground/60">{c.note}</p>}
-                  <Button size="sm" variant="neutral" className="self-start" onClick={() => reDownload(c)}>
+                  <Button
+                    size="sm"
+                    variant="neutral"
+                    className="self-start"
+                    onClick={() => reDownload(c)}
+                  >
                     <Download className="size-4" /> Unduh ulang
                   </Button>
                 </li>

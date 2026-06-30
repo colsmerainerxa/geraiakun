@@ -8,7 +8,7 @@ import { productMinPrice, products } from "./products"
 import { reviewsForProduct } from "./reviews"
 import { promos, transactions } from "./transactions"
 
-// Data mock resolve instan — latensi buatan dihapus agar UI terasa cepat.
+// Data mock resolve instan � latensi buatan dihapus agar UI terasa cepat.
 // (Dengan API nyata, latensi datang dari jaringan; tak perlu disimulasikan.)
 const delay = (_ms = 0) => Promise.resolve()
 
@@ -68,7 +68,7 @@ export const fakeApi = {
     if (typeof maxPrice === "number") {
       list = list.filter((p) => productMinPrice(p) <= maxPrice)
     }
-    if (badges && badges.length) {
+    if (badges?.length) {
       list = list.filter((p) => p.badges.some((b) => badges.includes(b)))
     }
     if (accountType) {

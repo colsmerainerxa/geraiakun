@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og"
 
-export const alt = "beliakun — Akun Premium AI & Digital, Harga Mahasiswa"
+export const alt = "geraiakun — Akun Premium AI & Digital, Harga Mahasiswa"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 

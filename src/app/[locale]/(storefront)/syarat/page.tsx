@@ -22,16 +22,16 @@ const sections = [
   {
     heading: "Penerimaan Ketentuan",
     headingEn: "Acceptance of Terms",
-    body: "Dengan mengakses dan menggunakan beliakun, kamu setuju untuk terikat dengan Syarat & Ketentuan ini. Jika kamu tidak menyetujui salah satu poin, mohon untuk tidak menggunakan layanan kami.",
+    body: "Dengan mengakses dan menggunakan geraiakun, kamu setuju untuk terikat dengan Syarat & Ketentuan ini. Jika kamu tidak menyetujui salah satu poin, mohon untuk tidak menggunakan layanan kami.",
     bodyEn:
-      "By accessing and using beliakun, you agree to be bound by these Terms & Conditions. If you do not agree with any part of them, please refrain from using our service.",
+      "By accessing and using geraiakun, you agree to be bound by these Terms & Conditions. If you do not agree with any part of them, please refrain from using our service.",
   },
   {
     heading: "Produk & Layanan",
     headingEn: "Products & Services",
-    body: "beliakun menjual akun premium dan langganan digital. Tipe akun (sharing atau private) serta durasi tertera jelas di setiap halaman produk. beliakun bukan afiliasi resmi dari brand yang dijual; semua merek dagang milik pemiliknya masing-masing.",
+    body: "geraiakun menjual akun premium dan langganan digital. Tipe akun (sharing atau private) serta durasi tertera jelas di setiap halaman produk. geraiakun bukan afiliasi resmi dari brand yang dijual; semua merek dagang milik pemiliknya masing-masing.",
     bodyEn:
-      "beliakun sells premium accounts and digital subscriptions. The account type (sharing or private) and duration are clearly stated on each product page. beliakun is not officially affiliated with the brands sold; all trademarks belong to their respective owners.",
+      "geraiakun sells premium accounts and digital subscriptions. The account type (sharing or private) and duration are clearly stated on each product page. geraiakun is not officially affiliated with the brands sold; all trademarks belong to their respective owners.",
   },
   {
     heading: "Pembayaran",

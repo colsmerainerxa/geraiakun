@@ -15,6 +15,7 @@ export function usePagination<T>(items: T[], pageSize = 10) {
   const current = Math.min(page, pageCount)
 
   useEffect(() => {
+    void items
     setPage(1)
   }, [items])
 
@@ -48,9 +49,14 @@ export function Pagination({
   const canNext = page < pageCount
 
   return (
-    <div className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", className)}>
+    <div
+      className={cn(
+        "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+        className,
+      )}
+    >
       <p className="text-xs font-bold text-foreground/60">
-        Menampilkan {from}–{to} dari {total}
+        Menampilkan {from}�{to} dari {total}
       </p>
       <div className="flex items-center gap-2">
         <Button

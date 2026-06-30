@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { AdminAnalyticsView } from "@/components/admin/admin-analytics-view"
 
 export const metadata: Metadata = {
-  title: "Analytics | Admin beliakun",
+  title: "Analytics | Admin geraiakun",
   robots: { index: false, follow: false },
 }
 

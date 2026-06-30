@@ -36,8 +36,8 @@ export function WhatsAppWidget() {
 
   const waLink = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
     isEn
-      ? "Hi beliakun, I have a question about my order/account."
-      : "Halo beliakun, saya mau tanya soal pesanan/akun saya.",
+      ? "Hi geraiakun, I have a question about my order/account."
+      : "Halo geraiakun, saya mau tanya soal pesanan/akun saya.",
   )}`
 
   return (

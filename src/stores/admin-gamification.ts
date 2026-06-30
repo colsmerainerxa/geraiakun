@@ -35,7 +35,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "steady", label: "Konsisten", threshold: 150, accent: "bg-accent-lime" },
   { id: "veteran", label: "Veteran Operasional", threshold: 300, accent: "bg-accent-purple" },
   { id: "machine", label: "Mesin Fulfillment", threshold: 600, accent: "bg-accent-pink" },
-  { id: "legend", label: "Legenda beliakun", threshold: 1000, accent: "bg-main" },
+  { id: "legend", label: "Legenda geraiakun", threshold: 1000, accent: "bg-main" },
 ]
 
 // Level = 1 + number of thresholds crossed. Each level needs more xp.
@@ -85,7 +85,7 @@ interface GamificationState {
 
 export const useAdminGamification = create<GamificationState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       xp: 0,
       streak: 0,
       lastActionDate: null,
@@ -136,6 +136,6 @@ export const useAdminGamification = create<GamificationState>()(
           unlocked: [],
         }),
     }),
-    { name: "beliakun-admin-gamification" },
+    { name: "geraiakun-admin-gamification" },
   ),
 )

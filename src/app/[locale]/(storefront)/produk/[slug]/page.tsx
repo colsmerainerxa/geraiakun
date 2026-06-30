@@ -32,7 +32,7 @@ export async function generateMetadata({
     alternates: seoAlternates(locale, path),
     openGraph: {
       type: "website",
-      title: `${title} · beliakun`,
+      title: `${title} · geraiakun`,
       description,
     },
   }

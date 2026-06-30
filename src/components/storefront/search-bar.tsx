@@ -193,7 +193,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
         >
           {matches.length === 0 ? (
             <div className="p-4 text-center text-sm text-foreground/60">
-              {ts("noResults")} <span className="font-bold">“{q}”</span>
+              {ts("noResults")} <span className="font-bold">�{q}�</span>
             </div>
           ) : (
             <ul className="flex flex-col p-1.5">
@@ -228,9 +228,9 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
                         <p className="truncate text-xs text-foreground/50">
                           {m.sub}
                           {m.price !== undefined && m.price > 0
-                            ? ` · ${formatPrice(m.price, isEn)}`
+                            ? ` � ${formatPrice(m.price, isEn)}`
                             : m.price === 0
-                              ? ` · ${isEn ? "Free" : "Gratis"}`
+                              ? ` � ${isEn ? "Free" : "Gratis"}`
                               : ""}
                         </p>
                       )}
@@ -259,7 +259,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
               className="flex w-full items-center justify-between border-t-2 border-border bg-secondary-background px-3.5 py-2.5 text-left text-sm font-bold hover:bg-main/10"
             >
               <span>
-                {ts("allResults")} <span className="text-foreground/50">“{q}”</span>
+                {ts("allResults")} <span className="text-foreground/50">�{q}�</span>
               </span>
               <CornerDownLeft className="size-3.5" />
             </button>

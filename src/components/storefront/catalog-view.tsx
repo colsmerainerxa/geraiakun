@@ -3,7 +3,7 @@
 import { SlidersHorizontal, X } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
-import { useEffect, useMemo, useState, type ReactNode } from "react"
+import { type ReactNode, useEffect, useMemo, useState } from "react"
 import { Container } from "@/components/shared/container"
 import { ProductCard, ProductCardSkeleton } from "@/components/storefront/product-card"
 import { Badge } from "@/components/ui/badge"
@@ -50,8 +50,8 @@ function badgeLabel(value: string, isEn: boolean) {
 
 const PRICE_RANGES = [
   { label: "< Rp50rb", min: 0, max: 50000 },
-  { label: "Rp50rb–100rb", min: 50000, max: 100000 },
-  { label: "Rp100rb–300rb", min: 100000, max: 300000 },
+  { label: "Rp50rb�100rb", min: 50000, max: 100000 },
+  { label: "Rp100rb�300rb", min: 100000, max: 300000 },
   { label: "> Rp300rb", min: 300000, max: Number.POSITIVE_INFINITY },
 ]
 
@@ -147,9 +147,11 @@ function Filters({
           {BADGE_OPTIONS.map((b) => (
             <label
               key={b.value}
+              htmlFor={`badge-filter-${b.value}`}
               className="flex cursor-pointer items-center gap-2.5 text-sm font-bold"
             >
               <Checkbox
+                id={`badge-filter-${b.value}`}
                 checked={badges.includes(b.value)}
                 onCheckedChange={() => toggleBadge(b.value)}
               />
@@ -260,6 +262,7 @@ export function CatalogView() {
 
   // Reset "load more" window whenever the filter/sort query changes.
   useEffect(() => {
+    void query
     setVisible(9)
   }, [query])
 
@@ -293,7 +296,7 @@ export function CatalogView() {
     <Container className="py-10">
       <div className="mb-6">
         <h1 className="font-heading text-3xl font-extrabold sm:text-4xl">
-          {initialSearch ? `${t("searchResultsFor")} “${initialSearch}”` : t("title")}
+          {initialSearch ? `${t("searchResultsFor")} �${initialSearch}�` : t("title")}
         </h1>
         <p className="mt-1 text-foreground/60">{t("subtitle")}</p>
       </div>

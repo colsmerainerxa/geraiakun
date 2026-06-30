@@ -24,6 +24,6 @@ export const useWishlist = create<WishlistState>()(
       remove: (slug) => set((s) => ({ slugs: s.slugs.filter((x) => x !== slug) })),
       clear: () => set({ slugs: [] }),
     }),
-    { name: "beliakun-wishlist" },
+    { name: "geraiakun-wishlist" },
   ),
 )

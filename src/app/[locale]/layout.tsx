@@ -36,7 +36,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(baseUrl),
-    title: { default: t("title"), template: `%s · beliakun` },
+    title: { default: t("title"), template: `%s · geraiakun` },
     description: t("description"),
     keywords: [
       "jual akun digital",
@@ -53,7 +53,7 @@ export async function generateMetadata({
       type: "website",
       locale: locale === "id" ? "id_ID" : "en_US",
       url: baseUrl,
-      siteName: "beliakun",
+      siteName: "geraiakun",
       title: t("title"),
       description: t("description"),
     },
@@ -85,7 +85,11 @@ export default async function LocaleLayout({
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${fontSans.variable} ${fontHeading.variable}`}>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${fontSans.variable} ${fontHeading.variable}`}
+    >
       <body className="min-h-dvh antialiased">
         <NextIntlClientProvider>
           <Providers>{children}</Providers>

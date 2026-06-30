@@ -1,16 +1,16 @@
 "use client"
 
 import { Flame, Trophy } from "lucide-react"
+import { cn } from "@/lib/utils"
 import {
   ACHIEVEMENTS,
   levelForXp,
   levelProgress,
   useAdminGamification,
 } from "@/stores/admin-gamification"
-import { cn } from "@/lib/utils"
 
 // Dashboard gamification card: level, XP progress, daily streak, and the
-// milestone-badge grid (locked vs unlocked). Pure motivational UI — never
+// milestone-badge grid (locked vs unlocked). Pure motivational UI � never
 // gates real admin permissions.
 export function AchievementsPanel() {
   const xp = useAdminGamification((s) => s.xp)
@@ -84,11 +84,18 @@ export function AchievementsPanel() {
                 key={a.id}
                 className={cn(
                   "rounded-base border-2 border-border p-2.5 text-center transition-all",
-                  have ? `${a.accent} text-main-foreground shadow-shadow-sm` : "bg-background opacity-60",
+                  have
+                    ? `${a.accent} text-main-foreground shadow-shadow-sm`
+                    : "bg-background opacity-60",
                 )}
               >
                 <p className="font-heading text-sm font-extrabold">{a.label}</p>
-                <p className={cn("text-[10px] font-bold", have ? "text-main-foreground/70" : "text-foreground/45")}>
+                <p
+                  className={cn(
+                    "text-[10px] font-bold",
+                    have ? "text-main-foreground/70" : "text-foreground/45",
+                  )}
+                >
                   {have ? "Terbuka" : `${a.threshold} XP`}
                 </p>
               </div>

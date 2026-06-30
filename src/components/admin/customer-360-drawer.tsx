@@ -1,21 +1,19 @@
 "use client"
 
 import { MessageCircleQuestion, ShieldCheck, ShoppingBag, Wallet } from "lucide-react"
+import { OrderStatusBadge, StatCard } from "@/components/admin/parts"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { OrderStatusBadge, StatCard } from "@/components/admin/parts"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useOrders } from "@/lib/api/queries"
-import { useTickets } from "@/stores/tickets"
 import { cn, formatDate, formatIDR, initials } from "@/lib/utils"
+import { useTickets } from "@/stores/tickets"
 import type { Customer, TicketStatus } from "@/types"
 
-const TICKET_STATUS: Record<TicketStatus, { label: string; variant: "warning" | "cyan" | "neutral" | "success" | "danger" }> = {
+const TICKET_STATUS: Record<
+  TicketStatus,
+  { label: string; variant: "warning" | "cyan" | "neutral" | "success" | "danger" }
+> = {
   baru: { label: "Baru", variant: "warning" },
   ditinjau: { label: "Ditinjau", variant: "cyan" },
   diproses: { label: "Diproses", variant: "neutral" },
@@ -23,7 +21,7 @@ const TICKET_STATUS: Record<TicketStatus, { label: string; variant: "warning" | 
   ditolak: { label: "Ditolak", variant: "danger" },
 }
 
-// Mock risk heuristic — real backend would score fraud/chargeback history.
+// Mock risk heuristic � real backend would score fraud/chargeback history.
 function riskFor(orderCount: number, ticketCount: number) {
   if (ticketCount >= 3) return { label: "Sedang", variant: "warning" as const }
   if (orderCount === 0) return { label: "Baru", variant: "cyan" as const }
@@ -50,7 +48,9 @@ export function Customer360Drawer({
   const custTickets = tickets
     .filter((t) => t.customerEmail?.toLowerCase() === customer.email.toLowerCase())
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-  const openTickets = custTickets.filter((t) => t.status === "baru" || t.status === "ditinjau").length
+  const openTickets = custTickets.filter(
+    (t) => t.status === "baru" || t.status === "ditinjau",
+  ).length
   const risk = riskFor(customer.orderCount, custTickets.length)
 
   return (
@@ -67,17 +67,53 @@ export function Customer360Drawer({
               <h2 className="font-heading text-lg font-extrabold">{customer.name}</h2>
               <p className="truncate text-xs text-foreground/60">{customer.email}</p>
             </div>
-            <Badge variant={customer.status === "vip" ? "purple" : customer.status === "aktif" ? "success" : "cyan"} className="ml-auto">
+            <Badge
+              variant={
+                customer.status === "vip"
+                  ? "purple"
+                  : customer.status === "aktif"
+                    ? "success"
+                    : "cyan"
+              }
+              className="ml-auto"
+            >
               {customer.status.toUpperCase()}
             </Badge>
           </div>
         </SheetHeader>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <StatCard label="LTV (Total Belanja)" value={formatIDR(customer.totalSpent, { compact: true })} hint={formatIDR(customer.totalSpent)} icon={Wallet} accent="bg-accent-lime" />
-          <StatCard label="Total Pesanan" value={customer.orderCount} icon={ShoppingBag} accent="bg-accent-cyan" />
-          <StatCard label="Tiket Terbuka" value={openTickets} icon={MessageCircleQuestion} accent="bg-warning" />
-          <StatCard label="Skor Risiko" value={risk.label} icon={ShieldCheck} accent={risk.variant === "success" ? "bg-success" : risk.variant === "warning" ? "bg-warning" : "bg-accent-cyan"} />
+          <StatCard
+            label="LTV (Total Belanja)"
+            value={formatIDR(customer.totalSpent, { compact: true })}
+            hint={formatIDR(customer.totalSpent)}
+            icon={Wallet}
+            accent="bg-accent-lime"
+          />
+          <StatCard
+            label="Total Pesanan"
+            value={customer.orderCount}
+            icon={ShoppingBag}
+            accent="bg-accent-cyan"
+          />
+          <StatCard
+            label="Tiket Terbuka"
+            value={openTickets}
+            icon={MessageCircleQuestion}
+            accent="bg-warning"
+          />
+          <StatCard
+            label="Skor Risiko"
+            value={risk.label}
+            icon={ShieldCheck}
+            accent={
+              risk.variant === "success"
+                ? "bg-success"
+                : risk.variant === "warning"
+                  ? "bg-warning"
+                  : "bg-accent-cyan"
+            }
+          />
         </div>
 
         <section className="flex flex-col gap-2">
@@ -102,7 +138,9 @@ export function Customer360Drawer({
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="font-heading text-sm font-extrabold">{formatIDR(o.total)}</span>
+                    <span className="font-heading text-sm font-extrabold">
+                      {formatIDR(o.total)}
+                    </span>
                     <OrderStatusBadge status={o.status} />
                   </div>
                 </li>
@@ -127,7 +165,9 @@ export function Customer360Drawer({
                   className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-secondary-background p-3"
                 >
                   <div className="min-w-0">
-                    <p className="font-heading text-xs font-extrabold text-foreground/50">{t.code}</p>
+                    <p className="font-heading text-xs font-extrabold text-foreground/50">
+                      {t.code}
+                    </p>
                     <p className="truncate text-sm font-bold">{t.subject}</p>
                     <p className="text-xs text-foreground/50">{formatDate(t.updatedAt)}</p>
                   </div>
@@ -140,7 +180,11 @@ export function Customer360Drawer({
           )}
         </section>
 
-        <div className={cn("rounded-base border-2 border-border bg-background p-3 text-xs text-foreground/60")}>
+        <div
+          className={cn(
+            "rounded-base border-2 border-border bg-background p-3 text-xs text-foreground/60",
+          )}
+        >
           <p className="font-bold text-foreground">Kontak</p>
           <p>WhatsApp: {customer.whatsapp}</p>
           <p>Bergabung: {formatDate(customer.joinedAt)}</p>

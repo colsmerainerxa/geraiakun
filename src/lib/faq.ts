@@ -5,7 +5,7 @@ export interface FaqItem {
   aEn: string
 }
 
-// Help-center FAQ — shared by the /bantuan accordion (UI) and its FAQPage JSON-LD.
+// Help-center FAQ � shared by the /bantuan accordion (UI) and its FAQPage JSON-LD.
 export const helpFaqs: FaqItem[] = [
   {
     q: "Apakah akun bergaransi?",
@@ -16,8 +16,8 @@ export const helpFaqs: FaqItem[] = [
   {
     q: "Berapa lama proses pengiriman?",
     qEn: "How long is the delivery process?",
-    a: "Mayoritas pesanan dikirim instan. Setelah pembayaran terverifikasi, detail akun otomatis dikirim ke email dan dashboard kamu dalam hitungan detik — umumnya di bawah 5 menit.",
-    aEn: "Most orders are delivered instantly. Once your payment is verified, account details are sent automatically to your email and dashboard within seconds — usually under 5 minutes.",
+    a: "Mayoritas pesanan dikirim instan. Setelah pembayaran terverifikasi, detail akun otomatis dikirim ke email dan dashboard kamu dalam hitungan detik � umumnya di bawah 5 menit.",
+    aEn: "Most orders are delivered instantly. Once your payment is verified, account details are sent automatically to your email and dashboard within seconds � usually under 5 minutes.",
   },
   {
     q: "Metode pembayaran apa saja yang tersedia?",

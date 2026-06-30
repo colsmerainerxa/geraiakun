@@ -46,7 +46,7 @@ export const useCompare = create<CompareState>()(
       has: (slug) => get().slugs.includes(slug),
       clear: () => set({ slugs: [], open: false }),
     }),
-    { name: "beliakun-compare" },
+    { name: "geraiakun-compare" },
   ),
 )
 

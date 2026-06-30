@@ -114,7 +114,7 @@ export function ProductDetail({
   function handleAddToCart() {
     addItem(buildCartItem())
     toast.success(t("addedToCart"), {
-      description: `${product.name} · ${isEn ? variant.labelEn : variant.label}`,
+      description: `${product.name} � ${isEn ? variant.labelEn : variant.label}`,
     })
   }
 
@@ -130,7 +130,7 @@ export function ProductDetail({
   ]
 
   return (
-    <Container className="py-8 pb-24 lg:py-12 lg:pb-12">
+    <Container className="py-8 pb-32 lg:py-12 lg:pb-12">
       {/* Breadcrumb */}
       <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-foreground/60">
         <Link href="/" className="hover:text-foreground hover:underline">
@@ -218,7 +218,7 @@ export function ProductDetail({
             <a href="#reviews" className="text-foreground/60 underline-offset-2 hover:underline">
               {formatNumber(product.reviewCount)} {tc("reviews")}
             </a>
-            <span className="text-foreground/40">•</span>
+            <span className="text-foreground/40">�</span>
             <span className="text-foreground/60">
               {formatNumber(product.soldCount)} {tc("sold")}
             </span>
@@ -295,10 +295,10 @@ export function ProductDetail({
                     <span className="text-xs font-semibold">
                       {formatPrice(v.price, isEn)}
                       {vOut ? (
-                        <span className="ml-1 opacity-70">· {tc("outOfStock")}</span>
+                        <span className="ml-1 opacity-70">� {tc("outOfStock")}</span>
                       ) : (
                         <span className="ml-1 opacity-70">
-                          · {v.stock} {t("stockLeft")}
+                          � {v.stock} {t("stockLeft")}
                         </span>
                       )}
                     </span>
@@ -548,16 +548,41 @@ export function ProductDetail({
       )}
 
       {/* Sticky buy bar (mobile) */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 px-4 py-3 backdrop-blur lg:hidden">
-        <div className="mx-auto flex max-w-7xl items-center gap-3">
-          <div className="flex flex-col leading-none">
-            <span className="text-[11px] text-foreground/50">{isEn ? "From" : "Mulai"}</span>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 px-3 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-md items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <span className="block truncate text-[11px] font-bold text-foreground/50">
+              {isEn ? variant.labelEn : variant.label}
+            </span>
             <span className="font-heading text-lg font-extrabold">
               {formatPrice(variant.price, isEn)}
             </span>
           </div>
-          <Button className="ml-auto flex-1" size="lg" onClick={handleBuyNow} disabled={soldOut}>
-            {soldOut ? tc("outOfStock") : t("buyDirectly")}
+          {!soldOut && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                disabled={qty <= 1}
+                className="flex size-8 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm disabled:opacity-40"
+                aria-label={tc("decrease")}
+              >
+                <Minus className="size-3.5" />
+              </button>
+              <span className="w-7 text-center font-heading text-sm font-extrabold">{qty}</span>
+              <button
+                type="button"
+                onClick={() => setQty((q) => Math.min(variant.stock, q + 1))}
+                disabled={qty >= variant.stock}
+                className="flex size-8 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm disabled:opacity-40"
+                aria-label={tc("increase")}
+              >
+                <Plus className="size-3.5" />
+              </button>
+            </div>
+          )}
+          <Button className="shrink-0 px-4" size="lg" onClick={handleBuyNow} disabled={soldOut}>
+            {soldOut ? tc("outOfStock") : tc("buyNow")}
           </Button>
           <Button
             variant="neutral"

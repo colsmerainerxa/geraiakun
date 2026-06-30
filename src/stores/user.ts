@@ -159,6 +159,6 @@ export const useUser = create<UserState>()(
           sessions: DEFAULT_SESSIONS,
         }),
     }),
-    { name: "beliakun-user" },
+    { name: "geraiakun-user" },
   ),
 )

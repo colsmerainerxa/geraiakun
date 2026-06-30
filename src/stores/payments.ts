@@ -37,7 +37,7 @@ function buildAttempt(input: CreatePaymentInput): PaymentAttempt {
     paymentCode: paymentCode(input.invoice, input.method),
     qrPayload:
       input.method === "qris"
-        ? `00020101021226670016ID.BELIAKUN.WWW0118${input.invoice}520458125303360540${input.amount}5802ID`
+        ? `00020101021226670016ID.GERAIAKUN.WWW0118${input.invoice}520458125303360540${input.amount}5802ID`
         : null,
     expiresAt: new Date(now.getTime() + 15 * 60 * 1000).toISOString(),
     createdAt: now.toISOString(),
@@ -83,7 +83,7 @@ export const usePayments = create<PaymentState>()(
                   paymentCode: paymentCode(invoice, method),
                   qrPayload:
                     method === "qris"
-                      ? `00020101021226670016ID.BELIAKUN.WWW0118${invoice}520458125303360540${item.amount}5802ID`
+                      ? `00020101021226670016ID.GERAIAKUN.WWW0118${invoice}520458125303360540${item.amount}5802ID`
                       : null,
                   expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
                   updatedAt: new Date().toISOString(),
@@ -107,6 +107,6 @@ export const usePayments = create<PaymentState>()(
           ),
         })),
     }),
-    { name: "beliakun-payments" },
+    { name: "geraiakun-payments" },
   ),
 )

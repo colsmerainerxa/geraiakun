@@ -34,7 +34,7 @@ export async function generateMetadata({
     alternates: seoAlternates(locale, `/artikel/${slug}`),
     openGraph: {
       type: "article",
-      title: `${title} · beliakun`,
+      title: `${title} · geraiakun`,
       description,
       publishedTime: article.date,
     },

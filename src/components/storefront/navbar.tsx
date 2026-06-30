@@ -22,6 +22,7 @@ function useNavLinks() {
   return [
     { href: "/", label: t("home") },
     { href: "/katalog", label: t("catalog") },
+    { href: "/rekomendasi", label: t("recommendation") },
     { href: "/reseller", label: t("reseller") },
     { href: "/artikel", label: t("blog") },
     { href: "/lacak", label: t("track") },
@@ -144,7 +145,7 @@ export function Navbar() {
             <SheetContent side="left" className="w-72">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
-                  <Sparkles className="size-5" /> beliakun
+                  <Sparkles className="size-5" /> geraiakun
                 </SheetTitle>
               </SheetHeader>
               <div className="md:hidden">

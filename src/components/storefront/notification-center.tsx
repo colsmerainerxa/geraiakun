@@ -198,7 +198,7 @@ function useNotificationsSeed(isEn: boolean) {
       },
       {
         kind: "info",
-        title: isEn ? "Welcome to beliakun! 🎉" : "Selamat datang di beliakun! 🎉",
+        title: isEn ? "Welcome to geraiakun! 🎉" : "Selamat datang di geraiakun! 🎉",
         body: isEn
           ? "Create an account, wishlist favorites, and enjoy new-member promos."
           : "Buat akun, wishlist produk favorit, dan nikmati promo member baru.",

@@ -45,7 +45,7 @@ export function TicketTracker() {
   // null = belum search; string = sudah search (bisa tidak ditemukan)
   const [trackedCode, setTrackedCode] = useState<string | null>(initialCode || null)
 
-  // Derived dari store — otomatis resync saat tickets berubah (e.g. setelah reply)
+  // Derived dari store � otomatis resync saat tickets berubah (e.g. setelah reply)
   const searched: Ticket | null | undefined = trackedCode
     ? (getByCode(trackedCode) ?? null)
     : undefined
@@ -224,7 +224,7 @@ function TicketDetail({
                   )}
                 >
                   <div className="mb-1 flex items-center gap-1.5 text-[10px] font-bold opacity-70">
-                    {isAgent ? t("agent") : t("you")} · {formatDate(m.date, dateLocale)}
+                    {isAgent ? t("agent") : t("you")} � {formatDate(m.date, dateLocale)}
                   </div>
                   <p className="text-sm">{m.message}</p>
                 </div>
@@ -250,7 +250,7 @@ function TicketDetail({
 
         <div className="mt-4 flex items-center justify-between text-xs text-foreground/50">
           <span>
-            {ticket.customerEmail} · {ticket.whatsapp}
+            {ticket.customerEmail} � {ticket.whatsapp}
           </span>
           <Link href="/bantuan" className="hover:underline">
             {t("openNew")}

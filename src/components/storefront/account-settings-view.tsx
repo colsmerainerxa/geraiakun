@@ -505,8 +505,8 @@ export function AccountSettingsView() {
               </h2>
               <p className="mt-1 text-sm text-foreground/60">
                 {isEn
-                  ? "Review where your beliakun account is currently signed in."
-                  : "Periksa perangkat yang sedang menggunakan akun beliakun Anda."}
+                  ? "Review where your geraiakun account is currently signed in."
+                  : "Periksa perangkat yang sedang menggunakan akun geraiakun Anda."}
               </p>
             </div>
             {sessions.some((session) => !session.current) && (

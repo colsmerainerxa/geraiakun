@@ -66,7 +66,7 @@ export function ReferralView() {
       label: "WhatsApp",
       icon: MessageCircle,
       href: `https://wa.me/?text=${encodeURIComponent(
-        `${isEn ? "Get premium accounts with a discount at beliakun — use my code " : "Dapat akun premium diskon di beliakun — pakai kode saya "}${code} ${link}`,
+        `${isEn ? "Get premium accounts with a discount at geraiakun — use my code " : "Dapat akun premium diskon di geraiakun — pakai kode saya "}${code} ${link}`,
       )}`,
       color: "bg-accent-lime",
     },
@@ -81,7 +81,7 @@ export function ReferralView() {
     {
       label: "Telegram",
       icon: Send,
-      href: `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(`beliakun · kode ${code}`)}`,
+      href: `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(`geraiakun · kode ${code}`)}`,
       color: "bg-accent-cyan",
     },
   ]

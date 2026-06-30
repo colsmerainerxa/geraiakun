@@ -6,19 +6,19 @@ import {
   Copy,
   KeyRound,
   LockKeyhole,
-  ShoppingCart,
   ShieldCheck,
+  ShoppingCart,
   Smartphone,
 } from "lucide-react"
-import { useState } from "react"
 import { useTranslations } from "next-intl"
+import { useState } from "react"
 import { toast } from "sonner"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
-import { vaultAccounts, vaultActivities, type VaultAccountStatus } from "@/lib/mock/enterprise"
+import { type VaultAccountStatus, vaultAccounts, vaultActivities } from "@/lib/mock/enterprise"
 import { products } from "@/lib/mock/products"
 import { cn, formatDate, formatIDR, formatNumber } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
@@ -30,10 +30,7 @@ const STATUS_KEY: Record<VaultAccountStatus, string> = {
   ditahan: "statusHeld",
   bermasalah: "statusIssue",
 }
-const STATUS_VARIANT: Record<
-  VaultAccountStatus,
-  "success" | "warning" | "neutral" | "danger"
-> = {
+const STATUS_VARIANT: Record<VaultAccountStatus, "success" | "warning" | "neutral" | "danger"> = {
   aktif: "success",
   "akan-habis": "warning",
   ditahan: "neutral",
@@ -68,7 +65,11 @@ export function AccountVaultView() {
   )
 
   function statusMeta(status: VaultAccountStatus) {
-    return { label: t(STATUS_KEY[status]), variant: STATUS_VARIANT[status], tone: STATUS_TONE[status] }
+    return {
+      label: t(STATUS_KEY[status]),
+      variant: STATUS_VARIANT[status],
+      tone: STATUS_TONE[status],
+    }
   }
 
   function copyLogin(email: string) {
@@ -161,9 +162,7 @@ export function AccountVaultView() {
             <p className="mt-1 font-heading text-2xl font-extrabold">
               {formatIDR(reorderEstimate)}
             </p>
-            <p className="text-xs font-bold text-main-foreground/70">
-              {t("reorderEstimateHint")}
-            </p>
+            <p className="text-xs font-bold text-main-foreground/70">{t("reorderEstimateHint")}</p>
           </div>
 
           {vaultAccounts.map((account) => {
@@ -222,7 +221,12 @@ export function AccountVaultView() {
               </div>
 
               <div className="grid gap-4 p-6 md:grid-cols-2">
-                <InfoTile icon={LockKeyhole} label={t("infoLoginEmail")} value={selected.loginEmail} mono />
+                <InfoTile
+                  icon={LockKeyhole}
+                  label={t("infoLoginEmail")}
+                  value={selected.loginEmail}
+                  mono
+                />
                 <InfoTile
                   icon={ShoppingCart}
                   label={t("infoReorderPrice")}

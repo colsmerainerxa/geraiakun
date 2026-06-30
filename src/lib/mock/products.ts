@@ -122,8 +122,8 @@ const seeds: Seed[] = [
     featured: true,
     variants: [
       v("Trial Gratis", "Free Trial", "private", null, 0, null, 100),
-      v("Basic · 10 Juta Token", "Basic · 10M Tokens", "private", null, 10000, 20000, 80),
-      v("Pro · 5 Juta Token", "Pro · 5M Tokens", "private", null, 10000, 40000, 50),
+      v("Basic � 10 Juta Token", "Basic � 10M Tokens", "private", null, 10000, 20000, 80),
+      v("Pro � 5 Juta Token", "Pro � 5M Tokens", "private", null, 10000, 40000, 50),
     ],
     features: [
       "Akses model AI via API (GPT & lainnya)",
@@ -150,9 +150,9 @@ function buildFaqs(p: Seed) {
     },
     {
       q: "Berapa lama proses setelah pembayaran?",
-      a: "Untuk produk ready stock, akun dikirim otomatis ke email & dashboard dalam hitungan detik–menit setelah pembayaran terverifikasi.",
+      a: "Untuk produk ready stock, akun dikirim otomatis ke email & dashboard dalam hitungan detik�menit setelah pembayaran terverifikasi.",
       qEn: "How long does it take after payment?",
-      aEn: "For ready-stock products, the account is delivered automatically to your email & dashboard within seconds–minutes after payment is verified.",
+      aEn: "For ready-stock products, the account is delivered automatically to your email & dashboard within seconds�minutes after payment is verified.",
     },
     {
       q: "Bagaimana jika akun bermasalah?",

@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { setRequestLocale } from "next-intl/server"
 import { AdminResellersView } from "@/components/admin/admin-resellers-view"
 
-export const metadata: Metadata = { title: "Reseller | Admin beliakun" }
+export const metadata: Metadata = { title: "Reseller | Admin geraiakun" }
 
 export default async function AdminResellerPage({
   params,

@@ -1,3 +1,4 @@
+import Script from "next/script"
 import type {
   BlogPosting,
   BreadcrumbList,
@@ -7,7 +8,6 @@ import type {
   WebSite,
   WithContext,
 } from "schema-dts"
-import Script from "next/script"
 import { SITE_URL } from "@/lib/seo/site"
 import type { Product } from "@/types"
 
@@ -17,15 +17,15 @@ export function organizationJsonLd(): WithContext<Organization> {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "beliakun",
+    name: "geraiakun",
     url: BASE,
     logo: `${BASE}/icon.png`,
     description:
       "Marketplace akun & langganan digital premium yang praktis, transparan, dan bergaransi.",
     sameAs: [
-      "https://instagram.com/beliakun",
-      "https://twitter.com/beliakun",
-      "https://tiktok.com/@beliakun",
+      "https://instagram.com/geraiakun",
+      "https://twitter.com/geraiakun",
+      "https://tiktok.com/@geraiakun",
     ],
   }
 }
@@ -34,7 +34,7 @@ export function websiteJsonLd(): WithContext<WebSite> {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "beliakun",
+    name: "geraiakun",
     url: BASE,
     potentialAction: {
       "@type": "SearchAction",
@@ -123,10 +123,10 @@ export function articleJsonLd(a: {
     dateModified: a.date,
     url: `${BASE}/artikel/${a.slug}`,
     image: `${BASE}/opengraph-image`,
-    author: { "@type": "Organization", name: "beliakun", url: BASE },
+    author: { "@type": "Organization", name: "geraiakun", url: BASE },
     publisher: {
       "@type": "Organization",
-      name: "beliakun",
+      name: "geraiakun",
       logo: { "@type": "ImageObject", url: `${BASE}/icon.png` },
     },
     mainEntityOfPage: `${BASE}/artikel/${a.slug}`,

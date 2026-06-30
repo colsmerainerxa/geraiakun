@@ -22,6 +22,6 @@ export const useRecentlyViewed = create<RecentlyViewedState>()(
         })),
       clear: () => set({ slugs: [] }),
     }),
-    { name: "beliakun-recently-viewed" },
+    { name: "geraiakun-recently-viewed" },
   ),
 )

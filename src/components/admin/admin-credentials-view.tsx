@@ -330,7 +330,7 @@ export function AdminCredentialsView() {
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="stock.product@vault.beliakun"
+                placeholder="stock.product@vault.geraiakun"
               />
             </Field>
           </div>
@@ -356,7 +356,7 @@ export function AdminCredentialsView() {
             onChange={(event) => setCsv(event.target.value)}
             className="min-h-52 font-mono text-xs"
             placeholder={
-              "prod-1,var-2,stock.one@vault.beliakun\nprod-2,var-4,stock.two@vault.beliakun"
+              "prod-1,var-2,stock.one@vault.geraiakun\nprod-2,var-4,stock.two@vault.geraiakun"
             }
           />
           <DialogFooter>

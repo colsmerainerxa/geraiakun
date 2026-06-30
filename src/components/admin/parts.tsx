@@ -6,13 +6,7 @@ import type { CredentialStock, OrderStatus, Transaction } from "@/types"
 
 export { paymentLabel }
 
-export function TableSkeleton({
-  rows = 6,
-  columns = 5,
-}: {
-  rows?: number
-  columns?: number
-}) {
+export function TableSkeleton({ rows = 6, columns = 5 }: { rows?: number; columns?: number }) {
   const grid = { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } as const
   return (
     <div className="flex flex-col gap-3">

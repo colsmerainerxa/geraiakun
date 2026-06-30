@@ -1,5 +1,5 @@
 // ============================================================
-// Domain types — marketplace akun digital
+// Domain types � marketplace akun digital
 // ============================================================
 
 export type ID = string
@@ -62,6 +62,52 @@ export interface Product {
   features: string[]
   featuresEn: string[]
   faqs: { q: string; a: string; qEn: string; aEn: string }[]
+}
+
+// ============================================================
+// Frontend-only UX models
+// ============================================================
+
+export interface QuizAnswer {
+  questionId: ID
+  value: string
+}
+
+export interface QuizQuestion {
+  id: ID
+  title: string
+  description: string
+  options: {
+    value: string
+    label: string
+    description: string
+    accent: string
+  }[]
+}
+
+export interface RecommendationResult {
+  product: Product
+  variantId: ID
+  score: number
+  reasons: string[]
+}
+
+export type PipelineStatus = string
+
+export interface PipelineColumn<TStatus extends PipelineStatus = PipelineStatus> {
+  id: TStatus
+  title: string
+  description?: string
+  accent?: string
+}
+
+export interface PipelineItem<TStatus extends PipelineStatus = PipelineStatus> {
+  id: ID
+  status: TStatus
+  title: string
+  subtitle?: string
+  meta?: string[]
+  accent?: string
 }
 
 export interface Review {
@@ -226,7 +272,7 @@ export interface QaQuestion {
 }
 
 // ============================================================
-// Support — Ticketing & notifikasi
+// Support � Ticketing & notifikasi
 // ============================================================
 
 export type TicketType =

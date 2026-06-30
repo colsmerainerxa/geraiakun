@@ -94,15 +94,15 @@ export default async function TentangPage({ params }: { params: Promise<{ locale
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-foreground/80">
             {isEn
-              ? "beliakun exists to make premium AI and digital tools accessible to everyone — especially students and young creators. We bring ChatGPT, Gemini, Canva, Perplexity, API keys, and hundreds of other subscriptions to your fingertips with instant delivery, a real warranty, and prices that respect a student budget."
-              : "beliakun hadir untuk membuat tools AI dan digital premium bisa diakses semua orang — terutama mahasiswa dan kreator muda. Kami hadirkan ChatGPT, Gemini, Canva, Perplexity, API key, dan ratusan langganan lainnya dalam genggaman dengan proses instan, garansi nyata, dan harga yang ramah kantong mahasiswa."}
+              ? "geraiakun exists to make premium AI and digital tools accessible to everyone — especially students and young creators. We bring ChatGPT, Gemini, Canva, Perplexity, API keys, and hundreds of other subscriptions to your fingertips with instant delivery, a real warranty, and prices that respect a student budget."
+              : "geraiakun hadir untuk membuat tools AI dan digital premium bisa diakses semua orang — terutama mahasiswa dan kreator muda. Kami hadirkan ChatGPT, Gemini, Canva, Perplexity, API key, dan ratusan langganan lainnya dalam genggaman dengan proses instan, garansi nyata, dan harga yang ramah kantong mahasiswa."}
           </p>
         </div>
 
-        {/* Why beliakun */}
+        {/* Why geraiakun */}
         <div className="mt-12">
           <h2 className="font-heading text-2xl font-extrabold">
-            {isEn ? "Why beliakun?" : "Kenapa beliakun?"}
+            {isEn ? "Why geraiakun?" : "Kenapa geraiakun?"}
           </h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             {values.map((v) => (

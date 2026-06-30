@@ -1,17 +1,26 @@
 "use client"
 
-import { ClipboardList, Clock, DollarSign, Package, Send, ShoppingBag, TrendingUp, Users } from "lucide-react"
+import {
+  ClipboardList,
+  Clock,
+  DollarSign,
+  Package,
+  Send,
+  ShoppingBag,
+  TrendingUp,
+  Users,
+} from "lucide-react"
 import { AchievementsPanel } from "@/components/admin/achievements-panel"
 import { StatCard } from "@/components/admin/parts"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { useDashboardStats } from "@/lib/api/queries"
 import { fulfillmentTasks } from "@/lib/mock/enterprise"
-import { Link } from "@/i18n/navigation"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
+import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 
 export default function AdminDashboardPage() {
   const { data, isLoading } = useDashboardStats()
@@ -36,7 +45,7 @@ export default function AdminDashboardPage() {
   const maxTrend = Math.max(1, ...data.trend.map((d) => d.value))
   const credTotal = data.credentials.total || 1
 
-  // "Your queue" — fulfillment tasks waiting on the active staff member.
+  // "Your queue" � fulfillment tasks waiting on the active staff member.
   const activeStaff = staff.find((m) => m.id === activeStaffId) ?? staff[0]
   const myQueue = fulfillmentTasks
     .filter((t) => t.status === "siap-kirim" || t.status === "menunggu-stok")
@@ -159,7 +168,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Your queue — fulfillment tasks waiting on the active staff */}
+      {/* Your queue � fulfillment tasks waiting on the active staff */}
       <div className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -169,7 +178,7 @@ export default function AdminDashboardPage() {
           <Badge variant="warning">{myQueue.length} perlu tindakan</Badge>
         </div>
         <p className="mt-1 text-sm text-foreground/60">
-          {activeStaff ? `Halo, ${activeStaff.name} — ` : ""}tugas fulfillment yang menunggu kamu.
+          {activeStaff ? `Halo, ${activeStaff.name} � ` : ""}tugas fulfillment yang menunggu kamu.
         </p>
         <ul className="mt-4 flex flex-col gap-2">
           {myQueue.map((task) => (
@@ -180,7 +189,7 @@ export default function AdminDashboardPage() {
               <div className="min-w-0">
                 <p className="font-heading text-sm font-bold">{task.invoice}</p>
                 <p className="truncate text-xs text-foreground/60">
-                  {task.productName} — {task.customer}
+                  {task.productName} � {task.customer}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
@@ -205,7 +214,7 @@ export default function AdminDashboardPage() {
           ))}
           {myQueue.length === 0 && (
             <li className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
-              Antrian kosong — semua tugas selesai. 🎉
+              Antrian kosong � semua tugas selesai. 🎉
             </li>
           )}
         </ul>

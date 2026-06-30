@@ -41,9 +41,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { formatDate, initials } from "@/lib/utils"
 import { ADMIN_ROLE_LABELS, ROLE_PERMISSIONS, useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { AdminRole } from "@/types"
-import { formatDate, initials } from "@/lib/utils"
 
 const ROLES = Object.keys(ADMIN_ROLE_LABELS) as AdminRole[]
 const RECOVERY_CODES = ["BK-29PX-7QAW", "BK-J4MN-82LC", "BK-6TVD-1RKE", "BK-W9HF-53ZU"]
@@ -304,7 +304,7 @@ export function AdminTeamView() {
             <div>
               <p className="text-sm font-bold">Scan dengan authenticator</p>
               <code className="mt-2 block rounded-base border-2 border-border bg-background p-3 text-xs">
-                BELIAKUN-{securityMember?.id.toUpperCase()}
+                GERAIAKUN-{securityMember?.id.toUpperCase()}
               </code>
               <p className="mt-3 text-xs font-bold text-foreground/50">Recovery codes</p>
               <div className="mt-2 grid grid-cols-2 gap-2">

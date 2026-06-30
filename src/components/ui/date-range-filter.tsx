@@ -48,7 +48,12 @@ export function DateRangeFilter({
   className?: string
 }) {
   return (
-    <div className={cn("inline-flex flex-wrap gap-1 rounded-base border-2 border-border bg-secondary-background p-1", className)}>
+    <div
+      className={cn(
+        "inline-flex flex-wrap gap-1 rounded-base border-2 border-border bg-secondary-background p-1",
+        className,
+      )}
+    >
       {PRESETS.map((p) => (
         <button
           key={p.value}

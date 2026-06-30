@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server"
 import { AdminShell } from "@/components/admin/admin-shell"
 
 export const metadata: Metadata = {
-  title: "Admin · beliakun",
+  title: "Admin · geraiakun",
   robots: { index: false, follow: false },
 }
 

@@ -30,7 +30,7 @@ export function ContactForm() {
       icon: Mail,
       accent: "bg-accent-cyan",
       label: isEn ? "Email" : "Email",
-      value: "halo@beliakun.id",
+      value: "halo@geraiakun.id",
     },
     {
       icon: Clock,

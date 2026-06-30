@@ -6,20 +6,24 @@
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
+    "lineEnding": "auto",
     "lineWidth": 100
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "a11y": { "recommended": true },
+      "preset": "recommended",
+      "a11y": { "preset": "recommended" },
       "correctness": {
         "noUnusedImports": "warn",
         "noUnusedVariables": "warn"
       },
       "suspicious": {
         "noArrayIndexKey": "off"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
       },
       "style": {
         "noNonNullAssertion": "off",
@@ -29,5 +33,8 @@
   },
   "javascript": {
     "formatter": { "quoteStyle": "double", "semicolons": "asNeeded" }
+  },
+  "css": {
+    "parser": { "tailwindDirectives": true }
   }
 }

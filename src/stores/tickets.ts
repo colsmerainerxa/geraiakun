@@ -68,7 +68,7 @@ function seedTickets(): Ticket[] {
         {
           id: "seed-msg-2",
           role: "agen",
-          author: "CS beliakun",
+          author: "CS geraiakun",
           message:
             "Halo Rafa, maaf atas kendalanya. Boleh kirim screenshot error saat login? Kami akan cek dan ganti akunmu secepatnya 🙏",
           date: iso(1),
@@ -130,9 +130,9 @@ function seedTickets(): Ticket[] {
         {
           id: "seed-msg-5",
           role: "agen",
-          author: "CS beliakun",
+          author: "CS geraiakun",
           message:
-            "Halo Bagus! Cek email kamu, ada undangan dari Canva. Klik tombol 'Join the Team', pakai akun Google/email yang kamu daftarkan. Panduan lengkap: https://beliakun.com/panduan/canva 🎨",
+            "Halo Bagus! Cek email kamu, ada undangan dari Canva. Klik tombol 'Join the Team', pakai akun Google/email yang kamu daftarkan. Panduan lengkap: https://geraiakun.com/panduan/canva 🎨",
           date: iso(8),
         },
         {
@@ -228,6 +228,6 @@ export const useTickets = create<TicketsState>()(
       getByCode: (code) => get().tickets.find((t) => t.code.toLowerCase() === code.toLowerCase()),
       clear: () => set({ tickets: [] }),
     }),
-    { name: "beliakun-tickets" },
+    { name: "geraiakun-tickets" },
   ),
 )

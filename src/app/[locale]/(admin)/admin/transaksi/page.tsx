@@ -2,15 +2,20 @@
 
 import { ArrowDownLeft, CheckCircle2, Clock, Download, XCircle } from "lucide-react"
 import { useMemo, useState } from "react"
-import { paymentLabel, StatCard, TableSkeleton, TransactionStatusBadge } from "@/components/admin/parts"
+import {
+  paymentLabel,
+  StatCard,
+  TableSkeleton,
+  TransactionStatusBadge,
+} from "@/components/admin/parts"
 import { Button } from "@/components/ui/button"
-import { Pagination, usePagination } from "@/components/ui/pagination"
 import {
   DateRangeFilter,
+  type DateRangePreset,
   inRange,
   useDateRange,
-  type DateRangePreset,
 } from "@/components/ui/date-range-filter"
+import { Pagination, usePagination } from "@/components/ui/pagination"
 import {
   Table,
   TableBody,
@@ -91,52 +96,52 @@ export default function AdminTransactionsPage() {
         <TableSkeleton columns={7} rows={6} />
       ) : (
         <>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID Transaksi</TableHead>
-              <TableHead>Invoice</TableHead>
-              <TableHead>Pelanggan</TableHead>
-              <TableHead>Metode</TableHead>
-              <TableHead>Jumlah</TableHead>
-              <TableHead>Tanggal</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paged.map((t) => (
-              <TableRow key={t.id}>
-                <TableCell className="font-mono text-xs text-foreground/60">
-                  {t.id.toUpperCase()}
-                </TableCell>
-                <TableCell className="font-heading font-bold">{t.invoice}</TableCell>
-                <TableCell>{t.customerName}</TableCell>
-                <TableCell className="text-foreground/70">{paymentLabel(t.method)}</TableCell>
-                <TableCell className="font-heading font-bold">{formatIDR(t.amount)}</TableCell>
-                <TableCell className="whitespace-nowrap text-foreground/70">
-                  {formatDate(t.createdAt)}
-                </TableCell>
-                <TableCell>
-                  <TransactionStatusBadge status={t.status} />
-                </TableCell>
-              </TableRow>
-            ))}
-            {total === 0 && (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
-                  Belum ada transaksi.
-                </TableCell>
+                <TableHead>ID Transaksi</TableHead>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Pelanggan</TableHead>
+                <TableHead>Metode</TableHead>
+                <TableHead>Jumlah</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <Pagination
-          page={page}
-          pageCount={pageCount}
-          pageSize={pageSize}
-          total={total}
-          onPageChange={setPage}
-        />
+            </TableHeader>
+            <TableBody>
+              {paged.map((t) => (
+                <TableRow key={t.id}>
+                  <TableCell className="font-mono text-xs text-foreground/60">
+                    {t.id.toUpperCase()}
+                  </TableCell>
+                  <TableCell className="font-heading font-bold">{t.invoice}</TableCell>
+                  <TableCell>{t.customerName}</TableCell>
+                  <TableCell className="text-foreground/70">{paymentLabel(t.method)}</TableCell>
+                  <TableCell className="font-heading font-bold">{formatIDR(t.amount)}</TableCell>
+                  <TableCell className="whitespace-nowrap text-foreground/70">
+                    {formatDate(t.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    <TransactionStatusBadge status={t.status} />
+                  </TableCell>
+                </TableRow>
+              ))}
+              {total === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
+                    Belum ada transaksi.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

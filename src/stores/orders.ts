@@ -30,6 +30,6 @@ export const usePurchasedOrders = create<OrdersState>()(
       getByInvoice: (invoice) =>
         get().orders.find((o) => o.invoice.toLowerCase() === invoice.toLowerCase()),
     }),
-    { name: "beliakun-orders" },
+    { name: "geraiakun-orders" },
   ),
 )

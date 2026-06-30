@@ -4,6 +4,8 @@ import type { LucideIcon } from "lucide-react"
 import { CornerDownLeft, Moon, Search, Sparkles, Store, Sun, UserCog } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { NAV } from "@/components/admin/admin-shell"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -11,17 +13,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { NAV } from "@/components/admin/admin-shell"
 import { useRouter } from "@/i18n/navigation"
+import { cn } from "@/lib/utils"
 import { ADMIN_ROLE_LABELS, roleCan, useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { AdminPermission } from "@/types"
-import { cn } from "@/lib/utils"
 
 // ⌘K command palette + global keyboard nav for the admin shell.
 // - Cmd/Ctrl+K toggles the palette
 // - `?` opens a shortcuts help dialog (when not typing)
-// - `g <key>` jumps to a module (when not typing) — see GOTO map below
+// - `g <key>` jumps to a module (when not typing) � see GOTO map below
 
 const GOTO: { key: string; href: string; label: string }[] = [
   { key: "d", href: "/admin", label: "Dashboard" },
@@ -147,6 +147,7 @@ export function CommandPalette() {
   }, [commands, query])
 
   useEffect(() => {
+    void query
     setActive(0)
   }, [query])
 
@@ -238,7 +239,7 @@ export function CommandPalette() {
         aria-label="Buka command palette"
       >
         <Search className="size-4" />
-        <span className="text-foreground/60">Cari…</span>
+        <span className="text-foreground/60">Cari�</span>
         <kbd className="ml-2 rounded-base border-2 border-border bg-background px-1.5 py-0.5 text-[10px] font-bold">
           ⌘K
         </kbd>
@@ -265,7 +266,7 @@ export function CommandPalette() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Ketik perintah atau modul…"
+              placeholder="Ketik perintah atau modul�"
               className="min-w-0 flex-1 bg-transparent font-heading text-sm font-bold outline-none placeholder:text-foreground/40"
             />
             <kbd className="rounded-base border-2 border-border bg-background px-1.5 py-0.5 text-[10px] font-bold text-foreground/60">

@@ -20,8 +20,8 @@ export interface ActivationGuide {
 // Template umum reusable
 const commonPrereqs = [
   {
-    id: "Akun beliakun & nomor invoice pesananmu",
-    en: "Your beliakun account & order invoice number",
+    id: "Akun geraiakun & nomor invoice pesananmu",
+    en: "Your geraiakun account & order invoice number",
   },
   { id: "Koneksi internet stabil", en: "A stable internet connection" },
   { id: "Email aktif untuk menerima kredensial", en: "Active email to receive credentials" },

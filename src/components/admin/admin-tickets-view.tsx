@@ -3,16 +3,21 @@
 import {
   ArrowRight,
   Clock,
+  Columns3,
   Inbox,
   Mail,
   MessageSquareReply,
   Phone,
+  Rows3,
   Search,
   Send,
   Star,
 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
+import { FilterPresetsBar } from "@/components/admin/filter-presets-bar"
+import { StatCard } from "@/components/admin/parts"
+import { PipelineBoard } from "@/components/admin/pipeline-board"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,8 +25,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Pagination, usePagination } from "@/components/ui/pagination"
-import { StatCard } from "@/components/admin/parts"
-import { FilterPresetsBar } from "@/components/admin/filter-presets-bar"
 import {
   Select,
   SelectContent,
@@ -32,9 +35,10 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { useFilterState } from "@/lib/hooks/use-filter-state"
-import { useAdminGamification } from "@/stores/admin-gamification"
 import { cn, formatDate, formatNumber, initials } from "@/lib/utils"
+import { useAdminGamification } from "@/stores/admin-gamification"
 import { useTickets } from "@/stores/tickets"
+import { useUI } from "@/stores/ui"
 import type { Ticket, TicketStatus } from "@/types"
 
 const STATUS_META: Record<
@@ -49,6 +53,21 @@ const STATUS_META: Record<
 }
 
 const STATUS_OPTIONS: TicketStatus[] = ["baru", "ditinjau", "diproses", "selesai", "ditolak"]
+
+const TICKET_COLUMNS = STATUS_OPTIONS.map((status) => ({
+  id: status,
+  title: STATUS_META[status].label,
+  accent:
+    status === "baru"
+      ? "bg-warning"
+      : status === "ditinjau"
+        ? "bg-accent-cyan"
+        : status === "diproses"
+          ? "bg-accent-purple"
+          : status === "selesai"
+            ? "bg-accent-lime"
+            : "bg-danger",
+}))
 
 const TYPE_LABEL: Record<Ticket["type"], string> = {
   garansi: "Garansi",
@@ -85,6 +104,8 @@ export function AdminTicketsView() {
   )
   const [activeId, setActiveId] = useState<string | null>(null)
   const [reply, setReply] = useState("")
+  const viewMode = useUI((state) => state.pipelineViews.tickets)
+  const setPipelineView = useUI((state) => state.setPipelineView)
 
   const stats = useMemo(() => {
     const list = tickets
@@ -133,15 +154,24 @@ export function AdminTicketsView() {
   function toggleAllOnPage(checked: boolean) {
     setSelected((prev) => {
       const next = new Set(prev)
-      if (checked) pageIds.forEach((id) => next.add(id))
-      else pageIds.forEach((id) => next.delete(id))
+      if (checked) {
+        pageIds.forEach((id) => {
+          next.add(id)
+        })
+      } else {
+        pageIds.forEach((id) => {
+          next.delete(id)
+        })
+      }
       return next
     })
   }
 
   function bulkSetStatus(next: TicketStatus) {
     if (selected.size === 0) return
-    selected.forEach((id) => setStatus(id, next))
+    selected.forEach((id) => {
+      setStatus(id, next)
+    })
     if (next === "selesai") award("ticket.resolved")
     toast.success(`${selected.size} tiket diubah ke "${STATUS_META[next].label}"`)
     setSelected(new Set())
@@ -151,7 +181,7 @@ export function AdminTicketsView() {
     if (!active) return
     const text = reply.trim()
     if (!text) return
-    adminReply(active.id, { author: "CS beliakun", message: text })
+    adminReply(active.id, { author: "CS geraiakun", message: text })
     setReply("")
     toast.success(`Balasan terkirim ke ${active.code}`)
   }
@@ -171,7 +201,12 @@ export function AdminTicketsView() {
         <StatCard icon={Star} label="Selesai" value={stats.done} accent="bg-accent-lime" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+      <div
+        className={cn(
+          "grid gap-6",
+          viewMode === "kanban" ? "lg:grid-cols-[minmax(0,1fr)_420px]" : "lg:grid-cols-[380px_1fr]",
+        )}
+      >
         {/* List */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
@@ -210,7 +245,27 @@ export function AdminTicketsView() {
             }}
           />
 
-          {selected.size > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-foreground/60">{filtered.length} tiket</p>
+            <div className="flex items-center gap-2 rounded-base border-2 border-border bg-secondary-background p-1 shadow-shadow-sm">
+              <Button
+                size="sm"
+                variant={viewMode === "table" ? "default" : "ghost"}
+                onClick={() => setPipelineView("tickets", "table")}
+              >
+                <Rows3 className="size-4" /> List
+              </Button>
+              <Button
+                size="sm"
+                variant={viewMode === "kanban" ? "default" : "ghost"}
+                onClick={() => setPipelineView("tickets", "kanban")}
+              >
+                <Columns3 className="size-4" /> Kanban
+              </Button>
+            </div>
+          </div>
+
+          {selected.size > 0 && viewMode === "table" && (
             <div className="flex flex-wrap items-center gap-2 rounded-base border-2 border-border bg-main p-2.5 shadow-shadow-sm">
               <span className="font-heading text-xs font-extrabold text-main-foreground">
                 {selected.size} terpilih
@@ -227,80 +282,125 @@ export function AdminTicketsView() {
             </div>
           )}
 
-          <div className="flex flex-col gap-2">
-            {filtered.length > 0 && (
-              <div className="flex items-center gap-2 px-1">
-                <Checkbox
-                  checked={
-                    allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false
-                  }
-                  onCheckedChange={(v) => toggleAllOnPage(!!v)}
-                  aria-label="Pilih semua di halaman ini"
-                />
-                <span className="text-[10px] font-extrabold uppercase text-foreground/40">
-                  Pilih semua
-                </span>
-              </div>
-            )}
-            {total === 0 ? (
-              <div className="rounded-base border-2 border-dashed border-border py-12 text-center text-sm text-foreground/50">
-                Tidak ada tiket.
-              </div>
-            ) : (
-              paged.map((t) => (
-                <div
-                  key={t.id}
+          {viewMode === "kanban" ? (
+            <PipelineBoard
+              columns={TICKET_COLUMNS}
+              items={filtered}
+              getStatus={(ticket) => ticket.status}
+              emptyLabel="Kosong"
+              renderCard={(ticket) => (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveId(ticket.id)
+                    setReply("")
+                  }}
                   className={cn(
-                    "flex gap-2 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm",
-                    activeId === t.id && "ring-4 ring-main/40",
-                    selected.has(t.id) && "bg-main/20",
+                    "w-full rounded-base border-2 border-border bg-secondary-background p-3 text-left shadow-shadow-sm",
+                    activeId === ticket.id && "ring-4 ring-main/40",
                   )}
                 >
-                  <Checkbox
-                    checked={selected.has(t.id)}
-                    onCheckedChange={(v) => toggleRow(t.id, !!v)}
-                    aria-label={`Pilih ${t.code}`}
-                    className="mt-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveId(t.id)
-                      setReply("")
-                    }}
-                    className="min-w-0 flex-1 text-left"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-heading text-xs font-extrabold text-foreground/50">
-                        {t.code}
-                      </span>
-                      <Badge variant={STATUS_META[t.status].variant}>
-                        {STATUS_META[t.status].label}
-                      </Badge>
-                    </div>
-                    <p className="mt-1.5 line-clamp-1 font-heading text-sm font-bold">{t.subject}</p>
-                    <div className="mt-1.5 flex items-center gap-2 text-xs text-foreground/60">
-                      <span className="truncate">{t.customerName}</span>
-                      <span>·</span>
-                      <span>{TYPE_LABEL[t.type]}</span>
-                      {t.priority === "tinggi" && (
-                        <Badge variant="danger" className="ml-auto px-1.5 py-0 text-[10px]">
-                          Prioritas
-                        </Badge>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-heading text-xs font-extrabold text-foreground/50">
+                      {ticket.code}
+                    </span>
+                    <Badge variant={PRIORITY_VARIANT[ticket.priority]}>
+                      <Star className="size-3" /> {ticket.priority}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 line-clamp-2 font-heading text-sm font-bold">
+                    {ticket.subject}
+                  </p>
+                  <div className="mt-3 border-t-2 border-dashed border-border pt-3 text-xs text-foreground/60">
+                    <p className="truncate font-bold text-foreground">{ticket.customerName}</p>
+                    <p>
+                      {TYPE_LABEL[ticket.type]}
+                      {ticket.invoice ? ` - ${ticket.invoice}` : ""}
+                    </p>
+                  </div>
+                </button>
+              )}
+            />
+          ) : (
+            <>
+              <div className="flex flex-col gap-2">
+                {filtered.length > 0 && (
+                  <div className="flex items-center gap-2 px-1">
+                    <Checkbox
+                      checked={
+                        allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false
+                      }
+                      onCheckedChange={(v) => toggleAllOnPage(!!v)}
+                      aria-label="Pilih semua di halaman ini"
+                    />
+                    <span className="text-[10px] font-extrabold uppercase text-foreground/40">
+                      Pilih semua
+                    </span>
+                  </div>
+                )}
+                {total === 0 ? (
+                  <div className="rounded-base border-2 border-dashed border-border py-12 text-center text-sm text-foreground/50">
+                    Tidak ada tiket.
+                  </div>
+                ) : (
+                  paged.map((t) => (
+                    <div
+                      key={t.id}
+                      className={cn(
+                        "flex gap-2 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm",
+                        activeId === t.id && "ring-4 ring-main/40",
+                        selected.has(t.id) && "bg-main/20",
                       )}
+                    >
+                      <Checkbox
+                        checked={selected.has(t.id)}
+                        onCheckedChange={(v) => toggleRow(t.id, !!v)}
+                        aria-label={`Pilih ${t.code}`}
+                        className="mt-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveId(t.id)
+                          setReply("")
+                        }}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-heading text-xs font-extrabold text-foreground/50">
+                            {t.code}
+                          </span>
+                          <Badge variant={STATUS_META[t.status].variant}>
+                            {STATUS_META[t.status].label}
+                          </Badge>
+                        </div>
+                        <p className="mt-1.5 line-clamp-1 font-heading text-sm font-bold">
+                          {t.subject}
+                        </p>
+                        <div className="mt-1.5 flex items-center gap-2 text-xs text-foreground/60">
+                          <span className="truncate">{t.customerName}</span>
+                          <span>·</span>
+                          <span>{TYPE_LABEL[t.type]}</span>
+                          {t.priority === "tinggi" && (
+                            <Badge variant="danger" className="ml-auto px-1.5 py-0 text-[10px]">
+                              Prioritas
+                            </Badge>
+                          )}
+                        </div>
+                      </button>
                     </div>
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-          <Pagination
-            page={page}
-            pageCount={pageCount}
-            pageSize={pageSize}
-            total={total}
-            onPageChange={setPage}
-          />
+                  ))
+                )}
+              </div>
+              <Pagination
+                page={page}
+                pageCount={pageCount}
+                pageSize={pageSize}
+                total={total}
+                onPageChange={setPage}
+              />
+            </>
+          )}
         </div>
 
         {/* Detail */}
@@ -409,7 +509,7 @@ export function AdminTicketsView() {
                       )}
                     >
                       <div className="mb-1 flex items-center gap-2 text-xs font-bold">
-                        {m.role === "agen" ? "CS beliakun" : m.author}
+                        {m.role === "agen" ? "CS geraiakun" : m.author}
                         <Badge
                           variant={m.role === "agen" ? "neutral" : "lime"}
                           className="px-1.5 py-0 text-[10px]"

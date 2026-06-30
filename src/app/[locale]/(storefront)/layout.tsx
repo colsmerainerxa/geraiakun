@@ -3,6 +3,7 @@ import { ScrollToTop } from "@/components/shared/scroll-to-top"
 import { CartDrawer } from "@/components/storefront/cart-drawer"
 import { CompareBar, CompareDrawer } from "@/components/storefront/compare"
 import { Footer } from "@/components/storefront/footer"
+import { MobileBottomNav } from "@/components/storefront/mobile-bottom-nav"
 import { Navbar } from "@/components/storefront/navbar"
 import { SocialProofToast } from "@/components/storefront/social-proof-toast"
 import { WhatsAppWidget } from "@/components/storefront/whatsapp-widget"
@@ -34,6 +35,7 @@ export default async function StorefrontLayout({
       <CartDrawer />
       <CompareDrawer />
       <CompareBar />
+      <MobileBottomNav />
       <SocialProofToast />
       <WhatsAppWidget />
       <ScrollToTop />

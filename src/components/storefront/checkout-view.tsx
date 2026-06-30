@@ -14,18 +14,20 @@ import {
   QrCode,
   ScanLine,
   ShieldCheck,
+  ShoppingCart,
   TimerReset,
   UserRound,
   Wallet,
 } from "lucide-react"
 import { motion } from "motion/react"
 import { useLocale, useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Container } from "@/components/shared/container"
 import { PromoInput } from "@/components/storefront/promo-input"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -83,6 +85,63 @@ const PAYMENT_GROUPS: {
 ]
 
 const FEE = 1000
+
+function CheckoutStepper() {
+  const t = useTranslations("checkout")
+  const steps = [
+    {
+      icon: UserRound,
+      title: t("stepContactTitle"),
+      body: t("stepContactDesc"),
+      accent: "bg-accent-lime",
+    },
+    {
+      icon: CreditCard,
+      title: t("stepPaymentTitle"),
+      body: t("stepPaymentDesc"),
+      accent: "bg-main",
+    },
+    {
+      icon: ShieldCheck,
+      title: t("stepReviewTitle"),
+      body: t("stepReviewDesc"),
+      accent: "bg-accent-cyan",
+    },
+  ]
+
+  return (
+    <section className="mb-6 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-heading text-sm font-extrabold uppercase text-foreground/60">
+          {t("stepperTitle")}
+        </h2>
+        <Badge variant="neutral">{t("stepperBadge")}</Badge>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {steps.map((step, index) => (
+          <div key={step.title} className="rounded-base border-2 border-border bg-background p-3">
+            <div className="flex items-start gap-3">
+              <span
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm",
+                  step.accent,
+                )}
+              >
+                <step.icon className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="font-heading text-sm font-extrabold">
+                  {index + 1}. {step.title}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-foreground/60">{step.body}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 function CheckoutAssurancePanel({ method }: { method: PaymentMethod }) {
   const highlights = [
@@ -182,7 +241,7 @@ export function CheckoutView() {
 
   const [method, setMethod] = useState<PaymentMethod>("qris")
   const [processing, setProcessing] = useState(false)
-  const [done, setDone] = useState<Order | null>(null)
+  const [done, _setDone] = useState<Order | null>(null)
 
   const {
     register,
@@ -193,14 +252,6 @@ export function CheckoutView() {
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount = computeDiscount(promo, subtotal)
   const total = subtotal - discount + FEE
-
-  // Empty cart guard (skip once an order succeeded).
-  useEffect(() => {
-    if (items.length === 0 && !done) {
-      const id = setTimeout(() => router.push("/katalog"), 1500)
-      return () => clearTimeout(id)
-    }
-  }, [items.length, done, router])
 
   function onSubmit(data: FormValues) {
     setProcessing(true)
@@ -343,8 +394,17 @@ export function CheckoutView() {
 
   if (items.length === 0) {
     return (
-      <Container className="py-24 text-center">
-        <p className="text-foreground/60">{t("emptyRedirect")}</p>
+      <Container className="py-20">
+        <div className="mx-auto flex max-w-md flex-col items-center rounded-base border-2 border-dashed border-border bg-secondary-background p-8 text-center shadow-shadow">
+          <span className="flex size-16 items-center justify-center rounded-base border-2 border-border bg-main shadow-shadow-sm">
+            <ShoppingCart className="size-7" />
+          </span>
+          <h1 className="mt-5 font-heading text-2xl font-extrabold">{t("emptyTitle")}</h1>
+          <p className="mt-2 text-sm text-foreground/60">{t("emptyDesc")}</p>
+          <Button asChild className="mt-5">
+            <Link href="/katalog">{t("emptyCta")}</Link>
+          </Button>
+        </div>
       </Container>
     )
   }
@@ -358,8 +418,13 @@ export function CheckoutView() {
         <ArrowLeft className="size-4" /> {tc("back")}
       </Link>
       <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">{t("title")}</h1>
+      <CheckoutStepper />
 
-      <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0">
+      <form
+        id="checkout-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="grid gap-8 pb-24 lg:grid-cols-[1fr_380px] lg:pb-0"
+      >
         <div className="flex flex-col gap-8">
           {/* Contact */}
           <section className="rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
@@ -549,7 +614,13 @@ export function CheckoutView() {
               <p className="text-[10px] font-bold uppercase text-foreground/50">{tc("total")}</p>
               <p className="font-heading text-lg font-extrabold leading-none">{formatIDR(total)}</p>
             </div>
-            <Button type="submit" form="checkout-form" size="lg" disabled={processing} className="shrink-0">
+            <Button
+              type="submit"
+              form="checkout-form"
+              size="lg"
+              disabled={processing}
+              className="shrink-0"
+            >
               <Lock className="size-4" /> {t("payNow")}
             </Button>
           </div>

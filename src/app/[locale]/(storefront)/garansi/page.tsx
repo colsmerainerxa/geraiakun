@@ -59,9 +59,9 @@ const sections = [
   {
     heading: "Cakupan Garansi",
     headingEn: "Warranty Coverage",
-    body: "Setiap akun yang dibeli di beliakun bergaransi sesuai masa aktifnya. Garansi mencakup akun yang tidak bisa login, kredensial salah, akun terkunci, atau fitur tidak berfungsi sebagaimana mestinya. Selama masa garansi berlaku, kami akan mengganti akun baru atau memperbaiki akun tersebut tanpa biaya tambahan.",
+    body: "Setiap akun yang dibeli di geraiakun bergaransi sesuai masa aktifnya. Garansi mencakup akun yang tidak bisa login, kredensial salah, akun terkunci, atau fitur tidak berfungsi sebagaimana mestinya. Selama masa garansi berlaku, kami akan mengganti akun baru atau memperbaiki akun tersebut tanpa biaya tambahan.",
     bodyEn:
-      "Every account purchased on beliakun carries a warranty matching its active period. The warranty covers accounts that cannot log in, wrong credentials, locked accounts, or features not working as described. While the warranty is valid, we will replace the account with a new one or repair it at no extra cost.",
+      "Every account purchased on geraiakun carries a warranty matching its active period. The warranty covers accounts that cannot log in, wrong credentials, locked accounts, or features not working as described. While the warranty is valid, we will replace the account with a new one or repair it at no extra cost.",
   },
   {
     heading: "Cara Klaim Garansi",

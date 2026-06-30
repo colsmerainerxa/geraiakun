@@ -2,8 +2,8 @@
 
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { refundCases as seedRefunds } from "@/lib/mock/enterprise"
 import { credentials as seedCredentials } from "@/lib/mock/credentials"
+import { refundCases as seedRefunds } from "@/lib/mock/enterprise"
 import { products as seedProducts } from "@/lib/mock/products"
 import { promos as seedPromos } from "@/lib/mock/transactions"
 import { useAdminGamification } from "@/stores/admin-gamification"
@@ -101,7 +101,7 @@ const SEED_STAFF: AdminStaff[] = [
   {
     id: "staff-owner",
     name: "Alya Putri",
-    email: "owner@beliakun.id",
+    email: "owner@geraiakun.id",
     role: "owner",
     status: "active",
     twoFactorEnabled: true,
@@ -110,7 +110,7 @@ const SEED_STAFF: AdminStaff[] = [
   {
     id: "staff-ops",
     name: "Rizky Mahendra",
-    email: "ops@beliakun.id",
+    email: "ops@geraiakun.id",
     role: "operations",
     status: "active",
     twoFactorEnabled: true,
@@ -119,7 +119,7 @@ const SEED_STAFF: AdminStaff[] = [
   {
     id: "staff-cs",
     name: "Naya Anindita",
-    email: "cs@beliakun.id",
+    email: "cs@geraiakun.id",
     role: "customer-support",
     status: "active",
     twoFactorEnabled: false,
@@ -128,7 +128,7 @@ const SEED_STAFF: AdminStaff[] = [
   {
     id: "staff-finance",
     name: "Fina Ramadhani",
-    email: "finance@beliakun.id",
+    email: "finance@geraiakun.id",
     role: "finance",
     status: "active",
     twoFactorEnabled: true,
@@ -137,7 +137,7 @@ const SEED_STAFF: AdminStaff[] = [
   {
     id: "staff-marketing",
     name: "Dio Prasetya",
-    email: "marketing@beliakun.id",
+    email: "marketing@geraiakun.id",
     role: "marketing",
     status: "invited",
     twoFactorEnabled: false,
@@ -166,7 +166,7 @@ const SEED_AUDITS: AuditEvent[] = [
     action: "released",
     module: "credential",
     targetId: "cred-1",
-    targetLabel: "stock.chatgpt-plus.1@vault.beliakun",
+    targetLabel: "stock.chatgpt-plus.1@vault.geraiakun",
     outcome: "success",
     ipAddress: "180.252.91.7",
     createdAt: "2026-06-28T08:50:00.000Z",
@@ -726,6 +726,6 @@ export const useEnterpriseAdmin = create<EnterpriseAdminState>()(
           credentials: seedCredentials,
         }),
     }),
-    { name: "beliakun-enterprise-admin" },
+    { name: "geraiakun-enterprise-admin" },
   ),
 )

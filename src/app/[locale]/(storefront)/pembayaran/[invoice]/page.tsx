@@ -10,7 +10,7 @@ export async function generateMetadata({
   const { invoice } = await params
   return {
     title: `Pembayaran ${invoice}`,
-    description: "Pantau status pembayaran dan lanjutkan proses pesanan beliakun.",
+    description: "Pantau status pembayaran dan lanjutkan proses pesanan geraiakun.",
     robots: { index: false, follow: false },
   }
 }

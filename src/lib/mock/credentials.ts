@@ -19,7 +19,7 @@ export const credentials: CredentialStock[] = products.slice(0, 10).flatMap((p) 
         productId: p.id,
         productName: p.name,
         variantLabel: variant.label,
-        email: `stock.${p.slug}.${cid}@vault.beliakun`,
+        email: `stock.${p.slug}.${cid}@vault.geraiakun`,
         status: statuses[cid % statuses.length],
         addedAt: `2026-06-${String((cid % 28) + 1).padStart(2, "0")}`,
       }

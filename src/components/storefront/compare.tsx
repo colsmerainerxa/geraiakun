@@ -6,12 +6,14 @@ import { usePathname } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import type { MouseEvent } from "react"
 import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { getProduct } from "@/lib/mock/products"
+import { getCategory } from "@/lib/mock/categories"
+import { getProduct, productTotalStock } from "@/lib/mock/products"
 import { cn, formatPrice } from "@/lib/utils"
 import { COMPARE_MAX, useCompare } from "@/stores/compare"
 
@@ -180,6 +182,17 @@ export function CompareDrawer() {
       },
     },
     {
+      label: t("rowBestFor"),
+      render: (p) => {
+        const category = getCategory(p.category)
+        return (
+          <Badge variant="neutral">
+            {isEn ? (category?.nameEn ?? p.category) : (category?.name ?? p.category)}
+          </Badge>
+        )
+      },
+    },
+    {
       label: t("rowRating"),
       render: (p) => (
         <span className="inline-flex items-center gap-1 font-bold">
@@ -203,12 +216,27 @@ export function CompareDrawer() {
       render: (p) => <span>{p.variants.length}</span>,
     },
     {
+      label: t("rowStock"),
+      render: (p) => {
+        const totalStock = productTotalStock(p)
+        return <Badge variant={totalStock > 0 ? "lime" : "danger"}>{totalStock}</Badge>
+      },
+    },
+    {
+      label: t("rowDelivery"),
+      render: () => <span className="font-bold">{t("instantDelivery")}</span>,
+    },
+    {
+      label: t("rowWarranty"),
+      render: () => <span className="font-bold">{t("fullWarranty")}</span>,
+    },
+    {
       label: t("rowTopFeatures"),
       render: (p) => (
         <ul className="flex flex-col gap-1 text-left">
           {(isEn ? p.featuresEn : p.features).slice(0, 3).map((f) => (
             <li key={f} className="text-xs leading-snug">
-              • {f}
+              - {f}
             </li>
           ))}
         </ul>
@@ -229,84 +257,91 @@ export function CompareDrawer() {
         {items.length === 0 ? (
           <p className="mt-8 text-center text-sm text-foreground/60">{t("empty")}</p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full border-separate border-spacing-0">
-              <thead>
-                <tr>
-                  <th className="sticky left-0 w-32 bg-background" />
-                  {items.map((p) => (
-                    <th key={p.id} className="min-w-36 p-2 align-top">
-                      <Link
-                        href={`/produk/${p.slug}`}
-                        className="group flex flex-col items-center gap-1.5 text-center"
-                      >
-                        <span
-                          className={cn(
-                            "flex size-14 items-center justify-center rounded-base border-2 border-border text-3xl shadow-shadow-sm",
-                            bgFor(p.accent),
-                          )}
-                        >
-                          {p.logo}
-                        </span>
-                        <span className="font-heading text-sm font-bold leading-snug group-hover:underline">
-                          {p.name}
-                        </span>
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => remove(p.slug)}
-                        className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-foreground/40 hover:text-danger"
-                      >
-                        <X className="size-3" /> {t("remove")}
-                      </button>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, ri) => (
-                  <tr key={row.label}>
-                    <td
-                      className={cn(
-                        "sticky left-0 w-32 bg-background p-3 align-top text-xs font-extrabold uppercase tracking-wide text-foreground/50",
-                        ri > 0 && "border-t-2 border-border",
-                      )}
-                    >
-                      {row.label}
-                    </td>
+          <div className="mt-4">
+            <div className="mb-3 rounded-base border-2 border-border bg-main p-3 shadow-shadow-sm">
+              <p className="font-heading text-sm font-extrabold text-main-foreground">
+                {t("drawerSubtitle", { count: items.length, max: COMPARE_MAX })}
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-separate border-spacing-0">
+                <thead>
+                  <tr>
+                    <th className="sticky left-0 w-32 bg-background" />
                     {items.map((p) => (
-                      <td
-                        key={p.id}
-                        className={cn(
-                          "p-3 text-center align-top text-sm",
-                          ri > 0 && "border-t-2 border-l-2 border-border",
-                          ri === 0 && "border-l-2 border-border",
-                        )}
-                      >
-                        {row.render(p)}
-                      </td>
+                      <th key={p.id} className="min-w-36 p-2 align-top">
+                        <Link
+                          href={`/produk/${p.slug}`}
+                          className="group flex flex-col items-center gap-1.5 text-center"
+                        >
+                          <span
+                            className={cn(
+                              "flex size-14 items-center justify-center rounded-base border-2 border-border text-3xl shadow-shadow-sm",
+                              bgFor(p.accent),
+                            )}
+                          >
+                            {p.logo}
+                          </span>
+                          <span className="font-heading text-sm font-bold leading-snug group-hover:underline">
+                            {p.name}
+                          </span>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => remove(p.slug)}
+                          className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-foreground/40 hover:text-danger"
+                        >
+                          <X className="size-3" /> {t("remove")}
+                        </button>
+                      </th>
                     ))}
                   </tr>
-                ))}
-                <tr>
-                  <td className="sticky left-0 w-32 bg-background p-3" />
-                  {items.map((p) => {
-                    const min = Math.min(...p.variants.map((v) => v.price))
-                    const minV = p.variants.find((v) => v.price === min) ?? p.variants[0]
-                    return (
-                      <td key={p.id} className="border-l-2 border-border p-3">
-                        <Button size="sm" asChild className="w-full">
-                          <Link href={`/produk/${p.slug}`}>{tc("viewDetail")}</Link>
-                        </Button>
-                        <span className="mt-1 block text-[10px] text-foreground/40">
-                          {isEn ? minV.labelEn : minV.label}
-                        </span>
+                </thead>
+                <tbody>
+                  {rows.map((row, ri) => (
+                    <tr key={row.label}>
+                      <td
+                        className={cn(
+                          "sticky left-0 w-32 bg-background p-3 align-top text-xs font-extrabold uppercase tracking-wide text-foreground/50",
+                          ri > 0 && "border-t-2 border-border",
+                        )}
+                      >
+                        {row.label}
                       </td>
-                    )
-                  })}
-                </tr>
-              </tbody>
-            </table>
+                      {items.map((p) => (
+                        <td
+                          key={p.id}
+                          className={cn(
+                            "p-3 text-center align-top text-sm",
+                            ri > 0 && "border-t-2 border-l-2 border-border",
+                            ri === 0 && "border-l-2 border-border",
+                          )}
+                        >
+                          {row.render(p)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  <tr>
+                    <td className="sticky left-0 w-32 bg-background p-3" />
+                    {items.map((p) => {
+                      const min = Math.min(...p.variants.map((v) => v.price))
+                      const minV = p.variants.find((v) => v.price === min) ?? p.variants[0]
+                      return (
+                        <td key={p.id} className="border-l-2 border-border p-3">
+                          <Button size="sm" asChild className="w-full">
+                            <Link href={`/produk/${p.slug}`}>{tc("viewDetail")}</Link>
+                          </Button>
+                          <span className="mt-1 block text-[10px] text-foreground/40">
+                            {isEn ? minV.labelEn : minV.label}
+                          </span>
+                        </td>
+                      )
+                    })}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </SheetContent>

@@ -10,8 +10,8 @@ import {
   Users,
   Wallet,
 } from "lucide-react"
-import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
+import { useMemo, useState } from "react"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { Badge } from "@/components/ui/badge"
@@ -48,11 +48,7 @@ export function ResellerPortalView() {
 
   return (
     <Container className="py-12">
-      <SectionHeading
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        subtitle={t("subtitle")}
-      />
+      <SectionHeading eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
 
       <div className="mt-8 overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
         <div className="grid gap-6 border-b-2 border-border bg-main p-6 lg:grid-cols-[1.4fr_1fr]">
@@ -93,7 +89,9 @@ export function ResellerPortalView() {
                   <Building2 className="size-5" />
                 </span>
                 <h3 className="mt-3 font-heading text-base font-extrabold">{plan.name}</h3>
-                <p className="text-xs text-foreground/60">{t("minTopup", { amount: formatIDR(plan.minTopup) })}</p>
+                <p className="text-xs text-foreground/60">
+                  {t("minTopup", { amount: formatIDR(plan.minTopup) })}
+                </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Badge variant="cyan">{plan.discount}</Badge>
                   <Badge variant="neutral">{plan.margin}</Badge>
@@ -169,7 +167,12 @@ export function ResellerPortalView() {
           accent="bg-main"
         />
         <PartnerStat icon={Users} label={t("statSeats")} value="40" accent="bg-accent-cyan" />
-        <PartnerStat icon={PackageCheck} label={t("statSla")} value="< 30m" accent="bg-accent-lime" />
+        <PartnerStat
+          icon={PackageCheck}
+          label={t("statSla")}
+          value="< 30m"
+          accent="bg-accent-lime"
+        />
         <PartnerStat
           icon={CreditCard}
           label={t("statInvoice")}
@@ -182,9 +185,7 @@ export function ResellerPortalView() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-heading text-lg font-extrabold">{t("ordersTitle")}</h2>
-            <p className="text-sm text-foreground/60">
-              {t("ordersDesc")}
-            </p>
+            <p className="text-sm text-foreground/60">{t("ordersDesc")}</p>
           </div>
           <Button variant="neutral">{t("downloadCsv")}</Button>
         </div>

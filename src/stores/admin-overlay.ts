@@ -61,6 +61,6 @@ export const useAdminOverlay = create<AdminOverlayState>()(
         })),
       reset: () => set({ productPatches: {}, orderStatus: {}, promoActive: {} }),
     }),
-    { name: "beliakun-admin-overlay" },
+    { name: "geraiakun-admin-overlay" },
   ),
 )

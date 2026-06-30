@@ -38,10 +38,10 @@ import {
 } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Link, usePathname } from "@/i18n/navigation"
-import { ADMIN_ROLE_LABELS, roleCan, useEnterpriseAdmin } from "@/stores/enterprise-admin"
-import { levelForXp, levelProgress, useAdminGamification } from "@/stores/admin-gamification"
-import type { AdminPermission } from "@/types"
 import { cn, initials } from "@/lib/utils"
+import { levelForXp, levelProgress, useAdminGamification } from "@/stores/admin-gamification"
+import { ADMIN_ROLE_LABELS, roleCan, useEnterpriseAdmin } from "@/stores/enterprise-admin"
+import type { AdminPermission } from "@/types"
 
 interface NavItem {
   href: string
@@ -244,7 +244,7 @@ function LevelBadge() {
   return (
     <span
       className="hidden items-center gap-2 rounded-base border-2 border-border bg-secondary-background px-2 py-1 shadow-shadow-sm sm:flex"
-      title={`Level ${level} · ${xp} XP · streak ${streak} hari`}
+      title={`Level ${level} � ${xp} XP � streak ${streak} hari`}
     >
       <span className="flex size-6 items-center justify-center rounded-base border-2 border-border bg-main font-heading text-[11px] font-extrabold text-main-foreground">
         {level}
@@ -256,7 +256,8 @@ function LevelBadge() {
   )
 }
 
-function PermissionDenied({ role }: { role: string }) {  return (
+function PermissionDenied({ role }: { role: string }) {
+  return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center rounded-base border-2 border-dashed border-border p-8 text-center">
       <span className="flex size-16 items-center justify-center rounded-base border-2 border-border bg-warning shadow-shadow">
         <LockKeyhole className="size-8" />

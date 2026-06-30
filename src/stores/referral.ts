@@ -85,8 +85,9 @@ export const useReferral = create<ReferralState>()(
           ],
         })),
       setPayout: (method, account) => set({ payoutMethod: method, payoutAccount: account }),
-      reset: () => set({ code: genCode(), entries: seedEntries(), payoutMethod: "", payoutAccount: "" }),
+      reset: () =>
+        set({ code: genCode(), entries: seedEntries(), payoutMethod: "", payoutAccount: "" }),
     }),
-    { name: "beliakun-referral" },
+    { name: "geraiakun-referral" },
   ),
 )

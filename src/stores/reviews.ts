@@ -55,7 +55,7 @@ export const useReviewsStore = create<ReviewsState>()(
         return q
       },
       questionsForProduct: (productId) => get().questions.filter((q) => q.productId === productId),
-      answerQuestion: (id, answer, answeredBy = "CS beliakun") =>
+      answerQuestion: (id, answer, answeredBy = "CS geraiakun") =>
         set((s) => ({
           questions: s.questions.map((q) =>
             q.id === id
@@ -70,6 +70,6 @@ export const useReviewsStore = create<ReviewsState>()(
         })),
       deleteQuestion: (id) => set((s) => ({ questions: s.questions.filter((q) => q.id !== id) })),
     }),
-    { name: "beliakun-reviews" },
+    { name: "geraiakun-reviews" },
   ),
 )

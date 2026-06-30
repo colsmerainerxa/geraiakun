@@ -27,7 +27,7 @@ export const usePromo = create<PromoState>()(
       clear: () => set({ code: null, promo: null }),
     }),
     {
-      name: "beliakun-promo",
+      name: "geraiakun-promo",
       // SECURITY: persist only the code, never the discount object. On load we
       // re-resolve it through getPromo (the trusted source), so a tampered
       // localStorage code can't inject an arbitrary discount.

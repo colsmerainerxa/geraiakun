@@ -184,6 +184,6 @@ export const useLoyalty = create<LoyaltyState>()(
       },
       reset: () => set({ points: 405, lifetimeEarned: 405, history: seedHistory(), redeemed: [] }),
     }),
-    { name: "beliakun-loyalty" },
+    { name: "geraiakun-loyalty" },
   ),
 )

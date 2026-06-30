@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 
 // URL-synced filter state for admin list views. Each filter value is mirrored
-// to a search-param (`<module>.<key>`) via history.replaceState — shareable
+// to a search-param (`<module>.<key>`) via history.replaceState � shareable
 // URLs + working back/forward, without the Suspense boundary that
 // useSearchParams() forces on static-rendered routes and without re-render
 // storms from router.push. Defaults clear the param so URLs stay clean.
@@ -26,11 +26,7 @@ function writeParam(paramKey: string, next: string, defaultValue: string) {
   window.history.replaceState(null, "", qs ? `${path}?${qs}` : path)
 }
 
-export function useFilterState<T extends string>(
-  module: string,
-  key: string,
-  defaultValue: T,
-) {
+export function useFilterState<T extends string>(module: string, key: string, defaultValue: T) {
   const paramKey = `${module}.${key}`
   const [value, setValue] = useState<T>(() => {
     const fromUrl = readParam(paramKey)
@@ -51,7 +47,9 @@ export function useFilterState<T extends string>(
       const params = new URLSearchParams(window.location.search)
       Array.from(params.keys())
         .filter((k) => k.startsWith(`${module}.`))
-        .forEach((k) => params.delete(k))
+        .forEach((k) => {
+          params.delete(k)
+        })
       const qs = params.toString()
       const path = window.location.pathname + window.location.hash
       window.history.replaceState(null, "", qs ? `${path}?${qs}` : path)
@@ -68,7 +66,9 @@ export function applyFilterSnapshot(module: string, snapshot: Record<string, str
   const params = new URLSearchParams(window.location.search)
   Array.from(params.keys())
     .filter((k) => k.startsWith(`${module}.`))
-    .forEach((k) => params.delete(k))
+    .forEach((k) => {
+      params.delete(k)
+    })
   Object.entries(snapshot).forEach(([key, val]) => {
     if (val) params.set(`${module}.${key}`, val)
   })

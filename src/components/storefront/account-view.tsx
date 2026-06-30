@@ -5,8 +5,8 @@ import {
   Gift,
   KeyRound,
   Package,
-  ShoppingCart,
   ShieldCheck,
+  ShoppingCart,
   Sparkles,
   Wallet,
 } from "lucide-react"

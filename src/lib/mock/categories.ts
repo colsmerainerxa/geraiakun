@@ -6,8 +6,8 @@ export const categories: Category[] = [
     slug: "ai-chatbot",
     name: "AI & Chatbot",
     nameEn: "AI & Chatbot",
-    description: "ChatGPT Plus & Gemini Pro — asisten AI premium",
-    descriptionEn: "ChatGPT Plus & Gemini Pro — premium AI assistants",
+    description: "ChatGPT Plus & Gemini Pro � asisten AI premium",
+    descriptionEn: "ChatGPT Plus & Gemini Pro � premium AI assistants",
     icon: "Bot",
     color: "accent-cyan",
     productCount: 0,
@@ -42,9 +42,9 @@ export const categoryContent: Record<
 > = {
   "ai-chatbot": {
     intro:
-      "Asisten AI seperti ChatGPT Plus dan Gemini Pro membantu menulis, riset, dan menyelesaikan tugas jauh lebih cepat. Di kategori ini kamu bisa pilih akun premium dengan harga hemat — tipe sharing maupun private — lengkap dengan garansi selama masa aktif.",
+      "Asisten AI seperti ChatGPT Plus dan Gemini Pro membantu menulis, riset, dan menyelesaikan tugas jauh lebih cepat. Di kategori ini kamu bisa pilih akun premium dengan harga hemat � tipe sharing maupun private � lengkap dengan garansi selama masa aktif.",
     introEn:
-      "AI assistants like ChatGPT Plus and Gemini Pro help you write, research, and finish tasks far faster. In this category you can pick premium accounts at affordable prices — sharing or private — all warranted during the active period.",
+      "AI assistants like ChatGPT Plus and Gemini Pro help you write, research, and finish tasks far faster. In this category you can pick premium accounts at affordable prices � sharing or private � all warranted during the active period.",
     faqs: [
       {
         q: "Apa beda ChatGPT Plus dan Gemini Pro?",
@@ -54,7 +54,7 @@ export const categoryContent: Record<
       },
       {
         q: "Akun sharing atau private, pilih mana?",
-        qEn: "Sharing or private account — which one?",
+        qEn: "Sharing or private account � which one?",
         a: "Sharing lebih hemat untuk pemakaian ringan; private cocok untuk pemakaian harian dengan riwayat chat pribadi.",
         aEn: "Sharing is cheaper for light use; private suits daily use with your own private chat history.",
       },
@@ -68,9 +68,9 @@ export const categoryContent: Record<
   },
   "api-developer": {
     intro:
-      "Butuh akses model AI langsung dari kode? Kategori API & Developer menyediakan API Key dengan kredit token — mulai dari varian Trial gratis untuk eksperimen, hingga paket Basic dan Pro untuk kebutuhan yang lebih serius.",
+      "Butuh akses model AI langsung dari kode? Kategori API & Developer menyediakan API Key dengan kredit token � mulai dari varian Trial gratis untuk eksperimen, hingga paket Basic dan Pro untuk kebutuhan yang lebih serius.",
     introEn:
-      "Need AI model access straight from your code? The API & Developer category offers API Keys with token credits — from a free Trial to experiment, to Basic and Pro plans for more serious needs.",
+      "Need AI model access straight from your code? The API & Developer category offers API Keys with token credits � from a free Trial to experiment, to Basic and Pro plans for more serious needs.",
     faqs: [
       {
         q: "Apa itu token pada API Key?",

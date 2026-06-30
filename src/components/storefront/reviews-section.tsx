@@ -20,13 +20,13 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn, formatDate, initials } from "@/lib/utils"
-import { useReviewsStore } from "@/stores/reviews"
 import { REVIEW_POINTS, useLoyalty } from "@/stores/loyalty"
+import { useReviewsStore } from "@/stores/reviews"
 import type { Product, Review } from "@/types"
 
 type SortKey = "recent" | "highest" | "lowest"
 
-/** Satu item review terpadu (mock atau buatan user) — bentuk seragam. */
+/** Satu item review terpadu (mock atau buatan user) � bentuk seragam. */
 interface FlatReview {
   id: string
   author: string
@@ -382,8 +382,8 @@ export function ReviewsSection({
                   </div>
                   <div className="flex items-center gap-2 text-xs text-foreground/50">
                     <StarRow rating={r.rating} />
-                    <span>· {r.variantLabel}</span>
-                    <span>· {formatDate(r.date, dateLocale)}</span>
+                    <span>� {r.variantLabel}</span>
+                    <span>� {formatDate(r.date, dateLocale)}</span>
                   </div>
                 </div>
               </div>

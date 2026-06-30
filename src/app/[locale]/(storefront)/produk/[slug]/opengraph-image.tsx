@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 import { getProduct, productMinPrice } from "@/lib/mock/products"
 import { formatPrice } from "@/lib/utils"
 
-export const alt = "beliakun — produk premium"
+export const alt = "geraiakun — produk premium"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -22,7 +22,7 @@ export default async function Image({
 }) {
   const { slug } = await params
   const product = getProduct(slug)
-  const name = product?.name ?? "beliakun"
+  const name = product?.name ?? "geraiakun"
   const brand = product?.brand ?? ""
   const tagline = product?.tagline ?? "Akun Premium AI & Digital"
   const bg = accentHex[product?.accent ?? "main"] ?? "#ffd23f"
@@ -49,7 +49,7 @@ export default async function Image({
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 38, fontWeight: 800, color: "#0a0a0a" }}>beliakun</span>
+        <span style={{ fontSize: 38, fontWeight: 800, color: "#0a0a0a" }}>geraiakun</span>
         <span
           style={{
             display: "flex",

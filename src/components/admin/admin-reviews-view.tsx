@@ -126,7 +126,7 @@ export function AdminReviewsView() {
                                 />
                               ))}
                             </span>
-                            <span>· {formatDate(r.date)}</span>
+                            <span>� {formatDate(r.date)}</span>
                           </div>
                         </div>
                       </div>
@@ -185,7 +185,7 @@ export function AdminReviewsView() {
                         <div>
                           <span className="text-sm font-bold">{q.author}</span>
                           <p className="text-xs text-foreground/50">
-                            {productName(q.productId)} · {formatDate(q.date)}
+                            {productName(q.productId)} � {formatDate(q.date)}
                           </p>
                         </div>
                       </div>
@@ -258,7 +258,7 @@ export function AdminReviewsView() {
                       <div>
                         <span className="text-sm font-bold">{q.author}</span>
                         <p className="text-xs text-foreground/50">
-                          {productName(q.productId)} · {formatDate(q.date)}
+                          {productName(q.productId)} � {formatDate(q.date)}
                         </p>
                       </div>
                     </div>
@@ -277,7 +277,7 @@ export function AdminReviewsView() {
                   <p className="mt-2.5 text-sm font-semibold">{q.question}</p>
                   <div className="mt-2 rounded-base border-2 border-border bg-background p-3">
                     <p className="text-xs font-bold text-foreground/60">
-                      {q.answeredBy} · {q.answeredAt ? formatDate(q.answeredAt) : ""}
+                      {q.answeredBy} � {q.answeredAt ? formatDate(q.answeredAt) : ""}
                     </p>
                     <p className="mt-1 text-sm text-foreground/80">{q.answer}</p>
                   </div>

@@ -52,7 +52,7 @@ export const testimonials: Testimonial[] = [
     role: "Mahasiswa Teknik",
     avatar: "https://api.dicebear.com/9.x/notionists/svg?seed=Hafidz",
     comment:
-      "ChatGPT Plus sharing cuma 35rb?! Gila sih. Belajar coding makin gampang. Thanks beliakun!",
+      "ChatGPT Plus sharing cuma 35rb?! Gila sih. Belajar coding makin gampang. Thanks geraiakun!",
     rating: 5,
   },
 ]

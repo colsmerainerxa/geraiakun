@@ -3,8 +3,10 @@
 import {
   Check,
   Clock3,
+  Columns3,
   FileImage,
   RefreshCcw,
+  Rows3,
   Search,
   ShieldCheck,
   WalletCards,
@@ -13,6 +15,7 @@ import {
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 import { StatCard } from "@/components/admin/parts"
+import { PipelineBoard } from "@/components/admin/pipeline-board"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -27,6 +30,7 @@ import {
 } from "@/components/ui/select"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
+import { useUI } from "@/stores/ui"
 import type { RefundDecision, RefundStatus } from "@/types"
 
 const STATUS_META: Record<
@@ -41,6 +45,23 @@ const STATUS_META: Record<
   closed: { label: "Selesai", variant: "success" },
 }
 
+const REFUND_COLUMNS = Object.entries(STATUS_META).map(([status, meta]) => ({
+  id: status as RefundStatus,
+  title: meta.label,
+  accent:
+    status === "draft"
+      ? "bg-secondary-background"
+      : status === "review"
+        ? "bg-warning"
+        : status === "replacement"
+          ? "bg-accent-cyan"
+          : status === "refund"
+            ? "bg-accent-pink"
+            : status === "rejected"
+              ? "bg-danger"
+              : "bg-accent-lime",
+}))
+
 export function AdminRefundsView() {
   const refunds = useEnterpriseAdmin((state) => state.refunds)
   const staff = useEnterpriseAdmin((state) => state.staff)
@@ -49,6 +70,8 @@ export function AdminRefundsView() {
   const [selectedId, setSelectedId] = useState(refunds[0]?.id ?? "")
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<RefundStatus | "all">("all")
+  const viewMode = useUI((state) => state.pipelineViews.refunds)
+  const setPipelineView = useUI((state) => state.setPipelineView)
 
   const filtered = useMemo(() => {
     const needle = query.toLowerCase().trim()
@@ -82,15 +105,24 @@ export function AdminRefundsView() {
   function toggleAllOnPage(on: boolean) {
     setChecked((prev) => {
       const next = new Set(prev)
-      if (on) pageIds.forEach((id) => next.add(id))
-      else pageIds.forEach((id) => next.delete(id))
+      if (on) {
+        pageIds.forEach((id) => {
+          next.add(id)
+        })
+      } else {
+        pageIds.forEach((id) => {
+          next.delete(id)
+        })
+      }
       return next
     })
   }
 
   function bulkDecide(decision: RefundDecision) {
     if (checked.size === 0) return
-    checked.forEach((id) => decideRefund(id, decision))
+    checked.forEach((id) => {
+      decideRefund(id, decision)
+    })
     toast.success(`${checked.size} kasus refund diputuskan: ${decision}`)
     setChecked(new Set())
   }
@@ -126,7 +158,14 @@ export function AdminRefundsView() {
         <StatCard label="SLA Target" value="< 2 jam" icon={ShieldCheck} accent="bg-accent-lime" />
       </div>
 
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6",
+          viewMode === "kanban"
+            ? "xl:grid-cols-[minmax(0,1fr)_380px]"
+            : "xl:grid-cols-[380px_minmax(0,1fr)]",
+        )}
+      >
         <section className="flex min-w-0 flex-col gap-4">
           <div className="grid gap-2">
             <div className="relative min-w-0">
@@ -156,7 +195,27 @@ export function AdminRefundsView() {
             </Select>
           </div>
 
-          {checked.size > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-foreground/60">{filtered.length} kasus refund</p>
+            <div className="flex items-center gap-2 rounded-base border-2 border-border bg-secondary-background p-1 shadow-shadow-sm">
+              <Button
+                size="sm"
+                variant={viewMode === "table" ? "default" : "ghost"}
+                onClick={() => setPipelineView("refunds", "table")}
+              >
+                <Rows3 className="size-4" /> List
+              </Button>
+              <Button
+                size="sm"
+                variant={viewMode === "kanban" ? "default" : "ghost"}
+                onClick={() => setPipelineView("refunds", "kanban")}
+              >
+                <Columns3 className="size-4" /> Kanban
+              </Button>
+            </div>
+          </div>
+
+          {checked.size > 0 && viewMode === "table" && (
             <div className="flex flex-wrap items-center gap-2 rounded-base border-2 border-border bg-main p-2.5 shadow-shadow-sm">
               <span className="font-heading text-xs font-extrabold text-main-foreground">
                 {checked.size} terpilih
@@ -176,47 +235,25 @@ export function AdminRefundsView() {
             </div>
           )}
 
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
-            {total > 0 && (
-              <div className="flex items-center gap-2 px-1">
-                <Checkbox
-                  checked={
-                    allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false
-                  }
-                  onCheckedChange={(v) => toggleAllOnPage(!!v)}
-                  aria-label="Pilih semua di halaman ini"
-                />
-                <span className="text-[10px] font-extrabold uppercase text-foreground/40">
-                  Pilih semua
-                </span>
-              </div>
-            )}
-            {paged.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  "flex gap-2 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm",
-                  selected?.id === item.id && "ring-4 ring-main/40",
-                  checked.has(item.id) && "bg-main/20",
-                )}
-              >
-                <Checkbox
-                  checked={checked.has(item.id)}
-                  onCheckedChange={(v) => toggleRow(item.id, !!v)}
-                  aria-label={`Pilih ${item.id}`}
-                  className="mt-1"
-                />
+          {viewMode === "kanban" ? (
+            <PipelineBoard
+              columns={REFUND_COLUMNS}
+              items={filtered}
+              getStatus={(item) => item.status}
+              emptyLabel="Kosong"
+              renderCard={(item) => (
                 <button
                   type="button"
                   onClick={() => setSelectedId(item.id)}
-                  className="min-w-0 flex-1 text-left"
+                  className={cn(
+                    "w-full rounded-base border-2 border-border bg-secondary-background p-3 text-left shadow-shadow-sm",
+                    selected?.id === item.id && "ring-4 ring-main/40",
+                  )}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-heading text-sm font-extrabold">{item.id}</p>
-                      <p className="truncate text-xs text-foreground/60">
-                        {item.orderInvoice} - {item.productName}
-                      </p>
+                      <p className="truncate text-xs text-foreground/60">{item.orderInvoice}</p>
                     </div>
                     <Badge variant={STATUS_META[item.status].variant}>
                       {STATUS_META[item.status].label}
@@ -225,24 +262,82 @@ export function AdminRefundsView() {
                   <p className="mt-3 line-clamp-2 text-sm text-foreground/70">{item.reason}</p>
                   <div className="mt-3 flex items-center justify-between gap-3 border-t-2 border-dashed border-border pt-3 text-xs">
                     <span className="font-bold">{item.owner}</span>
-                    <span className="text-foreground/50">{formatDate(item.updatedAt)}</span>
+                    <span className="font-heading font-extrabold">{formatIDR(item.amount)}</span>
                   </div>
                 </button>
+              )}
+            />
+          ) : (
+            <>
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
+                {total > 0 && (
+                  <div className="flex items-center gap-2 px-1">
+                    <Checkbox
+                      checked={
+                        allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false
+                      }
+                      onCheckedChange={(v) => toggleAllOnPage(!!v)}
+                      aria-label="Pilih semua di halaman ini"
+                    />
+                    <span className="text-[10px] font-extrabold uppercase text-foreground/40">
+                      Pilih semua
+                    </span>
+                  </div>
+                )}
+                {paged.map((item) => (
+                  <div
+                    key={item.id}
+                    className={cn(
+                      "flex gap-2 rounded-base border-2 border-border bg-secondary-background p-3 shadow-shadow-sm",
+                      selected?.id === item.id && "ring-4 ring-main/40",
+                      checked.has(item.id) && "bg-main/20",
+                    )}
+                  >
+                    <Checkbox
+                      checked={checked.has(item.id)}
+                      onCheckedChange={(v) => toggleRow(item.id, !!v)}
+                      aria-label={`Pilih ${item.id}`}
+                      className="mt-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(item.id)}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-heading text-sm font-extrabold">{item.id}</p>
+                          <p className="truncate text-xs text-foreground/60">
+                            {item.orderInvoice} - {item.productName}
+                          </p>
+                        </div>
+                        <Badge variant={STATUS_META[item.status].variant}>
+                          {STATUS_META[item.status].label}
+                        </Badge>
+                      </div>
+                      <p className="mt-3 line-clamp-2 text-sm text-foreground/70">{item.reason}</p>
+                      <div className="mt-3 flex items-center justify-between gap-3 border-t-2 border-dashed border-border pt-3 text-xs">
+                        <span className="font-bold">{item.owner}</span>
+                        <span className="text-foreground/50">{formatDate(item.updatedAt)}</span>
+                      </div>
+                    </button>
+                  </div>
+                ))}
+                {total === 0 && (
+                  <div className="rounded-base border-2 border-dashed border-border p-8 text-center text-sm font-bold text-foreground/50">
+                    Tidak ada kasus yang cocok.
+                  </div>
+                )}
               </div>
-            ))}
-            {total === 0 && (
-              <div className="rounded-base border-2 border-dashed border-border p-8 text-center text-sm font-bold text-foreground/50">
-                Tidak ada kasus yang cocok.
-              </div>
-            )}
-          </div>
-          <Pagination
-            page={page}
-            pageCount={pageCount}
-            pageSize={pageSize}
-            total={total}
-            onPageChange={setPage}
-          />
+              <Pagination
+                page={page}
+                pageCount={pageCount}
+                pageSize={pageSize}
+                total={total}
+                onPageChange={setPage}
+              />
+            </>
+          )}
         </section>
 
         {selected ? (
