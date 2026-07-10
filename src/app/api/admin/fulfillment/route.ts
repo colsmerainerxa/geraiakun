@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
@@ -10,6 +11,12 @@ async function requireAdmin() {
   if (!session?.user?.id || session.user.role !== "admin") return null
   return session
 }
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["WAITING_STOCK", "READY_TO_SEND", "RISK_REVIEW", "SENT"]).optional(),
+  risk: z.string().optional(),
+})
 
 export async function GET(request: Request) {
   const session = await requireAdmin()
@@ -42,8 +49,6 @@ export async function GET(request: Request) {
   return NextResponse.json({ data: tasks, total, page, limit })
 }
 
-const VALID_STATUSES = ["WAITING_STOCK", "READY_TO_SEND", "RISK_REVIEW", "SENT"] as const
-
 export async function PATCH(request: Request) {
   const session = await requireAdmin()
   if (!session) {
@@ -53,24 +58,14 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, mode: "demo" })
   }
 
-  const body = await request.json()
-  const { id, status, risk } = body as {
-    id?: string
-    status?: string
-    risk?: string
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
-
-  if (!id) {
-    return NextResponse.json({ error: "Missing task id" }, { status: 400 })
-  }
+  const { id, status, risk } = parsed.data
 
   const data: Record<string, unknown> = {}
-  if (status) {
-    if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 })
-    }
-    data.status = status
-  }
+  if (status) data.status = status
   if (risk) data.risk = risk
 
   const task = await prisma.fulfillmentTask.update({

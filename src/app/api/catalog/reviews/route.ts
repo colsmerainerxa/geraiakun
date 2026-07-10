@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/server/prisma"
+
+const postSchema = z.object({
+  productId: z.string().min(1),
+  rating: z.number().int().min(1).max(5),
+  userName: z.string().min(1).optional(),
+  title: z.string().optional(),
+  body: z.string().optional(),
+})
 
 export const runtime = "nodejs"
 
@@ -34,11 +43,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { productId, rating, title, body } = await req.json()
-
-  if (!productId || !rating || !title || !body) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = postSchema.safeParse(await req.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { productId, rating, title, body } = parsed.data
 
   const review = await prisma.review.create({
     data: {
@@ -46,8 +55,8 @@ export async function POST(req: Request) {
       userId: session.user.id,
       userName: session.user.name ?? "Anonymous",
       rating: Number(rating),
-      title,
-      body,
+      title: title ?? "",
+      body: body ?? "",
     },
   })
 

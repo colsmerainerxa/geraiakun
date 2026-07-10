@@ -1,7 +1,22 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const postSchema = z.object({
+  productId: z.string().min(1),
+  userId: z.string().min(1),
+  userName: z.string().min(1),
+  rating: z.number().int().min(1).max(5),
+  title: z.string().min(1),
+  body: z.string().optional(),
+})
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["published", "rejected"]),
+})
 
 export const runtime = "nodejs"
 
@@ -56,14 +71,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { productId, userId, userName, rating, title, body } = await request.json()
-
-  if (!productId || !userId || !rating || !title) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { productId, userId, userName, rating, title, body } = parsed.data
 
   const review = await prisma.review.create({
-    data: { productId, userId, userName, rating: Number(rating), title, body },
+    data: { productId, userId, userName, rating: Number(rating), title, body: body ?? "" },
     include: { product: { select: { name: true } } },
   })
 
@@ -80,11 +95,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { id, status } = await request.json()
-
-  if (!id || !status) {
-    return NextResponse.json({ error: "id and status are required" }, { status: 400 })
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { id, status } = parsed.data
 
   const review = await prisma.review.update({
     where: { id },

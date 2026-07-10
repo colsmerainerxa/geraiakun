@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const postSchema = z.object({
+  orderId: z.string().optional(),
+  productName: z.string().min(1),
+  reason: z.string().min(1),
+  amount: z.number(),
+})
 
 export const runtime = "nodejs"
 
@@ -34,12 +42,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const body = await req.json()
-  const { orderId, productName, reason, amount } = body
-
-  if (!productName || !reason || amount == null) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = postSchema.safeParse(await req.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { orderId, productName, reason, amount } = parsed.data
 
   let orderInvoice = ""
   if (orderId) {

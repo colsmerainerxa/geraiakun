@@ -1,9 +1,29 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
 
 export const runtime = "nodejs"
+
+const createProductSchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  brand: z.string().min(1),
+  categoryId: z.string().min(1),
+  tagline: z.string().optional().default(""),
+  taglineEn: z.string().optional().default(""),
+  description: z.string().optional().default(""),
+  descriptionEn: z.string().optional().default(""),
+  image: z.string().optional().default(""),
+  logo: z.string().optional().default(""),
+  accent: z.string().optional().default("#000000"),
+  badges: z.array(z.enum(["BESTSELLER", "NEW", "PROMO", "RARE"])).optional().default([]),
+  features: z.array(z.string()).optional().default([]),
+  featuresEn: z.array(z.string()).optional().default([]),
+  featured: z.boolean().optional().default(false),
+  faqs: z.array(z.any()).optional().default([]),
+})
 
 export async function GET(request: Request) {
   const session = await auth()
@@ -60,30 +80,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const body = await request.json()
-
-  if (!body.name || !body.slug || !body.brand || !body.categoryId) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = createProductSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const body = parsed.data
 
   const product = await prisma.product.create({
     data: {
       name: body.name,
       slug: body.slug,
       brand: body.brand,
-      tagline: body.tagline ?? "",
-      taglineEn: body.taglineEn ?? "",
-      description: body.description ?? "",
-      descriptionEn: body.descriptionEn ?? "",
+      tagline: body.tagline,
+      taglineEn: body.taglineEn,
+      description: body.description,
+      descriptionEn: body.descriptionEn,
       categoryId: body.categoryId,
-      image: body.image ?? "",
-      logo: body.logo ?? "",
-      accent: body.accent ?? "#000000",
-      badges: body.badges ?? [],
-      features: body.features ?? [],
-      featuresEn: body.featuresEn ?? [],
-      featured: body.featured ?? false,
-      faqs: body.faqs ?? [],
+      image: body.image,
+      logo: body.logo,
+      accent: body.accent,
+      badges: body.badges,
+      features: body.features,
+      featuresEn: body.featuresEn,
+      featured: body.featured,
+      faqs: body.faqs,
     },
     include: { variants: true, category: true },
   })

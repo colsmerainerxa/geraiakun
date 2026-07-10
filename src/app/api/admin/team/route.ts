@@ -1,7 +1,22 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const postSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
+  role: z.string().min(1),
+})
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  role: z.string().optional(),
+  status: z.string().optional(),
+  twoFactorEnabled: z.boolean().optional(),
+})
 
 export const runtime = "nodejs"
 
@@ -37,23 +52,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, mode: "demo" })
   }
 
-  const body = await request.json()
-  const { name, email, password, role } = body as {
-    name?: string
-    email?: string
-    password?: string
-    role?: string
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
-
-  if (!name || name.length < 2) {
-    return NextResponse.json({ error: "Name too short" }, { status: 400 })
-  }
-  if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Invalid email" }, { status: 400 })
-  }
-  if (!password || password.length < 6) {
-    return NextResponse.json({ error: "Password too short" }, { status: 400 })
-  }
+  const { name, email, password, role } = parsed.data
 
   const normalizedEmail = email.toLowerCase()
   const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } })
@@ -102,17 +105,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, mode: "demo" })
   }
 
-  const body = await request.json()
-  const { id, role, status, twoFactorEnabled } = body as {
-    id?: string
-    role?: string
-    status?: string
-    twoFactorEnabled?: boolean
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
-
-  if (!id) {
-    return NextResponse.json({ error: "Missing staff id" }, { status: 400 })
-  }
+  const { id, role, status, twoFactorEnabled } = parsed.data
 
   const data: Record<string, unknown> = {}
   if (typeof twoFactorEnabled === "boolean") data.twoFactorEnabled = twoFactorEnabled

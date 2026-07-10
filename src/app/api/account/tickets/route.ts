@@ -1,8 +1,22 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
 import { ticketPriorityToDb, ticketTypeToDb } from "@/lib/server/status"
+
+const postSchema = z.object({
+  type: z.enum(["garansi", "pembayaran", "akun", "lainnya"]),
+  subject: z.string().min(1),
+  description: z.string().min(1),
+  invoice: z.string().optional(),
+  productId: z.string().optional(),
+  productName: z.string().optional(),
+  priority: z.enum(["rendah", "normal", "tinggi"]),
+  customerName: z.string().min(1),
+  customerEmail: z.string().min(1),
+  whatsapp: z.string().min(1),
+})
 
 export const runtime = "nodejs"
 
@@ -30,12 +44,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { type, subject, description, invoice, productId, productName, priority, customerName, customerEmail, whatsapp } = body
-
-  if (!type || !subject || !description || !priority || !customerName || !customerEmail || !whatsapp) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { type, subject, description, invoice, productId, productName, priority, customerName, customerEmail, whatsapp } = parsed.data
 
   const code = `TKT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
 

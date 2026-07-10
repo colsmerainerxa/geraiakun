@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  risk: z.enum(["rendah", "sedang", "tinggi"]),
+})
 
 export const runtime = "nodejs"
 
@@ -52,11 +58,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { id, risk } = await request.json()
-
-  if (!id || !risk) {
-    return NextResponse.json({ error: "id and risk are required" }, { status: 400 })
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { id, risk } = parsed.data
 
   const task = await prisma.fulfillmentTask.update({
     where: { id },

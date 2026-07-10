@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
 import { encryptSecret } from "@/lib/server/crypto"
+
+const postSchema = z.object({
+  productId: z.string().min(1),
+  variantId: z.string().min(1),
+  loginEmail: z.string().min(1),
+  loginPassword: z.string().min(1),
+})
 
 export const runtime = "nodejs"
 
@@ -52,11 +60,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { productId, variantId, loginEmail, loginPassword } = await request.json()
-
-  if (!productId || !loginEmail || !loginPassword) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { productId, variantId, loginEmail, loginPassword } = parsed.data
 
   const product = await prisma.product.findUnique({
     where: { id: productId },

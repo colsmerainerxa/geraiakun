@@ -37,8 +37,15 @@ export const serverEnv = {
   MIDTRANS_SERVER_KEY: raw.MIDTRANS_SERVER_KEY,
   MIDTRANS_CLIENT_KEY: raw.MIDTRANS_CLIENT_KEY,
   MIDTRANS_IS_PRODUCTION: raw.MIDTRANS_IS_PRODUCTION === "true",
-  CREDENTIAL_ENCRYPTION_KEY:
-    raw.CREDENTIAL_ENCRYPTION_KEY ?? "geraiakun-dev-credential-key-change-me",
+  CREDENTIAL_ENCRYPTION_KEY: (() => {
+    const fallback = "geraiakun-dev-credential-key-change-me"
+    if (raw.CREDENTIAL_ENCRYPTION_KEY) return raw.CREDENTIAL_ENCRYPTION_KEY
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("CREDENTIAL_ENCRYPTION_KEY must be set in production")
+    }
+    console.warn("CREDENTIAL_ENCRYPTION_KEY not set — using insecure dev fallback")
+    return fallback
+  })(),
   APP_URL: raw.APP_URL ?? raw.NEXT_PUBLIC_APP_URL ?? "http://127.0.0.1:3000",
 }
 

@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
 
 export const runtime = "nodejs"
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["WAITING_PAYMENT", "PROCESSING", "COMPLETED", "CANCELLED", "REFUND"]),
+})
 
 export async function GET(request: Request) {
   const session = await auth()
@@ -62,16 +68,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { id, status } = await request.json()
-
-  if (!id || !status) {
-    return NextResponse.json({ error: "id and status are required" }, { status: 400 })
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
-
-  const validStatuses = ["WAITING_PAYMENT", "PROCESSING", "COMPLETED", "CANCELLED", "REFUND"]
-  if (!validStatuses.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 })
-  }
+  const { id, status } = parsed.data
 
   const data: Record<string, unknown> = { status }
   if (status === "COMPLETED") {

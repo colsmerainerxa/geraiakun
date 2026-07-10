@@ -1,7 +1,22 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const createSchema = z.object({
+  code: z.string().min(1).max(50),
+  description: z.string().min(1).max(500),
+  type: z.enum(["PERCENT", "NOMINAL"]),
+  value: z.number().min(0),
+  minPurchase: z.number().min(0).optional(),
+  maxDiscount: z.number().min(0).optional(),
+  startsAt: z.string().optional(),
+  expiresAt: z.string().min(1),
+  active: z.boolean().optional(),
+  maxUses: z.number().int().min(1).optional(),
+})
+const patchSchema = createSchema.partial()
 
 export const runtime = "nodejs"
 
@@ -30,12 +45,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const body = await request.json()
-  const { code, description, type, value, minPurchase, maxDiscount, startsAt, expiresAt, active, maxUses } = body
-
-  if (!code || !description || !type || value == null || !expiresAt) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  const parsed = createSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { code, description, type, value, minPurchase, maxDiscount, startsAt, expiresAt, active, maxUses } = parsed.data
 
   const promo = await prisma.promo.create({
     data: {
@@ -82,8 +96,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "id query param is required" }, { status: 400 })
   }
 
-  const body = await request.json()
-  const { code, description, type, value, minPurchase, maxDiscount, startsAt, expiresAt, active, maxUses } = body
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+  }
+  const { code, description, type, value, minPurchase, maxDiscount, startsAt, expiresAt, active, maxUses } = parsed.data
 
   const data: Record<string, unknown> = {}
   if (code != null) data.code = String(code).toUpperCase()

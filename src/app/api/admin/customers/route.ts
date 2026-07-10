@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1).optional(),
+  email: z.string().min(1).optional(),
+  whatsapp: z.string().min(1).optional(),
+  notes: z.string().optional(),
+})
 
 export const runtime = "nodejs"
 
@@ -59,18 +68,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, mode: "demo" })
   }
 
-  const body = await request.json()
-  const { id, name, email, whatsapp, notes } = body as {
-    id?: string
-    name?: string
-    email?: string
-    whatsapp?: string
-    notes?: string
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
-
-  if (!id) {
-    return NextResponse.json({ error: "Missing customer id" }, { status: 400 })
-  }
+  const { id, name, email, whatsapp, notes } = parsed.data
 
   // Update User fields
   const userData: Record<string, unknown> = {}

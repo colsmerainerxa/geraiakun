@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const postSchema = z.object({
+  userId: z.string().min(1),
+  code: z.string().min(1),
+  tier: z.string().min(1),
+  commission: z.number(),
+})
 
 export const runtime = "nodejs"
 
@@ -54,11 +62,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { userId, code, tier, commission } = await request.json()
-
-  if (!userId || !code) {
-    return NextResponse.json({ error: "userId and code are required" }, { status: 400 })
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { userId, code, tier, commission } = parsed.data
 
   const reseller = await prisma.reseller.create({
     data: { userId, code, tier, commission },

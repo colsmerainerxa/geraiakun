@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
 
 export const runtime = "nodejs"
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["NEW", "REVIEWING", "PROCESSING", "DONE", "REJECTED"]),
+})
+
+const postSchema = z.object({
+  id: z.string().min(1),
+  message: z.string().min(1),
+})
 
 export async function GET(request: Request) {
   const session = await auth()
@@ -50,10 +61,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { id, status } = await request.json()
-  if (!id || !status) {
-    return NextResponse.json({ error: "id and status are required" }, { status: 400 })
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { id, status } = parsed.data
 
   const ticket = await prisma.ticket.update({ where: { id }, data: { status } })
 
@@ -82,10 +94,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { id, message } = await request.json()
-  if (!id || !message) {
-    return NextResponse.json({ error: "id and message are required" }, { status: 400 })
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { id, message } = parsed.data
 
   const ticket = await prisma.ticket.findUnique({ where: { id } })
   if (!ticket) {

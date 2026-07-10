@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const patchSchema = z.object({
+  name: z.string().min(2).optional(),
+  whatsapp: z.string().min(8).optional(),
+})
 
 export const runtime = "nodejs"
 
@@ -45,8 +51,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { name, whatsapp } = body as { name?: string; whatsapp?: string }
+  const parsed = patchSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+  }
+  const { name, whatsapp } = parsed.data
 
   if (!backendFlags.databaseConfigured) {
     return NextResponse.json({ ok: true, mode: "demo" })

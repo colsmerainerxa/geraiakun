@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import type { Prisma } from "@/generated/prisma/client"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
@@ -7,6 +8,11 @@ import { prisma } from "@/lib/server/prisma"
 import { serializePaymentAttempt } from "@/lib/server/serializers"
 import { paymentMethodToDb } from "@/lib/server/status"
 import type { PaymentMethod } from "@/types"
+
+const postSchema = z.object({
+  invoice: z.string().min(1),
+  method: z.enum(["qris", "gopay", "ovo", "dana", "bca-va", "bni-va", "mandiri-va"]),
+})
 
 export const runtime = "nodejs"
 
@@ -36,11 +42,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { invoice, method } = (await request.json()) as { invoice: string; method: PaymentMethod }
-
-  if (!invoice || !method) {
-    return NextResponse.json({ error: "invoice and method are required" }, { status: 400 })
+  const parsed = postSchema.safeParse(await request.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { invoice, method } = parsed.data as { invoice: string; method: PaymentMethod }
 
   if (!backendFlags.databaseConfigured) {
     return NextResponse.json(demoAttempt(invoice, method))

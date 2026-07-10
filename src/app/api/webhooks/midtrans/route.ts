@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import type { Prisma } from "@/generated/prisma/client"
 import { backendFlags } from "@/lib/server/env"
 import { isValidMidtransSignature, normalizeMidtransNotification } from "@/lib/server/midtrans"
@@ -6,6 +7,15 @@ import { prisma } from "@/lib/server/prisma"
 import { mapMidtransStatus } from "@/lib/server/status"
 
 export const runtime = "nodejs"
+
+const webhookSchema = z.object({
+  order_id: z.string().min(1),
+  transaction_status: z.string().min(1),
+  transaction_id: z.string().optional(),
+  signature_key: z.string().optional(),
+  fraud_status: z.string().optional(),
+  status_message: z.string().optional(),
+})
 
 function eventKey(payload: Record<string, unknown>) {
   return [
@@ -66,7 +76,12 @@ export async function POST(request: Request) {
     )
   }
 
-  const payload = (await request.json()) as Record<string, unknown>
+  const raw = await request.json()
+  const parsed = webhookSchema.safeParse(raw)
+  if (!parsed.success) {
+    return NextResponse.json({ ok: false, message: "Invalid notification payload" }, { status: 400 })
+  }
+  const payload = raw as Record<string, unknown>
   if (!isValidMidtransSignature(payload)) {
     return NextResponse.json({ ok: false, message: "Invalid signature" }, { status: 401 })
   }

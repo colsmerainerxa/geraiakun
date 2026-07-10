@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+
+const productIdSchema = z.object({ productId: z.string().min(1) })
 
 export const runtime = "nodejs"
 
@@ -34,10 +37,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { productId } = await req.json()
-  if (!productId) {
-    return NextResponse.json({ error: "Missing productId" }, { status: 400 })
+  const parsed = productIdSchema.safeParse(await req.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { productId } = parsed.data
 
   const item = await prisma.wishlist.upsert({
     where: { userId_productId: { userId: session.user.id, productId } },
@@ -59,10 +63,11 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
-  const { productId } = await req.json()
-  if (!productId) {
-    return NextResponse.json({ error: "Missing productId" }, { status: 400 })
+  const parsed = productIdSchema.safeParse(await req.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
   }
+  const { productId } = parsed.data
 
   await prisma.wishlist.deleteMany({
     where: { userId: session.user.id, productId },
