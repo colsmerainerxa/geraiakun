@@ -31,9 +31,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useQueryClient } from "@tanstack/react-query"
 import { useAdminResellers } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { ResellerVerificationStatus } from "@/types"
 
 const RESELLER_PLANS = [
@@ -53,12 +53,28 @@ const STATUS_META: Record<
 }
 
 export function AdminResellersView() {
+  const queryClient = useQueryClient()
   const { data: resellersData } = useAdminResellers()
   const resellers = (resellersData ?? []) as any[]
-  const ledger = useEnterpriseAdmin((state) => state.ledger)
-  const bulkOrders = useEnterpriseAdmin((state) => state.bulkOrders)
-  const updateReseller = useEnterpriseAdmin((state) => state.updateReseller)
-  const adjustBalance = useEnterpriseAdmin((state) => state.adjustResellerBalance)
+  // ponytail: no API for ledger/bulkOrders yet; add when endpoints exist
+  const ledger = [] as any[]
+  const bulkOrders = [] as any[]
+  const updateReseller = async (id: string, patch: Record<string, unknown>) => {
+    await fetch("/api/admin/resellers", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...patch }),
+    })
+    queryClient.invalidateQueries({ queryKey: ["admin", "resellers"] })
+  }
+  const adjustBalance = async (id: string, amount: number, note: string) => {
+    await fetch("/api/admin/resellers", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, balanceAdjustment: amount, note }),
+    })
+    queryClient.invalidateQueries({ queryKey: ["admin", "resellers"] })
+  }
   const [selectedId, setSelectedId] = useState(resellers[0]?.id ?? "")
   const [query, setQuery] = useState("")
   const [balanceOpen, setBalanceOpen] = useState(false)

@@ -17,8 +17,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useAdminRisk } from "@/lib/api/queries"
+import { useQueryClient } from "@tanstack/react-query"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { RiskReviewStatus } from "@/types"
 
 const STATUS_META: Record<
@@ -32,9 +32,17 @@ const STATUS_META: Record<
 }
 
 export function AdminRiskView() {
+  const queryClient = useQueryClient()
   const { data: riskData } = useAdminRisk()
   const risks = (riskData ?? []) as any[]
-  const decideRisk = useEnterpriseAdmin((state) => state.decideRisk)
+  const decideRisk = async (id: string, decision: RiskReviewStatus, note: string) => {
+    await fetch("/api/admin/risk", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: decision, note }),
+    })
+    queryClient.invalidateQueries({ queryKey: ["admin", "risk"] })
+  }
   const [selectedId, setSelectedId] = useState(risks[0]?.id ?? "")
   const [query, setQuery] = useState("")
   const selected = risks.find((item) => item.id === selectedId) ?? risks[0]

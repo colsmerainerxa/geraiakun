@@ -1,8 +1,10 @@
 "use client"
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query"
 import { fakeApi, type ProductQuery } from "@/lib/mock/fake-api"
 import type { Order } from "@/types"
+import type { PaymentMethod } from "@/types"
+import type { PaymentAttempt } from "@/types/enterprise"
 
 async function fetchJson<T>(url: string, fallback: () => Promise<T>): Promise<T> {
   try {
@@ -462,6 +464,70 @@ export function useAdminRisk(status?: string, risk?: string) {
       if (!r.ok) return []
       const d = await r.json()
       return d.data ?? d
+    },
+  })
+}
+
+// ---- Account Profile ----
+export function useAccountProfile() {
+  return useQuery({
+    queryKey: ["account", "profile"],
+    queryFn: async () => {
+      const r = await fetch("/api/account/profile")
+      if (!r.ok) return null
+      return r.json()
+    },
+  })
+}
+
+// ---- Account Tickets ----
+export function useAccountTickets() {
+  return useQuery({
+    queryKey: ["account", "tickets"],
+    queryFn: async () => {
+      const r = await fetch("/api/account/tickets")
+      if (!r.ok) return []
+      return r.json()
+    },
+  })
+}
+
+// ---- Account Order (single by invoice) ----
+export function useAccountOrder(invoice: string) {
+  return useQuery({
+    queryKey: ["account", "order", invoice],
+    queryFn: async () => {
+      const r = await fetch(`/api/account/orders/${invoice}`)
+      if (!r.ok) return null
+      return r.json()
+    },
+    enabled: !!invoice,
+  })
+}
+
+// ---- Create / Retry Payment ----
+export function useCreatePayment() {
+  return useMutation({
+    mutationFn: async ({ invoice, method }: { invoice: string; method: PaymentMethod }) => {
+      const r = await fetch("/api/payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invoice, method }),
+      })
+      if (!r.ok) throw new Error("Payment creation failed")
+      return r.json() as Promise<PaymentAttempt>
+    },
+  })
+}
+
+// ---- Admin Analytics ----
+export function useAdminAnalytics() {
+  return useQuery({
+    queryKey: ["admin", "analytics"],
+    queryFn: async () => {
+      const r = await fetch("/api/admin/analytics")
+      if (!r.ok) return null
+      return r.json()
     },
   })
 }

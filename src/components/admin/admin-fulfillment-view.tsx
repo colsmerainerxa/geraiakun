@@ -42,7 +42,6 @@ import type { FulfillmentStatus, FulfillmentTask, RiskLevel } from "@/types"
 import { useAdminCredentials, useAdminFulfillment } from "@/lib/api/queries"
 import { cn } from "@/lib/utils"
 import { useAdminGamification } from "@/stores/admin-gamification"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import { useUI } from "@/stores/ui"
 import type { CredentialStock } from "@/types"
 
@@ -120,7 +119,8 @@ export function AdminFulfillmentView() {
   )
   const { data: rawCredentials = [] } = useAdminCredentials()
   const credentials = rawCredentials as Record<string, unknown>[]
-  const logAudit = useEnterpriseAdmin((state) => state.logAudit)
+  // ponytail: no-op — audit logging handled by server actions
+  const logAudit = (_entry: Record<string, unknown>) => {}
   const award = useAdminGamification((state) => state.award)
   const viewMode = useUI((state) => state.pipelineViews.fulfillment)
   const setPipelineView = useUI((state) => state.setPipelineView)
