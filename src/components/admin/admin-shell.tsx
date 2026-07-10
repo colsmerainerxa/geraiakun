@@ -40,7 +40,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Link, usePathname } from "@/i18n/navigation"
 import { cn, initials } from "@/lib/utils"
 import { levelForXp, levelProgress, useAdminGamification } from "@/stores/admin-gamification"
-import { ADMIN_ROLE_LABELS, roleCan, useEnterpriseAdmin } from "@/stores/enterprise-admin"
+import { ADMIN_ROLE_LABELS, roleCan } from "@/stores/enterprise-admin"
+import { useAdminTeam } from "@/lib/api/queries"
 import type { AdminPermission } from "@/types"
 
 interface NavItem {
@@ -131,11 +132,17 @@ function useActive() {
   return (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href))
 }
 
+function useStaffFromApi() {
+  const { data: staff = [] as any[] } = useAdminTeam()
+  const [activeStaffId, setActiveStaffId] = useState("")
+  const currentId = activeStaffId || staff[0]?.id || ""
+  return { staff, activeStaffId: currentId, setActiveStaff: setActiveStaffId }
+}
+
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const isActive = useActive()
-  const activeStaffId = useEnterpriseAdmin((state) => state.activeStaffId)
-  const staff = useEnterpriseAdmin((state) => state.staff)
-  const role = staff.find((member) => member.id === activeStaffId)?.role ?? "owner"
+  const { staff, activeStaffId } = useStaffFromApi()
+  const role = staff.find((member: any) => member.id === activeStaffId)?.role ?? "owner"
 
   return (
     <nav className="flex flex-col gap-5" aria-label="Navigasi admin">
@@ -192,9 +199,7 @@ function Brand() {
 }
 
 function RoleSwitcher() {
-  const activeStaffId = useEnterpriseAdmin((state) => state.activeStaffId)
-  const staff = useEnterpriseAdmin((state) => state.staff)
-  const setActiveStaff = useEnterpriseAdmin((state) => state.setActiveStaff)
+  const { staff, activeStaffId, setActiveStaff } = useStaffFromApi()
 
   return (
     <div className="rounded-base border-2 border-dashed border-border p-3">
@@ -205,10 +210,10 @@ function RoleSwitcher() {
         </SelectTrigger>
         <SelectContent>
           {staff
-            .filter((member) => member.status !== "suspended")
-            .map((member) => (
+            .filter((member: any) => member.status !== "suspended")
+            .map((member: any) => (
               <SelectItem key={member.id} value={member.id}>
-                {member.name} - {ADMIN_ROLE_LABELS[member.role]}
+                {member.name} - {ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}
               </SelectItem>
             ))}
         </SelectContent>
@@ -278,9 +283,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("common")
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-  const activeStaffId = useEnterpriseAdmin((state) => state.activeStaffId)
-  const staff = useEnterpriseAdmin((state) => state.staff)
-  const member = staff.find((item) => item.id === activeStaffId) ?? staff[0]
+  const { staff, activeStaffId } = useStaffFromApi()
+  const member = staff.find((item: any) => item.id === activeStaffId) ?? staff[0]
   const current = NAV.find((item) =>
     item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href),
   )
@@ -330,14 +334,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </Avatar>
               <div className="hidden sm:block">
                 <p className="text-xs font-bold leading-tight">{member.name}</p>
-                <p className="text-[10px] text-foreground/50">{ADMIN_ROLE_LABELS[member.role]}</p>
+                <p className="text-[10px] text-foreground/50">{ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}</p>
               </div>
             </div>
           </div>
         </header>
 
         <main id="admin-content" tabIndex={-1} className="min-w-0 flex-1 p-4 outline-none sm:p-6">
-          {allowed ? children : <PermissionDenied role={ADMIN_ROLE_LABELS[member.role]} />}
+          {allowed ? children : <PermissionDenied role={ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]} />}
         </main>
       </div>
     </div>

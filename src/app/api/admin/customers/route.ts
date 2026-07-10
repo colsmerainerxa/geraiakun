@@ -5,9 +5,15 @@ import { prisma } from "@/lib/server/prisma"
 
 export const runtime = "nodejs"
 
-export async function GET(request: Request) {
+async function requireAdmin() {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== "admin") {
+  if (!session?.user?.id || session.user.role !== "admin") return null
+  return session
+}
+
+export async function GET(request: Request) {
+  const session = await requireAdmin()
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   if (!backendFlags.databaseConfigured) {
@@ -42,4 +48,62 @@ export async function GET(request: Request) {
   ])
 
   return NextResponse.json({ data: users, total, page, limit })
+}
+
+export async function PATCH(request: Request) {
+  const session = await requireAdmin()
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  if (!backendFlags.databaseConfigured) {
+    return NextResponse.json({ ok: true, mode: "demo" })
+  }
+
+  const body = await request.json()
+  const { id, name, email, whatsapp, notes } = body as {
+    id?: string
+    name?: string
+    email?: string
+    whatsapp?: string
+    notes?: string
+  }
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing customer id" }, { status: 400 })
+  }
+
+  // Update User fields
+  const userData: Record<string, unknown> = {}
+  if (name) userData.name = name
+  if (email) userData.email = email.toLowerCase()
+  if (Object.keys(userData).length > 0) {
+    await prisma.user.update({ where: { id }, data: userData })
+  }
+
+  // Update CustomerProfile fields
+  const profileData: Record<string, unknown> = {}
+  if (whatsapp !== undefined) profileData.whatsapp = whatsapp
+  // ponytail: no `notes` column on CustomerProfile; skip until schema adds it
+  void notes
+  if (Object.keys(profileData).length > 0) {
+    await prisma.customerProfile.update({
+      where: { userId: id },
+      data: profileData,
+    })
+  }
+
+  await prisma.auditEvent.create({
+    data: {
+      actorId: session.user.id,
+      actorName: session.user.email ?? "Admin",
+      action: "customer.update",
+      module: "pelanggan",
+      targetId: id,
+      targetLabel: id,
+      outcome: "success",
+      detail: `Profil pelanggan diperbarui.`,
+    },
+  })
+
+  return NextResponse.json({ ok: true })
 }

@@ -52,3 +52,50 @@ export async function GET(request: Request) {
 
   return NextResponse.json({ data: orders, total, page, limit })
 }
+
+export async function PATCH(request: Request) {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  if (!backendFlags.databaseConfigured) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 503 })
+  }
+
+  const { id, status } = await request.json()
+
+  if (!id || !status) {
+    return NextResponse.json({ error: "id and status are required" }, { status: 400 })
+  }
+
+  const validStatuses = ["WAITING_PAYMENT", "PROCESSING", "COMPLETED", "CANCELLED", "REFUND"]
+  if (!validStatuses.includes(status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+  }
+
+  const data: Record<string, unknown> = { status }
+  if (status === "COMPLETED") {
+    data.paidAt = new Date()
+  }
+
+  const order = await prisma.order.update({
+    where: { id },
+    data,
+    include: { items: true, payments: true },
+  })
+
+  await prisma.auditEvent.create({
+    data: {
+      actorId: session.user.id,
+      actorName: session.user.email ?? "Admin",
+      action: "order.status_update",
+      module: "pesanan",
+      targetId: order.id,
+      targetLabel: order.invoice,
+      outcome: "success",
+      detail: `Status pesanan ${order.invoice} diubah ke ${status}.`,
+    },
+  })
+
+  return NextResponse.json(order)
+}

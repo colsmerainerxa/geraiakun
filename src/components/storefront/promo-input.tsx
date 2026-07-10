@@ -20,8 +20,8 @@ export function PromoInput({ subtotal }: { subtotal: number }) {
   const discount = computeDiscount(promo, subtotal)
   const belowMin = promo != null && subtotal < promo.minSpend
 
-  function handleApply() {
-    const ok = apply(code)
+  async function handleApply() {
+    const ok = await apply(code)
     if (ok) {
       toast.success(t("promoApplied"), { description: code.toUpperCase() })
       setCode("")

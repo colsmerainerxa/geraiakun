@@ -5,9 +5,15 @@ import { prisma } from "@/lib/server/prisma"
 
 export const runtime = "nodejs"
 
-export async function GET(request: Request) {
+async function requireAdmin() {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== "admin") {
+  if (!session?.user?.id || session.user.role !== "admin") return null
+  return session
+}
+
+export async function GET(request: Request) {
+  const session = await requireAdmin()
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   if (!backendFlags.databaseConfigured) {
@@ -34,4 +40,56 @@ export async function GET(request: Request) {
   ])
 
   return NextResponse.json({ data: tasks, total, page, limit })
+}
+
+const VALID_STATUSES = ["WAITING_STOCK", "READY_TO_SEND", "RISK_REVIEW", "SENT"] as const
+
+export async function PATCH(request: Request) {
+  const session = await requireAdmin()
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  if (!backendFlags.databaseConfigured) {
+    return NextResponse.json({ ok: true, mode: "demo" })
+  }
+
+  const body = await request.json()
+  const { id, status, risk } = body as {
+    id?: string
+    status?: string
+    risk?: string
+  }
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing task id" }, { status: 400 })
+  }
+
+  const data: Record<string, unknown> = {}
+  if (status) {
+    if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+    }
+    data.status = status
+  }
+  if (risk) data.risk = risk
+
+  const task = await prisma.fulfillmentTask.update({
+    where: { id },
+    data,
+  })
+
+  await prisma.auditEvent.create({
+    data: {
+      actorId: session.user.id,
+      actorName: session.user.email ?? "Admin",
+      action: "fulfillment.update",
+      module: "fulfillment",
+      targetId: task.invoice,
+      targetLabel: task.productName,
+      outcome: "success",
+      detail: `Fulfillment ${task.invoice} diperbarui.`,
+    },
+  })
+
+  return NextResponse.json({ ok: true, task })
 }

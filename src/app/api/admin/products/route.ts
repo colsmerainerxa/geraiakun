@@ -50,3 +50,56 @@ export async function GET(request: Request) {
 
   return NextResponse.json({ data, total, page, limit })
 }
+
+export async function POST(request: Request) {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  if (!backendFlags.databaseConfigured) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 503 })
+  }
+
+  const body = await request.json()
+
+  if (!body.name || !body.slug || !body.brand || !body.categoryId) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  }
+
+  const product = await prisma.product.create({
+    data: {
+      name: body.name,
+      slug: body.slug,
+      brand: body.brand,
+      tagline: body.tagline ?? "",
+      taglineEn: body.taglineEn ?? "",
+      description: body.description ?? "",
+      descriptionEn: body.descriptionEn ?? "",
+      categoryId: body.categoryId,
+      image: body.image ?? "",
+      logo: body.logo ?? "",
+      accent: body.accent ?? "#000000",
+      badges: body.badges ?? [],
+      features: body.features ?? [],
+      featuresEn: body.featuresEn ?? [],
+      featured: body.featured ?? false,
+      faqs: body.faqs ?? [],
+    },
+    include: { variants: true, category: true },
+  })
+
+  await prisma.auditEvent.create({
+    data: {
+      actorId: session.user.id,
+      actorName: session.user.email ?? "Admin",
+      action: "product.create",
+      module: "produk",
+      targetId: product.id,
+      targetLabel: product.name,
+      outcome: "success",
+      detail: `Produk ${product.name} dibuat.`,
+    },
+  })
+
+  return NextResponse.json(product)
+}
