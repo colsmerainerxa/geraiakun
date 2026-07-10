@@ -1,4 +1,26 @@
 import { PrismaAdapter } from "@auth/prisma-adapter"
+
+// ponytail: simple in-memory rate limiter — replace with Redis in production
+const loginAttempts = new Map<string, { count: number; resetAt: number }>()
+const MAX_ATTEMPTS = 5
+const WINDOW_MS = 15 * 60 * 1000
+
+function checkRateLimit(email: string): boolean {
+  const key = email.toLowerCase()
+  const now = Date.now()
+  const entry = loginAttempts.get(key)
+  if (entry && now < entry.resetAt) {
+    if (entry.count >= MAX_ATTEMPTS) return false
+    entry.count += 1
+  } else {
+    loginAttempts.set(key, { count: 1, resetAt: now + WINDOW_MS })
+  }
+  return true
+}
+
+function clearRateLimit(email: string) {
+  loginAttempts.delete(email.toLowerCase())
+}
 import NextAuth, { type NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
@@ -31,11 +53,15 @@ const providers: NextAuthConfig["providers"] = [
       const parsed = credentialsSchema.safeParse(rawCredentials)
       if (!parsed.success) return null
 
+      const email = parsed.data.email.toLowerCase()
+      if (!checkRateLimit(email)) return null
+
       const user = await prisma.user.findUnique({
-        where: { email: parsed.data.email.toLowerCase() },
+        where: { email },
       })
       const valid = await verifyPassword(parsed.data.password, user?.passwordHash)
       if (!user || !valid) return null
+      clearRateLimit(email)
 
       return {
         id: user.id,

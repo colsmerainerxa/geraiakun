@@ -36,7 +36,8 @@ export async function registerCustomer(input: z.input<typeof registerSchema>) {
   const email = parsed.data.email.toLowerCase()
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
-    return { ok: false, message: "Email sudah terdaftar. Silakan masuk." }
+    // ponytail: generic message prevents email enumeration
+    return { ok: false, message: "Email atau kata sandi tidak valid." }
   }
 
   await prisma.user.create({

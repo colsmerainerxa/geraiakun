@@ -237,10 +237,14 @@ export async function createCheckoutOrder(input: CheckoutActionInput) {
     })
 
     if (promo && discount > 0) {
-      await tx.promo.update({
-        where: { id: promo.id },
+      // Atomic conditional increment — prevents race condition
+      const claimed = await tx.promo.updateMany({
+        where: { id: promo.id, used: { lt: promo.quota } },
         data: { used: { increment: 1 } },
       })
+      if (claimed.count === 0) {
+        throw new Error("Kuota promo telah habis.")
+      }
     }
 
     return { order, payment, lines, total }
