@@ -166,6 +166,17 @@ export async function createCheckoutOrder(input: CheckoutActionInput) {
       }
     })
 
+    // Decrement stock atomically within transaction
+    for (const line of lines) {
+      const updated = await tx.productVariant.update({
+        where: { id: line.variant.id },
+        data: { stock: { decrement: line.input.qty } },
+      })
+      if (updated.stock < 0) {
+        throw new Error(`Stok ${line.product.name} tidak mencukupi.`)
+      }
+    }
+
     const subtotal = lines.reduce((sum, line) => sum + line.variant.price * line.input.qty, 0)
     const promo = parsed.data.promoCode
       ? await tx.promo.findFirst({
@@ -176,6 +187,9 @@ export async function createCheckoutOrder(input: CheckoutActionInput) {
           },
         })
       : null
+    if (promo && promo.used >= promo.quota) {
+      throw new Error("Kuota promo telah habis.")
+    }
     const discount = promoDiscount(promo, subtotal)
     const total = subtotal - discount + FEE
 

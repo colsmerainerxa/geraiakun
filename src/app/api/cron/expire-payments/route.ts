@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto"
 import { NextResponse } from "next/server"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
@@ -13,7 +14,14 @@ export async function GET(request: Request) {
   const secret = url.searchParams.get("secret")
   const authHeader = request.headers.get("authorization")
   const cronSecret = process.env.CRON_SECRET
-  if (secret !== cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  function safeCompare(a: string | null, b: string | undefined): boolean {
+    if (!a || !b) return false
+    const ab = Buffer.from(a)
+    const bb = Buffer.from(b)
+    if (ab.length !== bb.length) return false
+    return timingSafeEqual(ab, bb)
+  }
+  if (!safeCompare(secret, cronSecret) && !safeCompare(authHeader, cronSecret ? `Bearer ${cronSecret}` : undefined)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   if (!backendFlags.databaseConfigured) {

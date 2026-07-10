@@ -1,10 +1,27 @@
 "use server"
 
+import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
 import { encryptSecret } from "@/lib/server/crypto"
 import type { Prisma } from "@/generated/prisma/client"
+
+const bulkImportSchema = z.object({
+  items: z.array(z.object({
+    productId: z.string().min(1),
+    variantId: z.string().optional(),
+    loginEmail: z.string().min(1).max(500),
+    password: z.string().min(1).max(500),
+    pin: z.string().max(100).optional(),
+    note: z.string().max(2000).optional(),
+  })).min(1).max(1000),
+})
+const idSchema = z.string().min(1)
+const assignSchema = z.object({
+  taskId: z.string().min(1),
+  credentialId: z.string().min(1),
+})
 
 type CredentialStatus = "AVAILABLE" | "SOLD" | "EXPIRED" | "HELD"
 
@@ -24,24 +41,17 @@ async function syncVariantStock(tx: Prisma.TransactionClient, variantId: string 
   await tx.productVariant.update({ where: { id: variantId }, data: { stock: count } })
 }
 
-export async function bulkImportCredentials(input: {
-  items: {
-    productId: string
-    variantId?: string
-    loginEmail: string
-    password: string
-    pin?: string
-    note?: string
-  }[]
-}) {
+export async function bulkImportCredentials(input: z.infer<typeof bulkImportSchema>) {
+  const parsed = bulkImportSchema.safeParse(input)
+  if (!parsed.success) throw new Error("INVALID_INPUT")
   const session = await requireAdmin()
-  if (!input.items?.length) throw new Error("ITEMS_REQUIRED")
+  if (!parsed.data.items?.length) throw new Error("ITEMS_REQUIRED")
   if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo", count: input.items.length }
 
   const created = await prisma.$transaction(async (tx) => {
     const results: { id: string }[] = []
 
-    for (const item of input.items) {
+    for (const item of parsed.data.items) {
       const product = await tx.product.findUnique({
         where: { id: item.productId },
         select: { id: true, name: true },
@@ -75,7 +85,7 @@ export async function bulkImportCredentials(input: {
     }
 
     // Sync stock for all distinct variants touched
-    const variantIds = [...new Set(input.items.map((i) => i.variantId).filter(Boolean))] as string[]
+    const variantIds = [...new Set(parsed.data.items.map((i) => i.variantId).filter(Boolean))] as string[]
     for (const vid of variantIds) {
       await syncVariantStock(tx, vid)
     }
@@ -86,7 +96,7 @@ export async function bulkImportCredentials(input: {
         actorName: session.user.email ?? "Admin",
         action: "credential.bulk_import",
         module: "credential",
-        targetId: variantIds[0] ?? input.items[0].productId,
+        targetId: variantIds[0] ?? parsed.data.items[0].productId,
         targetLabel: `${results.length} credentials`,
         outcome: "success",
         detail: `Bulk import ${results.length} credentials untuk ${variantIds.length} varian.`,
@@ -99,7 +109,8 @@ export async function bulkImportCredentials(input: {
   return { ok: true, count: created.length }
 }
 
-export async function deleteCredential(id: string) {
+export async function deleteCredential(rawId: string) {
+  const id = idSchema.parse(rawId)
   const session = await requireAdmin()
   if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
 
@@ -128,7 +139,8 @@ export async function deleteCredential(id: string) {
   })
 }
 
-export async function assignCredentialToTask(taskId: string, credentialId: string) {
+export async function assignCredentialToTask(rawTaskId: string, rawCredentialId: string) {
+  const { taskId, credentialId } = assignSchema.parse({ taskId: rawTaskId, credentialId: rawCredentialId })
   const session = await requireAdmin()
   if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
 

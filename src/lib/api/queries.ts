@@ -282,10 +282,9 @@ export function useOrder(invoice: string) {
   return useQuery({
     queryKey: qk.order(invoice),
     queryFn: async () => {
-      const r = await fetch(`/api/admin/orders?search=${encodeURIComponent(invoice)}`)
+      const r = await fetch(`/api/account/orders/${encodeURIComponent(invoice)}`)
       if (!r.ok) return null
-      const data = await r.json()
-      return data.data?.[0] ?? null
+      return r.json()
     },
     enabled: !!invoice,
   })

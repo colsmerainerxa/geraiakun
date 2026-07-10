@@ -96,7 +96,7 @@ export function AuthRecoveryView({
       setError(result.message)
       return
     }
-    if (result.token) setActionToken(result.token)
+    if ("token" in result && typeof result.token === "string") setActionToken(result.token)
     setState("sent")
     toast.success(isEn ? "Reset link sent" : "Tautan reset dikirim")
   }
@@ -157,7 +157,7 @@ export function AuthRecoveryView({
       setError(result.message)
       return
     }
-    if (result.token) setActionToken(result.token)
+    if ("token" in result && typeof result.token === "string") setActionToken(result.token)
     setState("sent")
     toast.success(isEn ? "Verification link sent" : "Tautan verifikasi dikirim")
   }
@@ -172,7 +172,7 @@ export function AuthRecoveryView({
       setError(result.message)
       return
     }
-    if (result.token) setActionToken(result.token)
+    if ("token" in result && typeof result.token === "string") setActionToken(result.token)
     setState("sent")
     toast.success(isEn ? "A new link has been sent" : "Tautan baru telah dikirim")
   }

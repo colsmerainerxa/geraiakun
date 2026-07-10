@@ -31,7 +31,16 @@ function isFilled(value: string | undefined) {
 
 export const serverEnv = {
   DATABASE_URL: raw.DATABASE_URL ?? fallbackDatabaseUrl,
-  AUTH_SECRET: raw.AUTH_SECRET ?? raw.NEXTAUTH_SECRET ?? "geraiakun-dev-auth-secret-change-me",
+  AUTH_SECRET: (() => {
+    const fallback = "geraiakun-dev-auth-secret-change-me"
+    if (raw.AUTH_SECRET) return raw.AUTH_SECRET
+    if (raw.NEXTAUTH_SECRET) return raw.NEXTAUTH_SECRET
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET must be set in production")
+    }
+    console.warn("AUTH_SECRET not set — using insecure dev fallback")
+    return fallback
+  })(),
   AUTH_GOOGLE_ID: raw.AUTH_GOOGLE_ID,
   AUTH_GOOGLE_SECRET: raw.AUTH_GOOGLE_SECRET,
   MIDTRANS_SERVER_KEY: raw.MIDTRANS_SERVER_KEY,

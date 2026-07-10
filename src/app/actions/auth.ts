@@ -55,7 +55,8 @@ export async function registerCustomer(input: z.input<typeof registerSchema>) {
 
   const verification = await createVerificationToken(`${EMAIL_VERIFY_PREFIX}${email}`, 60)
 
-  return { ok: true, message: "Akun berhasil dibuat.", verificationToken: verification.token }
+  // ponytail: verification token sent via email; never returned to client
+  return { ok: true, message: "Akun berhasil dibuat." }
 }
 
 async function createVerificationToken(identifier: string, expiresInMinutes: number) {
@@ -75,18 +76,18 @@ export async function requestPasswordReset(email: string) {
   const parsed = z.string().email().safeParse(email)
   if (!parsed.success) return { ok: false, message: "Email tidak valid." }
 
-  let token = crypto.randomUUID()
   if (!backendFlags.databaseConfigured) {
-    return { ok: true, message: "Tautan reset siap dikirim.", token }
+    return { ok: true, message: "Tautan reset siap dikirim." }
   }
 
   const identifier = `${PASSWORD_RESET_PREFIX}${parsed.data.toLowerCase()}`
   const user = await prisma.user.findUnique({ where: { email: parsed.data.toLowerCase() } })
   if (user) {
-    token = (await createVerificationToken(identifier, 30)).token
+    await createVerificationToken(identifier, 30)
   }
 
-  return { ok: true, message: "Tautan reset siap dikirim.", token }
+  // ponytail: token sent via email in production; never returned to client
+  return { ok: true, message: "Tautan reset siap dikirim." }
 }
 
 export async function resetPassword(input: z.input<typeof resetPasswordSchema>) {
@@ -131,18 +132,18 @@ export async function requestEmailVerification(email: string) {
   const parsed = z.string().email().safeParse(email)
   if (!parsed.success) return { ok: false, message: "Email tidak valid." }
 
-  let token = crypto.randomUUID()
   if (!backendFlags.databaseConfigured) {
-    return { ok: true, message: "Tautan verifikasi siap dikirim.", token }
+    return { ok: true, message: "Tautan verifikasi siap dikirim." }
   }
 
   const normalizedEmail = parsed.data.toLowerCase()
   const user = await prisma.user.findUnique({ where: { email: normalizedEmail } })
   if (user) {
-    token = (await createVerificationToken(`${EMAIL_VERIFY_PREFIX}${normalizedEmail}`, 60)).token
+    await createVerificationToken(`${EMAIL_VERIFY_PREFIX}${normalizedEmail}`, 60)
   }
 
-  return { ok: true, message: "Tautan verifikasi siap dikirim.", token }
+  // ponytail: token sent via email in production; never returned to client
+  return { ok: true, message: "Tautan verifikasi siap dikirim." }
 }
 
 export async function verifyEmailToken(token: string) {
