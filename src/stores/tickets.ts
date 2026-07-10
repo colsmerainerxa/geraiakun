@@ -7,7 +7,9 @@ import type { Ticket, TicketMessage, TicketStatus } from "@/types"
 interface TicketsState {
   tickets: Ticket[]
   create: (
-    t: Omit<Ticket, "id" | "code" | "status" | "messages" | "createdAt" | "updatedAt">,
+    t: Omit<Ticket, "id" | "code" | "status" | "messages" | "createdAt" | "updatedAt"> & {
+      code?: string
+    },
   ) => Ticket
   reply: (id: string, message: Omit<TicketMessage, "id" | "date" | "role">) => void
   /** Agen admin membalas tiket — role "agen". */
@@ -159,7 +161,7 @@ export const useTickets = create<TicketsState>()(
           ...input,
           productName: input.productName ?? null,
           id: `ticket-${Date.now()}`,
-          code: genCode(seq),
+          code: input.code ?? genCode(seq),
           status: "baru",
           messages: [
             {

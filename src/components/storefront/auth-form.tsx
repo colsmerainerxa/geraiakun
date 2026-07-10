@@ -3,11 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Lock, Mail, Sparkles, User } from "lucide-react"
 import { motion } from "motion/react"
-import { useTranslations } from "next-intl"
+import { signIn } from "next-auth/react"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { registerCustomer } from "@/app/actions/auth"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -45,6 +47,7 @@ type FormValues = {
 
 export function AuthForm({ mode }: { mode: Mode }) {
   const t = useTranslations("auth")
+  const locale = useLocale()
   const router = useRouter()
   const isRegister = mode === "register"
   const [showPw, setShowPw] = useState(false)
@@ -58,19 +61,38 @@ export function AuthForm({ mode }: { mode: Mode }) {
     resolver: zodResolver(isRegister ? registerSchema : loginSchema),
   })
 
-  function onSubmit() {
-    toast.success(isRegister ? t("registerButton") : t("loginButton"), {
-      description: t("demoNote"),
+  async function onSubmit(values: FormValues) {
+    if (isRegister) {
+      const result = await registerCustomer({
+        name: values.name ?? "",
+        email: values.email,
+        password: values.password,
+      })
+      if (!result.ok) {
+        toast.error(result.message)
+        return
+      }
+      toast.success(result.message)
+    }
+
+    const result = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
     })
-    router.push(isRegister ? "/verifikasi-email" : "/akun")
+    if (result?.error) {
+      toast.error(isRegister ? "Akun dibuat, tetapi login gagal." : "Email atau sandi salah.")
+      return
+    }
+
+    router.push("/akun")
+    router.refresh()
   }
 
-  function continueWithGoogle() {
+  async function continueWithGoogle() {
     setSocialLoading(true)
-    window.setTimeout(() => {
-      toast.success(isRegister ? "Akun Google siap diverifikasi" : "Berhasil masuk dengan Google")
-      router.push(isRegister ? "/verifikasi-email" : "/akun")
-    }, 900)
+    await signIn("google", { callbackUrl: `/${locale}/akun` })
+    setSocialLoading(false)
   }
 
   return (
@@ -87,7 +109,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
             <Sparkles className="size-5" />
           </span>
           <span className="font-heading text-xl font-extrabold tracking-tight">
-            beli<span className="text-accent-pink">akun</span>
+            gerai<span className="text-accent-pink">akun</span>
           </span>
         </Link>
 

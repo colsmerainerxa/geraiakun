@@ -15,10 +15,10 @@ import { Badge } from "@/components/ui/badge"
 import { routing } from "@/i18n/routing"
 import { bgFor } from "@/lib/accent"
 import { categories, categoryContent } from "@/lib/mock/categories"
-import { fakeApi } from "@/lib/mock/fake-api"
 import { faqPageJsonLd, itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
 import { cn } from "@/lib/utils"
+import { getCatalogCategories, getCatalogProducts } from "@/lib/server/catalog"
 
 const icons: Record<string, LucideIcon> = {
   Bot,
@@ -39,7 +39,8 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
   const { locale, slug } = await params
-  const category = categories.find((c) => c.slug === slug)
+  const cats = await getCatalogCategories()
+  const category = cats.find((c) => c.slug === slug)
   if (!category) return {}
 
   const isEn = locale === "en"
@@ -62,7 +63,8 @@ export default async function CategoryPage({
   const { locale, slug } = await params
   setRequestLocale(locale)
 
-  const category = await fakeApi.getCategory(slug)
+  const cats = await getCatalogCategories()
+  const category = cats.find((c) => c.slug === slug)
   if (!category) notFound()
 
   const currentLocale = await getLocale()
@@ -80,7 +82,7 @@ export default async function CategoryPage({
   // Prefetch the category's products so the grid is in the SSR HTML (crawlable)
   // and CatalogView/CategoryView hydrates without a client fetch waterfall.
   const catQuery = { category: category.slug, sort: "populer" } as const
-  const catProducts = await fakeApi.getProducts(catQuery)
+  const catProducts = await getCatalogProducts(catQuery)
   const qc = new QueryClient()
   qc.setQueryData(["products", catQuery], catProducts)
 

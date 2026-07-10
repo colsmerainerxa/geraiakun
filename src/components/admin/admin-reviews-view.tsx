@@ -10,19 +10,17 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { products } from "@/lib/mock/products"
+import { useAdminProducts, useAdminReviews } from "@/lib/api/queries"
 import { cn, formatDate, initials } from "@/lib/utils"
-import { useReviewsStore } from "@/stores/reviews"
-
-const productName = (id: string) =>
-  products.find((p) => p.id === id)?.name ?? "Produk tidak dikenal"
+import { useQueryClient } from "@tanstack/react-query"
 
 export function AdminReviewsView() {
-  const reviews = useReviewsStore((s) => s.reviews)
-  const deleteReview = useReviewsStore((s) => s.deleteReview)
-  const questions = useReviewsStore((s) => s.questions)
-  const answerQuestion = useReviewsStore((s) => s.answerQuestion)
-  const deleteQuestion = useReviewsStore((s) => s.deleteQuestion)
+  const queryClient = useQueryClient()
+  const { data: reviews = [] as any[] } = useAdminReviews()
+  const { data: productsResult } = useAdminProducts()
+  const products = (productsResult?.data ?? []) as any[]
+  const productName = (id: string) =>
+    products.find((p: any) => p.id === id)?.name ?? "Produk tidak dikenal"
 
   const [search, setSearch] = useState("")
   const [qSearch, setQSearch] = useState("")
@@ -31,7 +29,7 @@ export function AdminReviewsView() {
   const filteredReviews = useMemo(() => {
     const q = search.toLowerCase().trim()
     return reviews.filter(
-      (r) =>
+      (r: any) =>
         !q ||
         r.author.toLowerCase().includes(q) ||
         r.comment.toLowerCase().includes(q) ||
@@ -39,6 +37,7 @@ export function AdminReviewsView() {
     )
   }, [reviews, search])
 
+  const questions: any[] = []
   const pendingQ = useMemo(
     () =>
       questions.filter(
@@ -51,6 +50,20 @@ export function AdminReviewsView() {
     [questions, qSearch],
   )
   const answeredQ = useMemo(() => questions.filter((q) => q.answer), [questions])
+
+  async function deleteReview(id: string) {
+    const r = await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE" })
+    if (r.ok) {
+      queryClient.invalidateQueries({ queryKey: ["admin", "reviews"] })
+      toast.success("Ulasan dihapus")
+    }
+  }
+  async function answerQuestion(_id: string, _answer: string) {
+    // ponytail: Q&A API not yet implemented — add when questions model exists
+  }
+  async function deleteQuestion(_id: string) {
+    // ponytail: Q&A API not yet implemented
+  }
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
@@ -93,7 +106,7 @@ export function AdminReviewsView() {
               />
             ) : (
               <div className="grid gap-3">
-                {filteredReviews.map((r) => (
+                {filteredReviews.map((r: any) => (
                   <div
                     key={r.id}
                     className="rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm"

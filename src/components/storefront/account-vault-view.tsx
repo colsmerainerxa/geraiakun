@@ -18,11 +18,35 @@ import { SectionHeading } from "@/components/shared/section-heading"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
-import { type VaultAccountStatus, vaultAccounts, vaultActivities } from "@/lib/mock/enterprise"
-import { products } from "@/lib/mock/products"
+import { useVault } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR, formatNumber } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { useUI } from "@/stores/ui"
+import type { VaultAccountStatus } from "@/types"
+
+const VAULT_ACTIVITIES = [
+  {
+    id: "act-1",
+    title: "Credential rotated",
+    body: "Password ChatGPT Plus diperbarui oleh tim fulfillment.",
+    date: "2026-06-27T09:15:00",
+    tone: "lime",
+  },
+  {
+    id: "act-2",
+    title: "Pengingat masa aktif",
+    body: "Gemini Pro berakhir dalam 5 hari dan siap dibeli kembali.",
+    date: "2026-06-26T16:20:00",
+    tone: "warning",
+  },
+  {
+    id: "act-3",
+    title: "Warranty check",
+    body: "Health check API Key selesai tanpa error login.",
+    date: "2026-06-25T10:00:00",
+    tone: "cyan",
+  },
+] as const
 
 const STATUS_KEY: Record<VaultAccountStatus, string> = {
   aktif: "statusActive",
@@ -54,15 +78,19 @@ export function AccountVaultView() {
   const t = useTranslations("vault")
   const addItem = useCart((state) => state.addItem)
   const setCartOpen = useUI((state) => state.setCartOpen)
-  const [selectedId, setSelectedId] = useState(vaultAccounts[0]?.id ?? "")
-  const selected = vaultAccounts.find((account) => account.id === selectedId) ?? vaultAccounts[0]
-  const expiring = vaultAccounts.filter((account) => account.status === "akan-habis").length
-  const reorderEstimate = vaultAccounts
+  const { data: vaultAccounts = [] } = useVault()
+  const vaultAccountsTyped = vaultAccounts as any[]
+  const [selectedId, setSelectedId] = useState(vaultAccountsTyped[0]?.id ?? "")
+  const selected = vaultAccountsTyped.find((account) => account.id === selectedId) ?? vaultAccountsTyped[0]
+  const expiring = vaultAccountsTyped.filter((account) => account.status === "akan-habis").length
+  const reorderEstimate = vaultAccountsTyped
     .filter((account) => account.status === "akan-habis")
     .reduce((sum, account) => sum + account.reorderPrice, 0)
-  const averageHealth = Math.round(
-    vaultAccounts.reduce((sum, account) => sum + account.healthScore, 0) / vaultAccounts.length,
-  )
+  const averageHealth = vaultAccountsTyped.length
+    ? Math.round(
+        vaultAccountsTyped.reduce((sum, account) => sum + account.healthScore, 0) / vaultAccountsTyped.length,
+      )
+    : 0
 
   function statusMeta(status: VaultAccountStatus) {
     return {
@@ -79,25 +107,35 @@ export function AccountVaultView() {
 
   function reorder() {
     if (!selected) return
-    const product = products.find((item) => item.id === selected.productId)
-    const variant = product?.variants.find((item) => item.id === selected.variantId)
-    if (!product || !variant) {
-      toast.error(t("toastReorderError"))
-      return
-    }
-    addItem({
-      productId: product.id,
-      productName: product.name,
-      productLogo: product.logo,
-      productSlug: product.slug,
-      variantId: variant.id,
-      variantLabel: variant.label,
-      price: variant.price,
-      qty: 1,
-      accent: product.accent,
-    })
-    toast.success(t("toastReorderAdded", { name: product.name }))
-    setCartOpen(true)
+    // Fetch product data from API via React Query hook is not possible inside callback.
+    // Use direct fetch to catalog API.
+    fetch(`/api/catalog/products/${selected.productSlug}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((product) => {
+        if (!product) {
+          toast.error(t("toastReorderError"))
+          return
+        }
+        const variant = product.variants?.find((item: { id: string }) => item.id === selected.variantId)
+        if (!variant) {
+          toast.error(t("toastReorderError"))
+          return
+        }
+        addItem({
+          productId: product.id,
+          productName: product.name,
+          productLogo: product.logo,
+          productSlug: product.slug,
+          variantId: variant.id,
+          variantLabel: variant.label,
+          price: variant.price,
+          qty: 1,
+          accent: product.accent,
+        })
+        toast.success(t("toastReorderAdded", { name: product.name }))
+        setCartOpen(true)
+      })
+      .catch(() => toast.error(t("toastReorderError")))
   }
 
   return (
@@ -136,7 +174,7 @@ export function AccountVaultView() {
         <VaultStat
           icon={KeyRound}
           label={t("statActive")}
-          value={formatNumber(vaultAccounts.length)}
+          value={formatNumber(vaultAccountsTyped.length)}
           accent="bg-accent-cyan"
         />
         <VaultStat
@@ -165,7 +203,7 @@ export function AccountVaultView() {
             <p className="text-xs font-bold text-main-foreground/70">{t("reorderEstimateHint")}</p>
           </div>
 
-          {vaultAccounts.map((account) => {
+          {vaultAccountsTyped.map((account) => {
             const meta = statusMeta(account.status)
             const active = selected?.id === account.id
             return (
@@ -276,7 +314,7 @@ export function AccountVaultView() {
                 <Activity className="size-5" /> {t("activityTitle")}
               </h3>
               <div className="mt-4 flex flex-col gap-3">
-                {vaultActivities.map((activity) => (
+                {VAULT_ACTIVITIES.map((activity) => (
                   <div key={activity.id} className="flex gap-3">
                     <span
                       className={cn(

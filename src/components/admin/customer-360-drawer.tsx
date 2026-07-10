@@ -37,17 +37,18 @@ export function Customer360Drawer({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { data: orders } = useOrders()
+  const { data: ordersResult } = useOrders()
+  const orders = (ordersResult?.data ?? []) as any[]
   const tickets = useTickets((s) => s.tickets)
 
   if (!customer) return null
 
   const custOrders = (orders ?? [])
-    .filter((o) => o.customerEmail.toLowerCase() === customer.email.toLowerCase())
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .filter((o: any) => o.customerEmail.toLowerCase() === customer.email.toLowerCase())
+    .sort((a: any, b: any) => b.createdAt.localeCompare(a.createdAt))
   const custTickets = tickets
-    .filter((t) => t.customerEmail?.toLowerCase() === customer.email.toLowerCase())
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .filter((t: any) => t.customerEmail?.toLowerCase() === customer.email.toLowerCase())
+    .sort((a: any, b: any) => b.updatedAt.localeCompare(a.updatedAt))
   const openTickets = custTickets.filter(
     (t) => t.status === "baru" || t.status === "ditinjau",
   ).length
@@ -126,7 +127,7 @@ export function Customer360Drawer({
             </p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {custOrders.slice(0, 6).map((o) => (
+              {custOrders.slice(0, 6).map((o: any) => (
                 <li
                   key={o.id}
                   className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-secondary-background p-3"
@@ -134,7 +135,7 @@ export function Customer360Drawer({
                   <div className="min-w-0">
                     <p className="font-heading text-sm font-bold">{o.invoice}</p>
                     <p className="truncate text-xs text-foreground/60">
-                      {o.items.map((it) => it.productName).join(", ")}
+                      {o.items.map((it: any) => it.productName).join(", ")}
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
@@ -159,7 +160,7 @@ export function Customer360Drawer({
             </p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {custTickets.slice(0, 6).map((t) => (
+              {custTickets.slice(0, 6).map((t: any) => (
                 <li
                   key={t.id}
                   className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-secondary-background p-3"
@@ -171,8 +172,8 @@ export function Customer360Drawer({
                     <p className="truncate text-sm font-bold">{t.subject}</p>
                     <p className="text-xs text-foreground/50">{formatDate(t.updatedAt)}</p>
                   </div>
-                  <Badge variant={TICKET_STATUS[t.status].variant} className="shrink-0">
-                    {TICKET_STATUS[t.status].label}
+                  <Badge variant={(TICKET_STATUS as any)[t.status]?.variant ?? "neutral"} className="shrink-0">
+                    {(TICKET_STATUS as any)[t.status]?.label ?? t.status}
                   </Badge>
                 </li>
               ))}

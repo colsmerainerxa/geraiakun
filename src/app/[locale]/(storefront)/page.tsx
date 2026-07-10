@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
 import { fakeApi } from "@/lib/mock/fake-api"
 import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld"
+import { getCatalogCategories, getCatalogProducts } from "@/lib/server/catalog"
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -20,11 +21,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("home")
   const tc = await getTranslations("common")
 
-  const [categories, featured, testimonials] = await Promise.all([
-    fakeApi.getCategories(),
-    fakeApi.getFeatured(),
+  const [categories, allProducts, testimonials] = await Promise.all([
+    getCatalogCategories(),
+    getCatalogProducts(),
     fakeApi.getTestimonials(),
   ])
+  const featured = allProducts.filter((p) => p.featured)
 
   const steps = [
     { n: "01", title: t("step1Title"), desc: t("step1Desc"), accent: "bg-accent-cyan" },
@@ -54,7 +56,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           subtitle={t("categoriesSubtitle")}
         />
         <RevealGroup className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          {categories.map((c) => (
+          {categories.map((c: any) => (
             <RevealItem key={c.id}>
               <CategoryCard category={c} />
             </RevealItem>
@@ -78,7 +80,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             }
           />
           <RevealGroup className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((p) => (
+            {featured.map((p: any) => (
               <RevealItem key={p.id}>
                 <ProductCard product={p} />
               </RevealItem>

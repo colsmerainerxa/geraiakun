@@ -13,14 +13,14 @@ export default async function VerifyEmailPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; token?: string }>
 }) {
   const { locale } = await params
-  const { status } = await searchParams
+  const { status, token } = await searchParams
   setRequestLocale(locale)
   return (
     <Container className="flex min-h-[70vh] items-center py-12">
-      <AuthRecoveryView mode="verify" expired={status === "expired"} />
+      <AuthRecoveryView mode="verify" expired={status === "expired"} token={token ?? null} />
     </Container>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { setRequestLocale } from "next-intl/server"
 import { AdminShell } from "@/components/admin/admin-shell"
+import { requireAdminSession } from "@/lib/server/auth-guards"
 
 export const metadata: Metadata = {
   title: "Admin · geraiakun",
@@ -16,5 +17,6 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params
   setRequestLocale(locale)
+  await requireAdminSession(locale)
   return <AdminShell>{children}</AdminShell>
 }

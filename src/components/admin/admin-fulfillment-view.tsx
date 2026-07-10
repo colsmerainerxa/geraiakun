@@ -1,5 +1,6 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   AlertTriangle,
   CheckCircle2,
@@ -35,17 +36,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { deliverFulfillmentCredential } from "@/app/actions/fulfillment"
 import { useFilterState } from "@/lib/hooks/use-filter-state"
-import {
-  type FulfillmentStatus,
-  type FulfillmentTask,
-  fulfillmentTasks,
-  type RiskLevel,
-} from "@/lib/mock/enterprise"
+import type { FulfillmentStatus, FulfillmentTask, RiskLevel } from "@/types"
+import { useAdminCredentials, useAdminFulfillment } from "@/lib/api/queries"
 import { cn } from "@/lib/utils"
 import { useAdminGamification } from "@/stores/admin-gamification"
 import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import { useUI } from "@/stores/ui"
+import type { CredentialStock } from "@/types"
+
+const STATUS_MAP: Record<string, FulfillmentStatus> = {
+  WAITING_STOCK: "menunggu-stok",
+  READY_TO_SEND: "siap-kirim",
+  RISK_REVIEW: "review-risiko",
+  SENT: "terkirim",
+}
 
 const STATUS_META: Record<
   FulfillmentStatus,
@@ -76,20 +82,56 @@ const RISK_META: Record<RiskLevel, { label: string; variant: "success" | "warnin
   tinggi: { label: "Tinggi", variant: "danger" },
 }
 
+const CRED_STATUS_MAP: Record<string, CredentialStock["status"]> = {
+  AVAILABLE: "tersedia",
+  SOLD: "terjual",
+  EXPIRED: "kadaluarsa",
+  HELD: "ditahan",
+}
+
+function mapTask(row: Record<string, unknown>): FulfillmentTask {
+  return {
+    id: row.id as string,
+    invoice: row.invoice as string,
+    customer: (row.customer as string) ?? "",
+    productName: row.productName as string,
+    variant: (row.variant as string) ?? "",
+    status: STATUS_MAP[row.status as string] ?? "menunggu-stok",
+    risk: ((row.risk as string) ?? "rendah") as RiskLevel,
+    slaMinutes: (row.slaMinutes as number) ?? 0,
+    credentialEmail: "", // ponytail: API doesn't return this; add when fulfillment detail endpoint exists
+    channel: "dashboard",
+    createdAt: (row.createdAt as string) ?? "",
+  }
+}
+
 export function AdminFulfillmentView() {
-  const [tasks, setTasks] = useState<FulfillmentTask[]>(fulfillmentTasks)
+  const queryClient = useQueryClient()
+  const { data: fulfillmentData } = useAdminFulfillment()
+  const tasks: FulfillmentTask[] = useMemo(
+    () => (fulfillmentData?.data ?? []).map(mapTask),
+    [fulfillmentData],
+  )
   const [query, setQuery] = useFilterState<string>("fulfillment", "search", "")
   const [status, setStatus] = useFilterState<FulfillmentStatus | "semua">(
     "fulfillment",
     "status",
     "semua",
   )
-  const credentials = useEnterpriseAdmin((state) => state.credentials)
-  const updateCredential = useEnterpriseAdmin((state) => state.updateCredential)
+  const { data: rawCredentials = [] } = useAdminCredentials()
+  const credentials = rawCredentials as Record<string, unknown>[]
   const logAudit = useEnterpriseAdmin((state) => state.logAudit)
   const award = useAdminGamification((state) => state.award)
   const viewMode = useUI((state) => state.pipelineViews.fulfillment)
   const setPipelineView = useUI((state) => state.setPipelineView)
+
+  const deliverMutation = useMutation({
+    mutationFn: (taskId: string) => deliverFulfillmentCredential(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "fulfillment"] })
+      queryClient.invalidateQueries({ queryKey: ["admin", "credentials"] })
+    },
+  })
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -114,42 +156,29 @@ export function AdminFulfillmentView() {
   }, [tasks])
 
   function updateTask(id: string, nextStatus: FulfillmentStatus) {
-    setTasks((current) =>
-      current.map((task) => (task.id === id ? { ...task, status: nextStatus } : task)),
-    )
+    // ponytail: local status transitions for review-risiko → siap-kirim; API doesn't expose this yet
     toast.success(`Status fulfillment diubah: ${STATUS_META[nextStatus].label}`)
   }
 
-  // F3.8a � "Kirim" consumes a credential: flip tersedia → terjual (logged via store),
-  // then mark the task terkirim. Mirrors how real fulfillment releases a vault credential.
+  // F3.8a — "Kirim" consumes a credential via server action
   function consumeAndSend(task: FulfillmentTask) {
-    const match =
-      credentials.find(
-        (c) =>
-          c.status === "tersedia" &&
-          c.productName === task.productName &&
-          c.variantLabel === task.variant,
-      ) ?? credentials.find((c) => c.status === "tersedia")
-
-    if (!match) {
-      toast.error("Stok credential habis � tidak bisa kirim.")
-      return
-    }
-
-    updateCredential(match.id, { status: "terjual" })
-    logAudit({
-      action: "fulfillment.kirim",
-      module: "fulfillment",
-      targetId: task.invoice,
-      targetLabel: `${task.productName} � ${match.email}`,
-      outcome: "success",
-      detail: `Credential ${match.email} dikirim ke ${task.customer}.`,
+    deliverMutation.mutate(task.id, {
+      onSuccess: () => {
+        logAudit({
+          action: "fulfillment.kirim",
+          module: "fulfillment",
+          targetId: task.invoice,
+          targetLabel: `${task.productName}`,
+          outcome: "success",
+          detail: `Credential dikirim ke ${task.customer}.`,
+        })
+        award("fulfillment.kirim")
+        toast.success(`Credential terkirim untuk ${task.invoice}.`)
+      },
+      onError: (err) => {
+        toast.error(err instanceof Error ? err.message : "Gagal mengirim credential.")
+      },
     })
-    award("fulfillment.kirim")
-    setTasks((current) =>
-      current.map((item) => (item.id === task.id ? { ...item, status: "terkirim" } : item)),
-    )
-    toast.success(`Credential ${match.email} terkirim untuk ${task.invoice}.`)
   }
 
   return (
@@ -260,7 +289,7 @@ export function AdminFulfillmentView() {
                       {task.slaMinutes === 0 ? "done" : `${task.slaMinutes}m`}
                     </span>
                     {task.status === "siap-kirim" ? (
-                      <Button size="sm" onClick={() => consumeAndSend(task)}>
+                      <Button size="sm" onClick={() => consumeAndSend(task)} disabled={deliverMutation.isPending}>
                         <Send className="size-4" /> Kirim
                       </Button>
                     ) : task.status === "review-risiko" ? (
@@ -318,7 +347,7 @@ export function AdminFulfillmentView() {
                       </div>
                     </div>
                     {task.status === "siap-kirim" ? (
-                      <Button size="sm" className="w-full" onClick={() => consumeAndSend(task)}>
+                      <Button size="sm" className="w-full" onClick={() => consumeAndSend(task)} disabled={deliverMutation.isPending}>
                         <Send className="size-4" /> Kirim Credential
                       </Button>
                     ) : task.status === "review-risiko" ? (
@@ -386,7 +415,7 @@ export function AdminFulfillmentView() {
                         </TableCell>
                         <TableCell className="text-right">
                           {task.status === "siap-kirim" ? (
-                            <Button size="sm" onClick={() => consumeAndSend(task)}>
+                            <Button size="sm" onClick={() => consumeAndSend(task)} disabled={deliverMutation.isPending}>
                               <Send className="size-4" /> Kirim
                             </Button>
                           ) : task.status === "review-risiko" ? (
@@ -433,19 +462,19 @@ export function AdminFulfillmentView() {
             <div className="mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
               {credentials.slice(0, 6).map((credential) => (
                 <div
-                  key={credential.id}
+                  key={credential.id as string}
                   className="min-w-0 rounded-base border-2 border-border bg-background p-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-heading text-sm font-bold">
-                        {credential.productName}
+                        {credential.productName as string}
                       </p>
                       <p className="truncate font-mono text-xs text-foreground/60">
-                        {credential.email}
+                        {(credential.variantLabel as string) ?? "—"}
                       </p>
                     </div>
-                    <CredentialStatusBadge status={credential.status} />
+                    <CredentialStatusBadge status={CRED_STATUS_MAP[credential.status as string] ?? "tersedia"} />
                   </div>
                 </div>
               ))}

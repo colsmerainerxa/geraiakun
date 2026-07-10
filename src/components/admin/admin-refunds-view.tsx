@@ -1,5 +1,6 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Check,
   Clock3,
@@ -28,10 +29,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { processRefund } from "@/app/actions/admin-refunds"
+import { useAdminRefunds, useAdminTeam } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import { useUI } from "@/stores/ui"
-import type { RefundDecision, RefundStatus } from "@/types"
+import type { RefundCase, RefundDecision, RefundStatus } from "@/types"
+
+const REFUND_STATUS_MAP: Record<string, RefundStatus> = {
+  DRAFT: "draft",
+  REVIEW: "review",
+  REPLACEMENT: "replacement",
+  REFUND: "refund",
+  REJECTED: "rejected",
+  CLOSED: "closed",
+}
+
+const DECISION_TO_API: Record<RefundDecision, string> = {
+  replacement: "REPLACEMENT",
+  refund: "REFUND",
+  reject: "REJECTED",
+}
+
+function mapRefund(row: Record<string, unknown>): RefundCase {
+  return {
+    id: row.id as string,
+    orderInvoice: row.orderInvoice as string,
+    ticketId: (row.ticketId as string) ?? null,
+    productId: (row.productId as string) ?? "",
+    productName: row.productName as string,
+    reason: (row.reason as string) ?? "",
+    amount: (row.amount as number) ?? 0,
+    status: REFUND_STATUS_MAP[row.status as string] ?? "draft",
+    owner: (row.owner as string) ?? "CS geraiakun",
+    evidence: (row.evidence as string[]) ?? [],
+    updatedAt: (row.updatedAt as string) ?? "",
+    timeline: (row.timeline as { label: string; done: boolean }[]) ?? [],
+  }
+}
 
 const STATUS_META: Record<
   RefundStatus,
@@ -63,15 +97,37 @@ const REFUND_COLUMNS = Object.entries(STATUS_META).map(([status, meta]) => ({
 }))
 
 export function AdminRefundsView() {
-  const refunds = useEnterpriseAdmin((state) => state.refunds)
-  const staff = useEnterpriseAdmin((state) => state.staff)
-  const assignRefund = useEnterpriseAdmin((state) => state.assignRefund)
-  const decideRefund = useEnterpriseAdmin((state) => state.decideRefund)
-  const [selectedId, setSelectedId] = useState(refunds[0]?.id ?? "")
+  const queryClient = useQueryClient()
+  const { data: refundsData } = useAdminRefunds()
+  const refunds: RefundCase[] = useMemo(
+    () => (refundsData?.data ?? []).map(mapRefund),
+    [refundsData],
+  )
+  const { data: staffData = [] as any[] } = useAdminTeam()
+  const staff = staffData
+  async function assignRefund(refundId: string, staffId: string) {
+    const r = await fetch("/api/admin/refunds", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: refundId, owner: staffId }),
+    })
+    if (r.ok) {
+      queryClient.invalidateQueries({ queryKey: ["admin", "refunds"] })
+    }
+  }
+  const [selectedId, setSelectedId] = useState("")
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<RefundStatus | "all">("all")
   const viewMode = useUI((state) => state.pipelineViews.refunds)
   const setPipelineView = useUI((state) => state.setPipelineView)
+
+  const processMutation = useMutation({
+    mutationFn: (input: { refundId: string; status: string; note?: string }) =>
+      processRefund(input as any),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "refunds"] })
+    },
+  })
 
   const filtered = useMemo(() => {
     const needle = query.toLowerCase().trim()
@@ -121,7 +177,7 @@ export function AdminRefundsView() {
   function bulkDecide(decision: RefundDecision) {
     if (checked.size === 0) return
     checked.forEach((id) => {
-      decideRefund(id, decision)
+      processMutation.mutate({ refundId: id, status: DECISION_TO_API[decision] })
     })
     toast.success(`${checked.size} kasus refund diputuskan: ${decision}`)
     setChecked(new Set())
@@ -135,8 +191,14 @@ export function AdminRefundsView() {
 
   function decide(decision: RefundDecision) {
     if (!selected) return
-    decideRefund(selected.id, decision)
-    toast.success(`Keputusan ${decision} disimpan untuk ${selected.orderInvoice}`)
+    processMutation.mutate(
+      { refundId: selected.id, status: DECISION_TO_API[decision] },
+      {
+        onSuccess: () => {
+          toast.success(`Keputusan ${decision} disimpan untuk ${selected.orderInvoice}`)
+        },
+      },
+    )
   }
 
   return (
@@ -363,10 +425,10 @@ export function AdminRefundsView() {
                 </SelectTrigger>
                 <SelectContent>
                   {staff
-                    .filter((member) =>
+                    .filter((member: any) =>
                       ["customer-support", "finance", "owner"].includes(member.role),
                     )
-                    .map((member) => (
+                    .map((member: any) => (
                       <SelectItem key={member.id} value={member.name}>
                         {member.name}
                       </SelectItem>
@@ -438,13 +500,13 @@ export function AdminRefundsView() {
                     Keputusan operator
                   </p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                    <Button size="sm" onClick={() => decide("replacement")}>
+                    <Button size="sm" onClick={() => decide("replacement")} disabled={processMutation.isPending}>
                       <RefreshCcw className="size-4" /> Replace
                     </Button>
-                    <Button size="sm" variant="danger" onClick={() => decide("refund")}>
+                    <Button size="sm" variant="danger" onClick={() => decide("refund")} disabled={processMutation.isPending}>
                       <WalletCards className="size-4" /> Refund
                     </Button>
-                    <Button size="sm" variant="neutral" onClick={() => decide("reject")}>
+                    <Button size="sm" variant="neutral" onClick={() => decide("reject")} disabled={processMutation.isPending}>
                       <XCircle className="size-4" /> Tolak
                     </Button>
                   </div>

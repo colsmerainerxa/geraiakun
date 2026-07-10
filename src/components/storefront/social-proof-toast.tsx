@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { products } from "@/lib/mock/products"
+import { useProducts } from "@/lib/api/queries"
 import { formatNumber, initials } from "@/lib/utils"
 
 // Nama-nama pembeli mock untuk rotasi toast social-proof.
@@ -50,8 +50,9 @@ interface ToastEvent {
   minutesAgo: number
 }
 
-function buildEvent(i: number): ToastEvent {
-  const p = products[i % products.length]
+function buildEvent(i: number, products: { slug: string; name: string; logo: string; accent: string }[]): ToastEvent {
+  const p = products.length > 0 ? products[i % products.length] : null
+  if (!p) return { id: i, productSlug: "", productName: "", productLogo: "", accent: "accent-cyan", buyer: BUYERS[i % BUYERS.length], city: CITIES[i % BUYERS.length], minutesAgo: 1 + (i % 12) }
   return {
     id: i,
     productSlug: p.slug,
@@ -70,6 +71,7 @@ function buildEvent(i: number): ToastEvent {
  * mengganggu first paint.
  */
 export function SocialProofToast() {
+  const { data: allProducts } = useProducts()
   const t = useTranslations("socialProof")
   const isEn = useLocale() === "en"
   const [current, setCurrent] = useState<ToastEvent | null>(null)
@@ -81,7 +83,7 @@ export function SocialProofToast() {
 
     const show = () => {
       eventIdx += 1
-      setCurrent(buildEvent(eventIdx))
+      setCurrent(buildEvent(eventIdx, allProducts ?? []))
       hideTimer = setTimeout(() => setCurrent(null), 6000)
       showTimer = setTimeout(show, 9000 + Math.random() * 5000)
     }

@@ -13,6 +13,7 @@ interface CreatePaymentInput {
 interface PaymentState {
   attempts: PaymentAttempt[]
   createAttempt: (input: CreatePaymentInput) => PaymentAttempt
+  upsertAttempt: (attempt: PaymentAttempt) => void
   getByInvoice: (invoice: string) => PaymentAttempt | undefined
   setStatus: (invoice: string, status: PaymentStatus, failureReason?: string | null) => void
   changeMethod: (invoice: string, method: PaymentMethod) => void
@@ -57,6 +58,10 @@ export const usePayments = create<PaymentState>()(
         }))
         return attempt
       },
+      upsertAttempt: (attempt) =>
+        set((state) => ({
+          attempts: [attempt, ...state.attempts.filter((item) => item.id !== attempt.id)],
+        })),
       getByInvoice: (invoice) =>
         get().attempts.find((item) => item.invoice.toLowerCase() === invoice.toLowerCase()),
       setStatus: (invoice, status, failureReason = null) =>

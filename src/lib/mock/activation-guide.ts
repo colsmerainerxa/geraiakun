@@ -1,21 +1,5 @@
-import type { CategorySlug } from "@/types"
-
-export interface ActivationStep {
-  title: { id: string; en: string }
-  desc: { id: string; en: string }
-}
-
-export interface ActivationGuide {
-  /** brand -> guide; fallback pakai category. */
-  brand?: string
-  category?: CategorySlug
-  difficulty: "easy" | "medium"
-  minutes: number
-  prerequisites: { id: string; en: string }[]
-  steps: ActivationStep[]
-  troubleshooting: { q: { id: string; en: string }; a: { id: string; en: string } }[]
-  tips: { id: string; en: string }[]
-}
+import type { ActivationGuide, ActivationStep, CategorySlug } from "@/types"
+export type { ActivationGuide, ActivationStep }
 
 // Template umum reusable
 const commonPrereqs = [

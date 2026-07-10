@@ -4,13 +4,14 @@ import { useTranslations } from "next-intl"
 import { Container } from "@/components/shared/container"
 import { ProductCard } from "@/components/storefront/product-card"
 import { useMounted } from "@/hooks/use-mounted"
-import { products } from "@/lib/mock/products"
+import { useProducts } from "@/lib/api/queries"
 import { useRecentlyViewed } from "@/stores/recently-viewed"
 
 export function RecentlyViewedStrip({ excludeSlug }: { excludeSlug?: string }) {
   const t = useTranslations("common")
   const mounted = useMounted()
   const slugs = useRecentlyViewed((s) => s.slugs)
+  const { data: allProducts } = useProducts()
 
   // Persisted store hydrates client-side; render nothing until mounted to avoid
   // a hydration mismatch (and the empty-state flash).
@@ -18,7 +19,7 @@ export function RecentlyViewedStrip({ excludeSlug }: { excludeSlug?: string }) {
 
   const items = slugs
     .filter((s) => s !== excludeSlug)
-    .map((s) => products.find((p) => p.slug === s))
+    .map((s) => (allProducts ?? []).find((p) => p.slug === s))
     .filter((p): p is NonNullable<typeof p> => Boolean(p))
     .slice(0, 4)
 

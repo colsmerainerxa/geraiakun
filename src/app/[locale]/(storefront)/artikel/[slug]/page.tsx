@@ -8,10 +8,83 @@ import { ShareButtons } from "@/components/storefront/share-buttons"
 import { Badge } from "@/components/ui/badge"
 import { Link } from "@/i18n/navigation"
 import { articles, getArticle, relatedArticles } from "@/lib/mock/articles"
-import { products } from "@/lib/mock/products"
 import { articleJsonLd, breadcrumbJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
 import { formatDate } from "@/lib/utils"
+import { getCatalogProducts } from "@/lib/server/catalog"
+import { backendFlags } from "@/lib/server/env"
+import type { Article } from "@/lib/mock/articles"
+
+async function getPrisma() {
+  return (await import("@/lib/server/prisma")).prisma
+}
+
+function isDbUnavailable(error: unknown) {
+  if (typeof error !== "object" || error === null) return false
+  const record = error as Record<string, unknown>
+  return (
+    record.code === "P2021" ||
+    String(record.message ?? "").includes("does not exist") ||
+    String(record.message ?? "").includes("TableDoesNotExist")
+  )
+}
+
+function dbArticleToArticle(
+  db: { slug: string; title: string; excerpt: string; body: string; category: string; publishedAt: Date },
+): Article {
+  return {
+    slug: db.slug,
+    title: db.title,
+    titleEn: db.title,
+    excerpt: db.excerpt,
+    excerptEn: db.excerpt,
+    category: db.category,
+    categoryEn: db.category,
+    emoji: "📝",
+    accent: "accent-cyan",
+    date: db.publishedAt.toISOString(),
+    readMinutes: Math.max(1, Math.ceil(db.body.split(/\s+/).length / 200)),
+    sections: [
+      {
+        heading: db.title,
+        headingEn: db.title,
+        body: db.body,
+        bodyEn: db.body,
+      },
+    ],
+    relatedSlugs: [],
+  }
+}
+
+async function getArticleFromDb(slug: string): Promise<Article | null> {
+  if (!backendFlags.databaseConfigured) return getArticle(slug) ?? null
+  try {
+    const prisma = await getPrisma()
+    const dbArticle = await prisma.article.findUnique({
+      where: { slug, published: true },
+    })
+    return dbArticle ? dbArticleToArticle(dbArticle) : null
+  } catch (error) {
+    if (isDbUnavailable(error)) return getArticle(slug) ?? null
+    throw error
+  }
+}
+
+async function getRelatedArticlesFromDb(slug: string, limit = 3): Promise<Article[]> {
+  if (!backendFlags.databaseConfigured) return relatedArticles(slug, limit)
+  try {
+    const prisma = await getPrisma()
+    const dbArticles = await prisma.article.findMany({
+      where: { published: true, slug: { not: slug } },
+      orderBy: { publishedAt: "desc" },
+      take: limit,
+    })
+    return dbArticles.map(dbArticleToArticle)
+  } catch (error) {
+    if (isDbUnavailable(error)) return relatedArticles(slug, limit)
+    throw error
+  }
+}
 
 export function generateStaticParams() {
   return articles.flatMap((a) => ["id", "en"].map((locale) => ({ locale, slug: a.slug })))
@@ -23,7 +96,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
   const { locale, slug } = await params
-  const article = getArticle(slug)
+  const article = await getArticleFromDb(slug)
   if (!article) return {}
   const isEn = locale === "en"
   const title = isEn ? article.titleEn : article.title
@@ -48,7 +121,7 @@ export default async function ArticlePage({
 }) {
   const { locale, slug } = await params
   setRequestLocale(locale)
-  const article = getArticle(slug)
+  const article = await getArticleFromDb(slug)
   if (!article) notFound()
 
   const t = await getTranslations("blog")
@@ -57,8 +130,9 @@ export default async function ArticlePage({
   const title = isEn ? article.titleEn : article.title
   const path = locale === "en" ? `/en/artikel/${slug}` : `/artikel/${slug}`
 
-  const related = products.filter((p) => article.relatedSlugs.includes(p.slug))
-  const more = relatedArticles(slug)
+  const allProducts = await getCatalogProducts()
+  const related = allProducts.filter((p) => article.relatedSlugs.includes(p.slug))
+  const more = await getRelatedArticlesFromDb(slug)
 
   return (
     <Container className="py-10 lg:py-12">

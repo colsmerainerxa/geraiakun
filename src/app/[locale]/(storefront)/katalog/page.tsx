@@ -3,9 +3,9 @@ import type { Metadata } from "next"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { Suspense } from "react"
 import { CatalogView } from "@/components/storefront/catalog-view"
-import { fakeApi } from "@/lib/mock/fake-api"
 import { itemListJsonLd, JsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
+import { getCatalogCategories, getCatalogProducts } from "@/lib/server/catalog"
 
 // Matches CatalogView's initial query (no filters) so the prefetched cache
 // hydrates the first client render — products land in the SSR HTML.
@@ -31,14 +31,14 @@ export default async function CatalogPage({ params }: { params: Promise<{ locale
 
   const qc = new QueryClient()
   const [products] = await Promise.all([
-    fakeApi.getProducts(DEFAULT_QUERY),
+    getCatalogProducts(DEFAULT_QUERY),
     qc.prefetchQuery({
       queryKey: ["products", DEFAULT_QUERY],
-      queryFn: () => fakeApi.getProducts(DEFAULT_QUERY),
+      queryFn: () => getCatalogProducts(DEFAULT_QUERY),
     }),
     qc.prefetchQuery({
       queryKey: ["categories"],
-      queryFn: () => fakeApi.getCategories(),
+      queryFn: getCatalogCategories,
     }),
   ])
 

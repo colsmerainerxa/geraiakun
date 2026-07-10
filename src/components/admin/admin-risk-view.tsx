@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useAdminRisk } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { RiskReviewStatus } from "@/types"
@@ -31,7 +32,8 @@ const STATUS_META: Record<
 }
 
 export function AdminRiskView() {
-  const risks = useEnterpriseAdmin((state) => state.risks)
+  const { data: riskData } = useAdminRisk()
+  const risks = (riskData ?? []) as any[]
   const decideRisk = useEnterpriseAdmin((state) => state.decideRisk)
   const [selectedId, setSelectedId] = useState(risks[0]?.id ?? "")
   const [query, setQuery] = useState("")
@@ -111,8 +113,8 @@ export function AdminRiskView() {
                     <p className="font-heading text-sm font-extrabold">{item.invoice}</p>
                     <p className="text-xs text-foreground/60">{item.customerName}</p>
                   </div>
-                  <Badge variant={STATUS_META[item.status].variant}>
-                    {STATUS_META[item.status].label}
+                  <Badge variant={STATUS_META[item.status as RiskReviewStatus].variant}>
+                    {STATUS_META[item.status as RiskReviewStatus].label}
                   </Badge>
                 </div>
                 <div className="mt-3 flex items-end justify-between gap-4">
@@ -147,8 +149,8 @@ export function AdminRiskView() {
           <section className="min-w-0 overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
             <div className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-border bg-main p-6">
               <div>
-                <Badge variant={STATUS_META[selected.status].variant}>
-                  {STATUS_META[selected.status].label}
+                <Badge variant={STATUS_META[selected.status as RiskReviewStatus].variant}>
+                  {STATUS_META[selected.status as RiskReviewStatus].label}
                 </Badge>
                 <h2 className="mt-2 font-heading text-xl font-extrabold">{selected.invoice}</h2>
                 <p className="text-sm font-bold text-main-foreground/65">
@@ -164,7 +166,7 @@ export function AdminRiskView() {
               <div>
                 <h3 className="font-heading text-sm font-extrabold">Sinyal terdeteksi</h3>
                 <ul className="mt-3 flex flex-col gap-2">
-                  {selected.signals.map((signal) => (
+                  {selected.signals.map((signal: string) => (
                     <li
                       key={signal}
                       className="flex items-start gap-2 rounded-base border-2 border-border bg-background p-3 text-sm font-semibold"

@@ -13,6 +13,7 @@ import {
 import { useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
+import { requestRefund } from "@/app/actions/refunds"
 import { Container } from "@/components/shared/container"
 import { SectionHeading } from "@/components/shared/section-heading"
 import { Badge } from "@/components/ui/badge"
@@ -20,7 +21,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { type RefundCase, type RefundStatus, refundCases } from "@/lib/mock/enterprise"
+import { type RefundCase, type RefundStatus } from "@/types"
+import { useUserRefunds } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 
 const STATUS_KEY: Record<RefundStatus, string> = {
@@ -44,27 +46,40 @@ const STATUS_VARIANT: Record<RefundStatus, "neutral" | "warning" | "cyan" | "suc
 export function RefundCenterView() {
   const t = useTranslations("refundCenter")
   const [query, setQuery] = useState("")
-  const [selectedId, setSelectedId] = useState(refundCases[0]?.id ?? "")
-  const selected = refundCases.find((item) => item.id === selectedId) ?? refundCases[0]
+  const { data: refundCases = [] as RefundCase[] } = useUserRefunds()
+  const [selectedId, setSelectedId] = useState("")
+  const selected = refundCases.find((item: RefundCase) => item.id === selectedId) ?? refundCases[0]
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
     if (!q) return refundCases
     return refundCases.filter(
-      (item) =>
+      (item: RefundCase) =>
         item.id.toLowerCase().includes(q) ||
         item.orderInvoice.toLowerCase().includes(q) ||
         item.productName.toLowerCase().includes(q),
     )
-  }, [query])
+  }, [query, refundCases])
 
   function statusMeta(status: RefundStatus) {
     return { label: t(STATUS_KEY[status]), variant: STATUS_VARIANT[status] }
   }
 
-  function submitDraft(event: React.FormEvent<HTMLFormElement>) {
+  async function submitDraft(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    toast.success(t("toastDraftTitle"), { description: t("toastDraftDesc") })
-    event.currentTarget.reset()
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    try {
+      const result = await requestRefund({
+        invoice: String(formData.get("invoice") ?? ""),
+        reason: String(formData.get("reason") ?? ""),
+      })
+      toast.success(t("toastDraftTitle"), {
+        description: `${t("toastDraftDesc")} ${result.id}`,
+      })
+      form.reset()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Refund gagal diajukan.")
+    }
   }
 
   return (
@@ -101,7 +116,7 @@ export function RefundCenterView() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {filtered.map((item) => (
+            {filtered.map((item: RefundCase) => (
               <CaseButton
                 key={item.id}
                 item={item}
@@ -172,7 +187,7 @@ export function RefundCenterView() {
                   <div className="mt-5">
                     <p className="font-heading text-sm font-extrabold">{t("timelineTitle")}</p>
                     <div className="mt-3 flex flex-col gap-3">
-                      {selected.timeline.map((step, index) => (
+                      {(selected.timeline as Array<{ label: string; done: boolean }>).map((step, index) => (
                         <div key={step.label} className="flex gap-3">
                           <span
                             className={cn(

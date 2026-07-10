@@ -27,16 +27,19 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { downloadCsv } from "@/lib/csv"
+import { useAdminAudit } from "@/lib/api/queries"
 import { cn, formatDate } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
+
+import type { AuditEvent } from "@/types"
 
 export function AdminAuditView() {
-  const audits = useEnterpriseAdmin((state) => state.audits)
+  const { data: auditResult, isLoading } = useAdminAudit({ limit: 100 })
+  const audits: AuditEvent[] = auditResult?.data ?? []
   const [query, setQuery] = useState("")
   const [module, setModule] = useState("all")
   const [rangePreset, setRangePreset] = useState<DateRangePreset>("30d")
   const range = useDateRange(rangePreset)
-  const [selectedId, setSelectedId] = useState(audits[0]?.id ?? "")
+  const [selectedId, setSelectedId] = useState("")
   const modules = useMemo(() => [...new Set(audits.map((item) => item.module))].sort(), [audits])
   const filtered = useMemo(() => {
     const needle = query.toLowerCase().trim()
@@ -51,6 +54,14 @@ export function AdminAuditView() {
     })
   }, [audits, module, query, range])
   const selected = audits.find((item) => item.id === selectedId) ?? filtered[0]
+
+  if (isLoading) {
+    return (
+      <div className="flex min-w-0 flex-col gap-6">
+        <p className="text-sm text-foreground/60">Memuat audit log...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-w-0 flex-col gap-6">

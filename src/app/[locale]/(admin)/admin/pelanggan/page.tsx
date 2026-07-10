@@ -32,20 +32,21 @@ const STATUS: Record<
 }
 
 export default function AdminCustomersPage() {
-  const { data: customers, isLoading } = useCustomers()
+  const { data: result, isLoading } = useCustomers()
+  const customers = (result?.data ?? []) as any[]
   const [search, setSearch] = useState("")
 
   const filtered = useMemo(() => {
-    if (!customers) return []
     const q = search.toLowerCase().trim()
     if (!q) return customers
     return customers.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q),
+      (c: any) =>
+        c.name?.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q),
     )
   }, [customers, search])
 
   const { page, setPage, pageCount, paged, total, pageSize } = usePagination(filtered, 10)
-  const [active, setActive] = useState<Customer | null>(null)
+  const [active, setActive] = useState<any | null>(null)
 
   return (
     <div className="flex flex-col gap-4">
@@ -65,14 +66,14 @@ export default function AdminCustomersPage() {
           onClick={() =>
             downloadCsv(
               "pelanggan.csv",
-              filtered.map((c) => ({
-                nama: c.name,
-                email: c.email,
-                whatsapp: c.whatsapp,
-                bergabung: c.joinedAt,
-                pesanan: c.orderCount,
-                total_belanja: c.totalSpent,
-                status: c.status,
+              filtered.map((c: any) => ({
+                nama: c.name ?? "",
+                email: c.email ?? "",
+                whatsapp: c.profile?.whatsapp ?? "",
+                bergabung: c.createdAt ?? "",
+                pesanan: c._count?.orders ?? 0,
+                total_belanja: 0,
+                status: c.profile?.status ?? "baru",
               })),
             )
           }
@@ -98,7 +99,7 @@ export default function AdminCustomersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paged.map((c) => (
+              {paged.map((c: any) => (
                 <TableRow
                   key={c.id}
                   className="cursor-pointer transition-colors hover:bg-secondary-background"
@@ -107,7 +108,7 @@ export default function AdminCustomersPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-9">
-                        <AvatarImage src={c.avatar} alt={c.name} />
+                        <AvatarImage src={c.image ?? c.profile?.avatar} alt={c.name} />
                         <AvatarFallback>{initials(c.name)}</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
@@ -117,17 +118,19 @@ export default function AdminCustomersPage() {
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-foreground/70">
-                    {c.whatsapp}
+                    {c.profile?.whatsapp ?? "-"}
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-foreground/70">
-                    {formatDate(c.joinedAt)}
+                    {formatDate(c.createdAt)}
                   </TableCell>
-                  <TableCell className="font-heading font-bold">{c.orderCount}</TableCell>
+                  <TableCell className="font-heading font-bold">{c._count?.orders ?? 0}</TableCell>
                   <TableCell className="font-heading font-bold">
-                    {formatIDR(c.totalSpent)}
+                    -
                   </TableCell>
                   <TableCell>
-                    <Badge variant={STATUS[c.status].variant}>{STATUS[c.status].label}</Badge>
+                    <Badge variant={STATUS[(c.profile?.status ?? "baru") as keyof typeof STATUS]?.variant ?? "cyan"}>
+                      {STATUS[(c.profile?.status ?? "baru") as keyof typeof STATUS]?.label ?? "Baru"}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <ChevronRight className="ml-auto size-4 text-foreground/40" />

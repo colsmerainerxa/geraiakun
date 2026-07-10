@@ -18,6 +18,7 @@ import {
 import { useLocale } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
+import { changePaymentMethod, retryPayment } from "@/app/actions/payment"
 import { Container } from "@/components/shared/container"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -157,6 +158,7 @@ export function PaymentStatusView({ invoice }: { invoice: string }) {
   const setStatus = usePayments((state) => state.setStatus)
   const changeMethod = usePayments((state) => state.changeMethod)
   const retry = usePayments((state) => state.retry)
+  const upsertAttempt = usePayments((state) => state.upsertAttempt)
   const order = usePurchasedOrders((state) =>
     state.orders.find((item) => item.invoice.toLowerCase() === invoice.toLowerCase()),
   )
@@ -225,17 +227,29 @@ export function PaymentStatusView({ invoice }: { invoice: string }) {
     }, 1200)
   }
 
-  function handleRetry() {
-    retry(invoice)
-    updateOrder(invoice, { status: "menunggu-pembayaran" })
-    toast.success(isEn ? "New payment window created" : "Waktu pembayaran baru dibuat")
+  async function handleRetry() {
+    try {
+      const nextAttempt = await retryPayment(invoice, attempt!.method)
+      upsertAttempt(nextAttempt)
+      retry(invoice)
+      updateOrder(invoice, { status: "menunggu-pembayaran" })
+      toast.success(isEn ? "New payment window created" : "Waktu pembayaran baru dibuat")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Gagal membuat pembayaran baru.")
+    }
   }
 
-  function saveMethod() {
-    changeMethod(invoice, nextMethod)
-    updateOrder(invoice, { paymentMethod: nextMethod, status: "menunggu-pembayaran" })
-    setMethodOpen(false)
-    toast.success(isEn ? "Payment method updated" : "Metode pembayaran diperbarui")
+  async function saveMethod() {
+    try {
+      const nextAttempt = await changePaymentMethod(invoice, nextMethod)
+      upsertAttempt(nextAttempt)
+      changeMethod(invoice, nextMethod)
+      updateOrder(invoice, { paymentMethod: nextMethod, status: "menunggu-pembayaran" })
+      setMethodOpen(false)
+      toast.success(isEn ? "Payment method updated" : "Metode pembayaran diperbarui")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Gagal mengganti metode pembayaran.")
+    }
   }
 
   return (

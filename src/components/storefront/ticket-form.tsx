@@ -6,6 +6,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { createTicket } from "@/app/actions/tickets"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -88,24 +89,41 @@ export function TicketForm({
   const typeVal = watch("type")
   const priorityVal = watch("priority")
 
-  function onSubmit(values: FormValues) {
-    const ticket = create({
-      type: values.type,
-      subject: values.subject,
-      description: values.description,
-      invoice: values.invoice || null,
-      productId,
-      productName,
-      priority: values.priority as TicketPriority,
-      customerName: values.customerName,
-      customerEmail: values.customerEmail,
-      whatsapp: values.whatsapp,
-    })
-    setCreatedCode(ticket.code)
-    toast.success(`${t("submitted")} ${ticket.code}`)
-    reset()
-    if (successRedirectToTrack) {
-      setTimeout(() => router.push(`/bantuan/tiket?code=${ticket.code}`), 900)
+  async function onSubmit(values: FormValues) {
+    try {
+      const result = await createTicket({
+        type: values.type,
+        subject: values.subject,
+        description: values.description,
+        invoice: values.invoice || null,
+        productId,
+        productName,
+        priority: values.priority as TicketPriority,
+        customerName: values.customerName,
+        customerEmail: values.customerEmail,
+        whatsapp: values.whatsapp,
+      })
+      const ticket = create({
+        code: result.code,
+        type: values.type,
+        subject: values.subject,
+        description: values.description,
+        invoice: values.invoice || null,
+        productId,
+        productName,
+        priority: values.priority as TicketPriority,
+        customerName: values.customerName,
+        customerEmail: values.customerEmail,
+        whatsapp: values.whatsapp,
+      })
+      setCreatedCode(ticket.code)
+      toast.success(`${t("submitted")} ${ticket.code}`)
+      reset()
+      if (successRedirectToTrack) {
+        setTimeout(() => router.push(`/bantuan/tiket?code=${ticket.code}`), 900)
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Tiket gagal dibuat.")
     }
   }
 

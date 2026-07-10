@@ -1,4 +1,7 @@
-import type { AccountType, CategorySlug, Product } from "@/types"
+import type { CategorySlug, Product } from "@/types"
+// re-export for backward compat — types now live in @/types
+export type { ProductQuery, SortKey, DurationBucket } from "@/types"
+import type { ProductQuery } from "@/types"
 import { categories } from "./categories"
 import { banners, testimonials } from "./content"
 import { credentialStats, credentials } from "./credentials"
@@ -8,24 +11,9 @@ import { productMinPrice, products } from "./products"
 import { reviewsForProduct } from "./reviews"
 import { promos, transactions } from "./transactions"
 
-// Data mock resolve instan � latensi buatan dihapus agar UI terasa cepat.
+// Data mock resolve instan — latensi buatan dihapus agar UI terasa cepat.
 // (Dengan API nyata, latensi datang dari jaringan; tak perlu disimulasikan.)
 const delay = (_ms = 0) => Promise.resolve()
-
-export type SortKey = "populer" | "termurah" | "termahal" | "rating" | "terbaru"
-
-export interface ProductQuery {
-  category?: CategorySlug | "semua"
-  search?: string
-  sort?: SortKey
-  minPrice?: number
-  maxPrice?: number
-  badges?: string[]
-  accountType?: AccountType
-  duration?: DurationBucket
-}
-
-export type DurationBucket = "1m" | "3m" | "1y" | "lifetime"
 
 function categoriesWithCount() {
   return categories.map((c) => ({

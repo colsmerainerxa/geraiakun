@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { categories } from "@/lib/mock/categories"
-import { productMinPrice, products } from "@/lib/mock/products"
+import { useCategories, useProducts } from "@/lib/api/queries"
+import type { Product, Category } from "@/types"
 import { cn, formatPrice } from "@/lib/utils"
 
 const TRENDING_SLUGS = ["chatgpt-plus", "claude-pro", "gemini-advanced", "canva-pro"]
@@ -24,7 +24,7 @@ interface Match {
   price?: number
 }
 
-function buildMatches(q: string, isEn: boolean): Match[] {
+function buildMatches(q: string, isEn: boolean, products: Product[], categories: Category[]): Match[] {
   const query = q.toLowerCase().trim()
   if (!query) return []
   const out: Match[] = []
@@ -42,7 +42,7 @@ function buildMatches(q: string, isEn: boolean): Match[] {
         logo: p.logo,
         slug: p.slug,
         accent: p.accent,
-        price: productMinPrice(p),
+        price: Math.min(...p.variants.map((v: any) => v.price)),
       })
     }
   }
@@ -77,13 +77,15 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
   const ts = useTranslations("search")
   const isEn = useLocale() === "en"
   const router = useRouter()
+  const { data: products = [] } = useProducts()
+  const { data: categories = [] } = useCategories()
   const [q, setQ] = useState("")
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const wrapRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const matches = useMemo(() => buildMatches(q, isEn), [q, isEn])
+  const matches = useMemo(() => buildMatches(q, isEn, products, categories), [q, isEn, products, categories])
   const showDropdown = open && q.trim().length > 0
 
   // Close on outside click
@@ -98,7 +100,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
     return () => document.removeEventListener("mousedown", onClick)
   }, [open])
 
-  const trending = TRENDING_SLUGS.map((s) => products.find((p) => p.slug === s)).filter(Boolean)
+  const trending = TRENDING_SLUGS.map((s) => products.find((p) => p.slug === s)).filter(Boolean) as Product[]
 
   function go(value: string) {
     router.push(`/katalog${value ? `?q=${encodeURIComponent(value)}` : ""}`)

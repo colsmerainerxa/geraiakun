@@ -1,4 +1,21 @@
-import type { ID, PaymentMethod } from "./index"
+import type { ID, PaymentMethod, CategorySlug, AccountType } from "./index"
+
+export interface ActivationStep {
+  title: { id: string; en: string }
+  desc: { id: string; en: string }
+}
+
+export interface ActivationGuide {
+  /** brand -> guide; fallback pakai category. */
+  brand?: string
+  category?: CategorySlug
+  difficulty: "easy" | "medium"
+  minutes: number
+  prerequisites: { id: string; en: string }[]
+  steps: ActivationStep[]
+  troubleshooting: { q: { id: string; en: string }; a: { id: string; en: string } }[]
+  tips: { id: string; en: string }[]
+}
 
 export type PaymentStatus = "pending" | "checking" | "paid" | "expired" | "failed" | "cancelled"
 
@@ -179,4 +196,51 @@ export interface BulkOrderDraft {
   total: number
   status: BulkOrderStatus
   createdAt: string
+}
+
+export type FulfillmentStatus = "menunggu-stok" | "siap-kirim" | "review-risiko" | "terkirim"
+export type RiskLevel = "rendah" | "sedang" | "tinggi"
+
+export interface FulfillmentTask {
+  id: ID
+  invoice: string
+  productName: string
+  variant: string
+  customer: string
+  risk: RiskLevel
+  slaMinutes: number
+  status: FulfillmentStatus
+  credentialEmail: string
+  channel: string
+  createdAt: string
+}
+
+export interface ResellerPlan {
+  id: string
+  name: string
+  discount: number
+  perks: string[]
+}
+
+export interface ResellerOrder {
+  id: ID
+  invoice: string
+  productName: string
+  total: number
+  commission: number
+  status: string
+  date: string
+}
+
+export interface AnalyticsMetric {
+  label: string
+  value: string
+  delta: number
+  trend: number[]
+}
+
+export interface CustomerSegment {
+  label: string
+  count: number
+  percentage: number
 }

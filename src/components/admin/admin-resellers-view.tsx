@@ -31,10 +31,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { resellerPlans } from "@/lib/mock/enterprise"
+import { useAdminResellers } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
 import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { ResellerVerificationStatus } from "@/types"
+
+const RESELLER_PLANS = [
+  { id: "starter", name: "Starter Reseller", discount: "8%" },
+  { id: "pro", name: "Pro Agency", discount: "15%" },
+  { id: "enterprise", name: "Enterprise Partner", discount: "Custom" },
+] as const
 
 const STATUS_META: Record<
   ResellerVerificationStatus,
@@ -47,7 +53,8 @@ const STATUS_META: Record<
 }
 
 export function AdminResellersView() {
-  const resellers = useEnterpriseAdmin((state) => state.resellers)
+  const { data: resellersData } = useAdminResellers()
+  const resellers = (resellersData ?? []) as any[]
   const ledger = useEnterpriseAdmin((state) => state.ledger)
   const bulkOrders = useEnterpriseAdmin((state) => state.bulkOrders)
   const updateReseller = useEnterpriseAdmin((state) => state.updateReseller)
@@ -142,8 +149,8 @@ export function AdminResellersView() {
                     </p>
                     <p className="truncate text-xs text-foreground/55">{item.ownerName}</p>
                   </div>
-                  <Badge variant={STATUS_META[item.verificationStatus].variant}>
-                    {STATUS_META[item.verificationStatus].label}
+                  <Badge variant={STATUS_META[item.verificationStatus as ResellerVerificationStatus].variant}>
+                    {STATUS_META[item.verificationStatus as ResellerVerificationStatus].label}
                   </Badge>
                 </div>
                 <div className="mt-3 flex items-end justify-between gap-3 border-t-2 border-dashed border-border pt-3">
@@ -152,7 +159,7 @@ export function AdminResellersView() {
                     <p className="font-heading font-extrabold">{formatIDR(item.balance)}</p>
                   </div>
                   <span className="rounded-base border-2 border-border bg-main px-2 py-1 text-xs font-bold">
-                    {resellerPlans.find((plan) => plan.id === item.tierId)?.name ?? item.tierId}
+                    {RESELLER_PLANS.find((plan) => plan.id === item.tierId)?.name ?? item.tierId}
                   </span>
                 </div>
               </button>
@@ -164,8 +171,8 @@ export function AdminResellersView() {
           <section className="min-w-0 overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow">
             <div className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-border bg-main p-6">
               <div>
-                <Badge variant={STATUS_META[selected.verificationStatus].variant}>
-                  {STATUS_META[selected.verificationStatus].label}
+                <Badge variant={STATUS_META[selected.verificationStatus as ResellerVerificationStatus].variant}>
+                  {STATUS_META[selected.verificationStatus as ResellerVerificationStatus].label}
                 </Badge>
                 <h2 className="mt-2 font-heading text-xl font-extrabold">{selected.companyName}</h2>
                 <p className="text-sm font-bold text-main-foreground/65">
@@ -209,7 +216,7 @@ export function AdminResellersView() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {resellerPlans.map((plan) => (
+                        {RESELLER_PLANS.map((plan) => (
                           <SelectItem key={plan.id} value={plan.id}>
                             {plan.name} - {plan.discount}
                           </SelectItem>

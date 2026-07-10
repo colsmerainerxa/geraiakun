@@ -25,6 +25,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { createCheckoutOrder } from "@/app/actions/checkout"
 import { Container } from "@/components/shared/container"
 import { PromoInput } from "@/components/storefront/promo-input"
 import { Badge } from "@/components/ui/badge"
@@ -34,7 +35,6 @@ import { Label } from "@/components/ui/label"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
 import { downloadInvoice } from "@/lib/invoice"
-import { checkoutAssuranceSteps } from "@/lib/mock/enterprise"
 import { computeDiscount } from "@/lib/promo"
 import { cn, formatIDR, paymentLabel } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
@@ -53,6 +53,13 @@ const schema = z.object({
 })
 
 type FormValues = z.infer<typeof schema>
+
+const ASSURANCE_STEPS = [
+  { label: "Invoice dibuat", description: "Nomor invoice dan instruksi bayar langsung tersedia." },
+  { label: "Pembayaran dipantau", description: "QRIS, e-wallet, dan VA ditampilkan sebagai status real-time." },
+  { label: "Risk check", description: "Order dicek dari sinyal fraud, stok, dan duplikasi akun." },
+  { label: "Credential dikirim", description: "Akun masuk ke dashboard, email, dan riwayat pesanan." },
+]
 
 const PAYMENT_GROUPS: {
   group: "qris" | "eWallet" | "bankTransfer"
@@ -206,7 +213,7 @@ function CheckoutAssurancePanel({ method }: { method: PaymentMethod }) {
         ))}
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-4">
-        {checkoutAssuranceSteps.map((step, index) => (
+        {ASSURANCE_STEPS.map((step, index) => (
           <div key={step.label} className="rounded-base border-2 border-dashed border-border p-3">
             <p className="font-heading text-xs font-extrabold">
               {index + 1}. {step.label}
@@ -221,11 +228,6 @@ function CheckoutAssurancePanel({ method }: { method: PaymentMethod }) {
   )
 }
 
-function makeInvoice() {
-  const n = Math.floor(1000 + Math.random() * 8999)
-  return `INV-2026${n}`
-}
-
 export function CheckoutView() {
   const t = useTranslations("checkout")
   const tc = useTranslations("common")
@@ -237,7 +239,7 @@ export function CheckoutView() {
   const promo = usePromo((s) => s.promo)
   const clearPromo = usePromo((s) => s.clear)
   const addOrder = usePurchasedOrders((s) => s.addOrder)
-  const createPaymentAttempt = usePayments((s) => s.createAttempt)
+  const upsertPaymentAttempt = usePayments((s) => s.upsertAttempt)
 
   const [method, setMethod] = useState<PaymentMethod>("qris")
   const [processing, setProcessing] = useState(false)
@@ -253,43 +255,35 @@ export function CheckoutView() {
   const discount = computeDiscount(promo, subtotal)
   const total = subtotal - discount + FEE
 
-  function onSubmit(data: FormValues) {
+  async function onSubmit(data: FormValues) {
     setProcessing(true)
-    setTimeout(() => {
-      const invoice = makeInvoice()
-      const now = new Date().toISOString()
-      const order: Order = {
-        id: `ord-${invoice}`,
-        invoice,
-        customerName: data.name,
-        customerEmail: data.email,
-        whatsapp: data.whatsapp,
-        items: items.map((i) => ({
-          productId: i.productId,
-          productName: i.productName,
-          productLogo: i.productLogo,
-          variantId: i.variantId,
-          variantLabel: i.variantLabel,
-          price: i.price,
-          qty: i.qty,
-        })),
-        subtotal,
-        discount,
-        fee: FEE,
-        total,
-        status: "menunggu-pembayaran",
+    try {
+      const result = await createCheckoutOrder({
+        customer: data,
         paymentMethod: method,
-        createdAt: now,
-        paidAt: null,
-        credentials: [],
-      }
-      addOrder(order)
-      createPaymentAttempt({ invoice, method, amount: total })
+        promoCode: promo?.code ?? null,
+        items: items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          qty: item.qty,
+        })),
+      })
+      addOrder(result.order)
+      upsertPaymentAttempt(result.payment)
       clear()
       clearPromo()
+      router.push(`/pembayaran/${result.order.invoice}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Checkout gagal diproses."
+      if (message === "AUTH_REQUIRED") {
+        toast.error("Silakan masuk dulu untuk checkout.")
+        router.push("/masuk?callbackUrl=/checkout")
+      } else {
+        toast.error(message)
+      }
+    } finally {
       setProcessing(false)
-      router.push(`/pembayaran/${invoice}`)
-    }, 1600)
+    }
   }
 
   if (done) {
@@ -323,7 +317,7 @@ export function CheckoutView() {
             </span>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-4">
-            {checkoutAssuranceSteps.map((step, index) => (
+            {ASSURANCE_STEPS.map((step, index) => (
               <div
                 key={step.label}
                 className="rounded-base border-2 border-border bg-background p-3"

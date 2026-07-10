@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { LoyaltyView } from "@/components/storefront/loyalty-view"
 import { seoAlternates } from "@/lib/seo/site"
+import { requireCustomerSession } from "@/lib/server/auth-guards"
 
 export async function generateMetadata({
   params,
@@ -21,5 +22,6 @@ export async function generateMetadata({
 export default async function RewardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
+  await requireCustomerSession(locale, "/reward")
   return <LoyaltyView />
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { setRequestLocale } from "next-intl/server"
 import { AccountVaultView } from "@/components/storefront/account-vault-view"
 import { seoAlternates } from "@/lib/seo/site"
+import { requireCustomerSession } from "@/lib/server/auth-guards"
 
 export async function generateMetadata({
   params,
@@ -24,5 +25,6 @@ export default async function AccountVaultPage({
 }) {
   const { locale } = await params
   setRequestLocale(locale)
+  await requireCustomerSession(locale, "/akun/vault")
   return <AccountVaultView />
 }

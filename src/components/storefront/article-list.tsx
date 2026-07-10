@@ -5,24 +5,34 @@ import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { articles } from "@/lib/mock/articles"
+import { useArticles } from "@/lib/api/queries"
 import { cn, formatDate } from "@/lib/utils"
+
+const ACCENTS = ["accent-cyan", "accent-lime", "accent-pink", "accent-purple"]
+const EMOJIS = ["🎓", "🤖", "🔐", "⚡"]
 
 export function ArticleList() {
   const t = useTranslations("blog")
   const isEn = useLocale() === "en"
   const [cat, setCat] = useState("all")
 
-  // Filter by the id-category string (stable key); display label by locale.
-  const cats = Array.from(new Set(articles.map((a) => a.category)))
-  const catLabel = (c: string) =>
-    isEn ? (articles.find((a) => a.category === c)?.categoryEn ?? c) : c
-  const list = cat === "all" ? articles : articles.filter((a) => a.category === cat)
+  const { data: articles = [] as any[] } = useArticles()
+
+  const cats: string[] = Array.from(new Set(articles.map((a: any) => a.category)))
+  const list = cat === "all" ? articles : articles.filter((a: any) => a.category === cat)
 
   const filters = [
     { value: "all", label: isEn ? "All" : "Semua" },
-    ...cats.map((c) => ({ value: c, label: catLabel(c) })),
+    ...cats.map((c: string) => ({ value: c, label: c })),
   ]
+
+  if (articles.length === 0) {
+    return (
+      <p className="py-8 text-center text-foreground/50">
+        {isEn ? "No articles yet." : "Belum ada artikel."}
+      </p>
+    )
+  }
 
   return (
     <>
@@ -46,7 +56,7 @@ export function ArticleList() {
       </div>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((a) => (
+        {list.map((a: any, i: number) => (
           <Link
             key={a.slug}
             href={`/artikel/${a.slug}`}
@@ -55,26 +65,23 @@ export function ArticleList() {
             <div
               className={cn(
                 "flex aspect-[16/9] items-center justify-center border-b-2 border-border text-6xl",
-                bgFor(a.accent),
+                bgFor(ACCENTS[i % ACCENTS.length]),
               )}
             >
-              {a.emoji}
+              {EMOJIS[i % EMOJIS.length]}
             </div>
             <div className="flex flex-1 flex-col gap-2 p-5">
               <div className="flex items-center gap-2 text-xs text-foreground/60">
-                <Badge variant="neutral">{isEn ? a.categoryEn : a.category}</Badge>
-                <span>
-                  {a.readMinutes} {t("readTime")}
-                </span>
+                <Badge variant="neutral">{a.category}</Badge>
               </div>
               <h2 className="font-heading text-lg font-bold leading-snug">
-                {isEn ? a.titleEn : a.title}
+                {a.title}
               </h2>
               <p className="line-clamp-2 text-sm text-foreground/70">
-                {isEn ? a.excerptEn : a.excerpt}
+                {a.excerpt}
               </p>
               <span className="mt-auto pt-2 text-xs text-foreground/50">
-                {formatDate(a.date, isEn ? "en-US" : "id-ID")}
+                {formatDate(a.publishedAt, isEn ? "en-US" : "id-ID")}
               </span>
             </div>
           </Link>

@@ -1,8 +1,10 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Download, Eye, Pencil, Plus, Search, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
+import { createProduct, deleteProduct, updateProduct } from "@/app/actions/admin-products"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -33,9 +35,8 @@ import {
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { downloadCsv } from "@/lib/csv"
-import { productMinPrice, productTotalStock } from "@/lib/mock/products"
+import { useAdminProducts } from "@/lib/api/queries"
 import { formatIDR } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { AccountType, CategorySlug, Product, ProductVariant } from "@/types"
 
 const CATEGORIES: CategorySlug[] = [
@@ -47,6 +48,14 @@ const CATEGORIES: CategorySlug[] = [
   "edukasi",
 ]
 const ACCOUNT_TYPES: AccountType[] = ["sharing", "private", "invite", "lifetime"]
+
+function minPrice(p: Product) {
+  return p.variants.length ? Math.min(...p.variants.map((v) => v.price)) : 0
+}
+
+function totalStock(p: Product) {
+  return p.variants.reduce((sum, v) => sum + v.stock, 0)
+}
 
 function newVariant(): ProductVariant {
   return {
@@ -107,13 +116,36 @@ function slugify(value: string) {
     .replace(/(^-|-$)/g, "")
 }
 
+/** Maps a Product draft to the shape expected by the createProduct/updateProduct server action. */
+function toActionInput(draft: Product): Parameters<typeof createProduct>[0] {
+  return {
+    slug: draft.slug,
+    name: draft.name.trim(),
+    brand: draft.brand.trim(),
+    tagline: draft.tagline,
+    taglineEn: draft.taglineEn || draft.tagline,
+    description: draft.description,
+    descriptionEn: draft.descriptionEn || draft.description,
+    image: draft.image,
+    logo: draft.logo,
+    accent: draft.accent,
+    categoryId: draft.category,
+    badges: draft.badges as never[], // ponytail: ProductBadge → zod enum mismatch; cast until badge types are unified
+    features: draft.features,
+    featuresEn: draft.featuresEn.length ? draft.featuresEn : draft.features,
+    featured: draft.featured,
+    faqs: draft.faqs,
+  }
+}
+
 export function AdminProductsView() {
-  const catalog = useEnterpriseAdmin((state) => state.catalog)
-  const saveProduct = useEnterpriseAdmin((state) => state.saveProduct)
-  const removeProduct = useEnterpriseAdmin((state) => state.removeProduct)
+  const queryClient = useQueryClient()
+  const { data: productsData } = useAdminProducts()
+  const catalog: Product[] = productsData?.data ?? []
   const [query, setQuery] = useState("")
   const [draft, setDraft] = useState<Product | null>(null)
   const [preview, setPreview] = useState<Product | null>(null)
+
   const filtered = useMemo(() => {
     const needle = query.toLowerCase().trim()
     if (!needle) return catalog
@@ -124,6 +156,28 @@ export function AdminProductsView() {
         .includes(needle),
     )
   }, [catalog, query])
+
+  const isExisting = (id: string) => catalog.some((item) => item.id === id)
+
+  const saveMutation = useMutation({
+    mutationFn: async (product: Product) => {
+      const input = toActionInput(product)
+      if (isExisting(product.id)) {
+        return updateProduct(product.id, input)
+      }
+      return createProduct(input)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] })
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] })
+    },
+  })
 
   function patchProduct(patch: Partial<Product>) {
     setDraft((current) => (current ? { ...current, ...patch } : current))
@@ -142,7 +196,7 @@ export function AdminProductsView() {
     )
   }
 
-  function save() {
+  async function save() {
     if (!draft) return
     const slug = draft.slug || slugify(draft.name)
     if (
@@ -162,7 +216,7 @@ export function AdminProductsView() {
       toast.error("Periksa label, harga, dan stok setiap varian")
       return
     }
-    saveProduct({
+    const payload: Product = {
       ...draft,
       slug,
       name: draft.name.trim(),
@@ -170,16 +224,25 @@ export function AdminProductsView() {
       taglineEn: draft.taglineEn || draft.tagline,
       descriptionEn: draft.descriptionEn || draft.description,
       featuresEn: draft.featuresEn.length ? draft.featuresEn : draft.features,
-    })
-    setDraft(null)
-    toast.success("Produk tersimpan")
+    }
+    try {
+      await saveMutation.mutateAsync(payload)
+      setDraft(null)
+      toast.success("Produk tersimpan")
+    } catch {
+      toast.error("Gagal menyimpan produk")
+    }
   }
 
-  function remove(id: string) {
+  async function remove(id: string) {
     const product = catalog.find((item) => item.id === id)
-    if (!product || !window.confirm(`Hapus ${product.name} dari katalog lokal?`)) return
-    removeProduct(id)
-    toast.success("Produk dihapus")
+    if (!product || !window.confirm(`Hapus ${product.name}?`)) return
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success("Produk dihapus")
+    } catch {
+      toast.error("Gagal menghapus produk")
+    }
   }
 
   return (
@@ -205,8 +268,8 @@ export function AdminProductsView() {
                   produk: product.name,
                   brand: product.brand,
                   kategori: product.category,
-                  harga_mulai: productMinPrice(product),
-                  stok: productTotalStock(product),
+                  harga_mulai: minPrice(product),
+                  stok: totalStock(product),
                   varian: product.variants.length,
                   featured: String(product.featured),
                 })),
@@ -254,9 +317,9 @@ export function AdminProductsView() {
               </TableCell>
               <TableCell className="font-bold">{product.variants.length}</TableCell>
               <TableCell className="font-heading font-bold">
-                {formatIDR(productMinPrice(product))}
+                {formatIDR(minPrice(product))}
               </TableCell>
-              <TableCell className="font-heading font-bold">{productTotalStock(product)}</TableCell>
+              <TableCell className="font-heading font-bold">{totalStock(product)}</TableCell>
               <TableCell>
                 <Badge variant={product.featured ? "success" : "neutral"}>
                   {product.featured ? "Featured" : "Active"}
@@ -306,7 +369,7 @@ export function AdminProductsView() {
         <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {catalog.some((item) => item.id === draft?.id) ? "Edit Produk" : "Produk Baru"}
+              {draft && isExisting(draft.id) ? "Edit Produk" : "Produk Baru"}
             </DialogTitle>
             <DialogDescription>
               Lengkapi identitas, varian, harga, stok, konten, dan preview produk.
@@ -556,11 +619,11 @@ export function AdminProductsView() {
                 <div className="mt-5 border-t-2 border-dashed border-border pt-4">
                   <p className="text-xs font-bold text-main-foreground/55">Mulai dari</p>
                   <p className="font-heading text-2xl font-extrabold">
-                    {formatIDR(draft.variants.length ? productMinPrice(draft) : 0)}
+                    {formatIDR(minPrice(draft))}
                   </p>
                   <p className="text-xs font-bold text-main-foreground/55">
                     {draft.variants.length} varian -{" "}
-                    {draft.variants.reduce((sum, variant) => sum + variant.stock, 0)} stok
+                    {totalStock(draft)} stok
                   </p>
                 </div>
               </aside>
@@ -570,7 +633,9 @@ export function AdminProductsView() {
             <Button variant="neutral" onClick={() => setDraft(null)}>
               Batal
             </Button>
-            <Button onClick={save}>Simpan Produk</Button>
+            <Button onClick={save} disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "Menyimpan..." : "Simpan Produk"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

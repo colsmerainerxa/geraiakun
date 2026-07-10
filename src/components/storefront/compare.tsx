@@ -12,8 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { getCategory } from "@/lib/mock/categories"
-import { getProduct, productTotalStock } from "@/lib/mock/products"
+import { useProduct, useProducts } from "@/lib/api/queries"
 import { cn, formatPrice } from "@/lib/utils"
 import { COMPARE_MAX, useCompare } from "@/stores/compare"
 
@@ -88,6 +87,7 @@ export function CompareButton({
 export function CompareBar() {
   const t = useTranslations("compare")
   const mounted = useMounted()
+  const { data: allProducts = [] } = useProducts()
   const slugs = useCompare((s) => s.slugs)
   const remove = useCompare((s) => s.remove)
   const clear = useCompare((s) => s.clear)
@@ -115,7 +115,7 @@ export function CompareBar() {
           </span>
           <div className="flex flex-1 items-center gap-2 overflow-x-auto">
             {slugs.map((slug) => {
-              const p = getProduct(slug)
+              const p = allProducts.find((x: any) => x.slug === slug)
               if (!p) return null
               return (
                 <div
@@ -163,31 +163,31 @@ export function CompareDrawer() {
   const t = useTranslations("compare")
   const tc = useTranslations("common")
   const isEn = useLocale() === "en"
+  const { data: allProducts = [] } = useProducts()
   const slugs = useCompare((s) => s.slugs)
   const open = useCompare((s) => s.open)
   const setOpen = useCompare((s) => s.setOpen)
   const remove = useCompare((s) => s.remove)
 
   const items = slugs
-    .map((s) => getProduct(s))
-    .filter((p): p is NonNullable<typeof p> => Boolean(p))
+    .map((s) => allProducts.find((x: any) => x.slug === s))
+    .filter((p): p is any => Boolean(p))
 
   // Baris atribut yang dibandingkan.
   const rows: { label: string; render: (p: (typeof items)[number]) => React.ReactNode }[] = [
     {
       label: tc("price"),
       render: (p) => {
-        const min = Math.min(...p.variants.map((v) => v.price))
+        const min = Math.min(...p.variants.map((v: any) => v.price))
         return <span className="font-heading font-extrabold">{formatPrice(min, isEn)}</span>
       },
     },
     {
       label: t("rowBestFor"),
       render: (p) => {
-        const category = getCategory(p.category)
         return (
           <Badge variant="neutral">
-            {isEn ? (category?.nameEn ?? p.category) : (category?.name ?? p.category)}
+            {isEn ? (p.category?.nameEn ?? p.category?.slug ?? "") : (p.category?.name ?? p.category?.slug ?? "")}
           </Badge>
         )
       },
@@ -218,7 +218,7 @@ export function CompareDrawer() {
     {
       label: t("rowStock"),
       render: (p) => {
-        const totalStock = productTotalStock(p)
+        const totalStock = p.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
         return <Badge variant={totalStock > 0 ? "lime" : "danger"}>{totalStock}</Badge>
       },
     },
@@ -234,7 +234,7 @@ export function CompareDrawer() {
       label: t("rowTopFeatures"),
       render: (p) => (
         <ul className="flex flex-col gap-1 text-left">
-          {(isEn ? p.featuresEn : p.features).slice(0, 3).map((f) => (
+          {(isEn ? p.featuresEn : p.features).slice(0, 3).map((f: any) => (
             <li key={f} className="text-xs leading-snug">
               - {f}
             </li>
@@ -325,8 +325,8 @@ export function CompareDrawer() {
                   <tr>
                     <td className="sticky left-0 w-32 bg-background p-3" />
                     {items.map((p) => {
-                      const min = Math.min(...p.variants.map((v) => v.price))
-                      const minV = p.variants.find((v) => v.price === min) ?? p.variants[0]
+                      const min = Math.min(...p.variants.map((v: any) => v.price))
+                      const minV = p.variants.find((v: any) => v.price === min) ?? p.variants[0]
                       return (
                         <td key={p.id} className="border-l-2 border-border p-3">
                           <Button size="sm" asChild className="w-full">

@@ -42,33 +42,56 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { formatDate, initials } from "@/lib/utils"
-import { ADMIN_ROLE_LABELS, ROLE_PERMISSIONS, useEnterpriseAdmin } from "@/stores/enterprise-admin"
+import { ADMIN_ROLE_LABELS, ROLE_PERMISSIONS } from "@/stores/enterprise-admin"
+import { useAdminTeam } from "@/lib/api/queries"
+import { useQueryClient } from "@tanstack/react-query"
 import type { AdminRole } from "@/types"
 
 const ROLES = Object.keys(ADMIN_ROLE_LABELS) as AdminRole[]
 const RECOVERY_CODES = ["BK-29PX-7QAW", "BK-J4MN-82LC", "BK-6TVD-1RKE", "BK-W9HF-53ZU"]
 
 export function AdminTeamView() {
-  const staff = useEnterpriseAdmin((state) => state.staff)
-  const activeStaffId = useEnterpriseAdmin((state) => state.activeStaffId)
-  const inviteStaff = useEnterpriseAdmin((state) => state.inviteStaff)
-  const updateStaff = useEnterpriseAdmin((state) => state.updateStaff)
+  const queryClient = useQueryClient()
+  const { data: staff = [] as any[] } = useAdminTeam()
+  const activeStaffId = ""
   const [inviteOpen, setInviteOpen] = useState(false)
   const [securityId, setSecurityId] = useState("")
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [role, setRole] = useState<AdminRole>("operations")
 
+  async function inviteStaff(input: { name: string; email: string; role: AdminRole }) {
+    const r = await fetch("/api/admin/team", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    })
+    if (r.ok) {
+      queryClient.invalidateQueries({ queryKey: ["admin", "team"] })
+      toast.success("Anggota tim diundang")
+    }
+  }
+  async function updateStaff(id: string, patch: Record<string, unknown>) {
+    const r = await fetch("/api/admin/team", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...patch }),
+    })
+    if (r.ok) {
+      queryClient.invalidateQueries({ queryKey: ["admin", "team"] })
+    }
+  }
+
   const stats = useMemo(
     () => ({
-      active: staff.filter((member) => member.status === "active").length,
-      invited: staff.filter((member) => member.status === "invited").length,
-      twoFactor: staff.filter((member) => member.twoFactorEnabled).length,
-      roles: new Set(staff.map((member) => member.role)).size,
+      active: staff.filter((member: any) => member.status === "active").length,
+      invited: staff.filter((member: any) => member.status === "invited").length,
+      twoFactor: staff.filter((member: any) => member.twoFactorEnabled).length,
+      roles: new Set(staff.map((member: any) => member.role)).size,
     }),
     [staff],
   )
-  const securityMember = staff.find((member) => member.id === securityId)
+  const securityMember = staff.find((member: any) => member.id === securityId)
 
   function submitInvite() {
     if (name.trim().length < 2 || !email.includes("@")) {
@@ -122,7 +145,7 @@ export function AdminTeamView() {
           <span>Aksi</span>
         </div>
         <div className="divide-y-2 divide-border">
-          {staff.map((member) => (
+          {staff.map((member: any) => (
             <div
               key={member.id}
               className="grid gap-4 p-5 md:grid-cols-[1.5fr_1fr_1fr_1fr_auto] md:items-center"

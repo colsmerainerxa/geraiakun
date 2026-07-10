@@ -3,6 +3,7 @@ import { routing } from "@/i18n/routing"
 import { articles } from "@/lib/mock/articles"
 import { categories } from "@/lib/mock/categories"
 import { products } from "@/lib/mock/products"
+import { backendFlags } from "@/lib/server/env"
 import { SITE_URL } from "@/lib/seo/site"
 
 // Stable content-update date — avoids the "lying lastmod" of new Date() that
@@ -36,7 +37,21 @@ function entry(
   }
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+async function getPrisma() {
+  return (await import("@/lib/server/prisma")).prisma
+}
+
+function isDbUnavailable(error: unknown) {
+  if (typeof error !== "object" || error === null) return false
+  const record = error as Record<string, unknown>
+  return (
+    record.code === "P2021" ||
+    String(record.message ?? "").includes("does not exist") ||
+    String(record.message ?? "").includes("TableDoesNotExist")
+  )
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     entry("", "weekly", 1),
     entry("/katalog", "daily", 0.9),
@@ -49,11 +64,54 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry("/privasi", "yearly", 0.2),
   ]
 
-  const categoryRoutes = categories.map((c) => entry(`/kategori/${c.slug}`, "weekly", 0.7))
+  let categorySlugs: string[] = categories.map((c) => c.slug)
+  let productRoutes: { slug: string; updatedAt: string }[] = products.map((p) => ({
+    slug: p.slug,
+    updatedAt: LAST_UPDATED,
+  }))
+  let articleRoutes: { slug: string; updatedAt: string }[] = articles.map((a) => ({
+    slug: a.slug,
+    updatedAt: a.date,
+  }))
 
-  const productRoutes = products.map((p) => entry(`/produk/${p.slug}`, "weekly", 0.8))
+  if (backendFlags.databaseConfigured) {
+    try {
+      const prisma = await getPrisma()
+      const [dbCats, dbProducts, dbArticles] = await Promise.all([
+        prisma.category.findMany({ select: { slug: true } }),
+        prisma.product.findMany({
+          where: { active: true },
+          select: { slug: true, updatedAt: true },
+        }),
+        prisma.article.findMany({
+          where: { published: true },
+          select: { slug: true, updatedAt: true },
+        }),
+      ])
+      categorySlugs = dbCats.map((c) => c.slug)
+      productRoutes = dbProducts.map((p) => ({
+        slug: p.slug,
+        updatedAt: p.updatedAt.toISOString().split("T")[0],
+      }))
+      articleRoutes = dbArticles.map((a) => ({
+        slug: a.slug,
+        updatedAt: a.updatedAt.toISOString().split("T")[0],
+      }))
+    } catch (error) {
+      if (!isDbUnavailable(error)) throw error
+      // fall back to mock data (already set above)
+    }
+  }
 
-  const articleRoutes = articles.map((a) => entry(`/artikel/${a.slug}`, "monthly", 0.6, a.date))
+  const categoryRoutes = categorySlugs.map((slug) =>
+    entry(`/kategori/${slug}`, "weekly", 0.7),
+  )
+  const productEntries = productRoutes.map((p) =>
+    entry(`/produk/${p.slug}`, "weekly", 0.8, p.updatedAt),
+  )
+  const articleEntries = articleRoutes.map((a) =>
+    entry(`/artikel/${a.slug}`, "monthly", 0.6, a.updatedAt),
+  )
 
-  return [...staticRoutes, ...categoryRoutes, ...productRoutes, ...articleRoutes]
+  return [...staticRoutes, ...categoryRoutes, ...productEntries, ...articleEntries]
 }

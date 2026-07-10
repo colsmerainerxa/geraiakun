@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { products } from "@/lib/mock/products"
+import { useProducts } from "@/lib/api/queries"
 import { cn, formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import type { Product, QuizQuestion, RecommendationResult } from "@/types"
@@ -57,6 +57,7 @@ function buildResults(
   answers: AnswerMap,
   isEn: boolean,
   reasonLabels: Record<string, string>,
+  products: Product[],
 ): RecommendationResult[] {
   return products
     .map((product) => {
@@ -152,6 +153,7 @@ export function ProductFinderQuiz() {
   const t = useTranslations("finder")
   const tc = useTranslations("common")
   const isEn = useLocale() === "en"
+  const { data: products } = useProducts()
   const addItem = useCart((state) => state.addItem)
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<AnswerMap>({})
@@ -289,8 +291,8 @@ export function ProductFinderQuiz() {
     [t],
   )
   const results = useMemo(
-    () => buildResults(answers, isEn, reasonLabels).slice(0, 3),
-    [answers, isEn, reasonLabels],
+    () => buildResults(answers, isEn, reasonLabels, products ?? []).slice(0, 3),
+    [answers, isEn, reasonLabels, products],
   )
 
   function choose(questionId: string, value: string) {

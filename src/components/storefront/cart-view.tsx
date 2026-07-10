@@ -8,7 +8,7 @@ import { PromoInput } from "@/components/storefront/promo-input"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { products } from "@/lib/mock/products"
+import { useProducts } from "@/lib/api/queries"
 import { computeDiscount } from "@/lib/promo"
 import { cn, formatIDR, formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
@@ -23,13 +23,14 @@ export function CartView() {
   const items = useCart((s) => s.items)
   const updateQty = useCart((s) => s.updateQty)
   const removeItem = useCart((s) => s.removeItem)
+  const { data: allProducts } = useProducts()
   const addItem = useCart((s) => s.addItem)
   const promo = usePromo((s) => s.promo)
 
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount = computeDiscount(promo, subtotal)
   const total = subtotal - discount + FEE
-  const cross = products.filter((p) => !items.some((i) => i.productSlug === p.slug)).slice(0, 2)
+  const cross = (allProducts ?? []).filter((p) => !items.some((i) => i.productSlug === p.slug)).slice(0, 2)
 
   if (items.length === 0) {
     return (
@@ -176,7 +177,7 @@ export function CartView() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {cross.map((p) => {
               const pMin = Math.min(...p.variants.map((cv) => cv.price))
-              const pv = p.variants.find((cv) => cv.price === pMin) ?? p.variants[0]
+              const pv = p.variants.find((cv: any) => cv.price === pMin) ?? p.variants[0]
               return (
                 <div
                   key={p.id}

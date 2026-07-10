@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og"
-import { getProduct, productMinPrice } from "@/lib/mock/products"
+import { getCatalogProduct } from "@/lib/server/catalog"
 import { formatPrice } from "@/lib/utils"
 
 export const alt = "geraiakun — produk premium"
@@ -21,12 +21,14 @@ export default async function Image({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = await getCatalogProduct(slug)
   const name = product?.name ?? "geraiakun"
   const brand = product?.brand ?? ""
   const tagline = product?.tagline ?? "Akun Premium AI & Digital"
   const bg = accentHex[product?.accent ?? "main"] ?? "#ffd23f"
-  const price = product ? formatPrice(productMinPrice(product)) : ""
+  const price = product
+    ? formatPrice(Math.min(...product.variants.map((v) => v.price)))
+    : ""
 
   return new ImageResponse(
     <div

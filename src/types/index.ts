@@ -26,6 +26,21 @@ export interface Category {
 
 export type AccountType = "sharing" | "private" | "invite" | "lifetime"
 
+export type SortKey = "populer" | "termurah" | "termahal" | "rating" | "terbaru"
+
+export type DurationBucket = "1m" | "3m" | "1y" | "lifetime"
+
+export interface ProductQuery {
+  category?: CategorySlug | "semua"
+  search?: string
+  sort?: SortKey
+  minPrice?: number
+  maxPrice?: number
+  badges?: string[]
+  accountType?: AccountType
+  duration?: DurationBucket
+}
+
 export interface ProductVariant {
   id: ID
   label: string // mis. "1 Bulan Private"
@@ -334,21 +349,30 @@ export interface AppNotification {
 }
 
 export type {
+  ActivationGuide,
+  ActivationStep,
   AdminPermission,
   AdminRole,
   AdminStaff,
+  AnalyticsMetric,
   AuditEvent,
   BalanceLedgerEntry,
   BulkOrderDraft,
   BulkOrderLine,
   BulkOrderStatus,
+  CustomerSegment,
+  FulfillmentStatus,
+  FulfillmentTask,
   PaymentAttempt,
   PaymentStatus,
   RefundCase,
   RefundDecision,
   RefundStatus,
   ResellerAccount,
+  ResellerOrder,
+  ResellerPlan,
   ResellerVerificationStatus,
+  RiskLevel,
   RiskReview,
   RiskReviewStatus,
   UserSession,

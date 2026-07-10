@@ -29,12 +29,13 @@ import { downloadCsv } from "@/lib/csv"
 import { formatDate, formatIDR } from "@/lib/utils"
 
 export default function AdminTransactionsPage() {
-  const { data: transactions, isLoading } = useTransactions()
+  const { data: txResult, isLoading } = useTransactions()
+  const transactions = (txResult?.data ?? []) as any[]
   const [rangePreset, setRangePreset] = useState<DateRangePreset>("30d")
   const range = useDateRange(rangePreset)
 
   const list = useMemo(
-    () => (transactions ?? []).filter((t) => inRange(t.createdAt, range)),
+    () => (transactions ?? []).filter((t: any) => inRange(t.createdAt, range)),
     [transactions, range],
   )
   const { page, setPage, pageCount, paged, total, pageSize } = usePagination(list, 10)
@@ -42,10 +43,10 @@ export default function AdminTransactionsPage() {
   const stats = useMemo(() => {
     const list = transactions ?? []
     return {
-      success: list.filter((t) => t.status === "berhasil"),
-      pending: list.filter((t) => t.status === "pending").length,
-      failed: list.filter((t) => t.status === "gagal").length,
-      revenue: list.filter((t) => t.status === "berhasil").reduce((s, t) => s + t.amount, 0),
+      success: list.filter((t: any) => t.status === "berhasil"),
+      pending: list.filter((t: any) => t.status === "pending").length,
+      failed: list.filter((t: any) => t.status === "gagal").length,
+      revenue: list.filter((t: any) => t.status === "berhasil").reduce((s, t) => s + t.amount, 0),
     }
   }, [transactions])
 
@@ -76,7 +77,7 @@ export default function AdminTransactionsPage() {
           onClick={() =>
             downloadCsv(
               "transaksi.csv",
-              list.map((tr) => ({
+              list.map((tr: any) => ({
                 id: tr.id,
                 invoice: tr.invoice,
                 pelanggan: tr.customerName,
@@ -109,7 +110,7 @@ export default function AdminTransactionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paged.map((t) => (
+              {paged.map((t: any) => (
                 <TableRow key={t.id}>
                   <TableCell className="font-mono text-xs text-foreground/60">
                     {t.id.toUpperCase()}

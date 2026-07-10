@@ -39,8 +39,8 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Link, useRouter } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { articles } from "@/lib/mock/articles"
-import { products } from "@/lib/mock/products"
+import { useArticles } from "@/lib/api/queries"
+import { useProducts } from "@/lib/api/queries"
 import { cn, discountPercent, formatIDR, formatNumber, formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { useRecentlyViewed } from "@/stores/recently-viewed"
@@ -81,8 +81,10 @@ export function ProductDetail({
     addRecent(product.slug)
   }, [product.slug, addRecent])
 
-  const crossSell = products.filter((p) => p.slug !== product.slug).slice(0, 2)
-  const relatedArticles = articles.filter((a) => a.relatedSlugs.includes(product.slug)).slice(0, 3)
+  const { data: allProducts } = useProducts()
+  const { data: articles = [] } = useArticles()
+  const crossSell = (allProducts ?? []).filter((p) => p.slug !== product.slug).slice(0, 2)
+  const relatedArticles = (articles as any[]).filter((a) => a.tags?.includes(product.slug) || a.tags?.includes(product.brand)).slice(0, 3)
 
   // Default to the cheapest in-stock variant, else the first.
   const cheapest = [...product.variants].sort((a, b) => a.price - b.price)

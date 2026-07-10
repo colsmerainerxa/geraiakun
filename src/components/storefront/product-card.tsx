@@ -11,7 +11,6 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { productMinPrice } from "@/lib/mock/products"
 import { cn, discountPercent, formatIDR, formatNumber, formatPrice } from "@/lib/utils"
 import type { Product, ProductBadge } from "@/types"
 
@@ -29,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
   const t = useTranslations("common")
   const locale = useLocale()
   const isEn = locale === "en"
-  const min = productMinPrice(product)
+  const min = Math.min(...product.variants.map((v) => v.price))
   const minVariant = product.variants.find((v) => v.price === min)
   const original = minVariant?.originalPrice ?? null
   const off = original ? discountPercent(original, min) : 0

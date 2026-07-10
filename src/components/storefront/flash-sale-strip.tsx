@@ -10,15 +10,28 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Link } from "@/i18n/navigation"
 import { bgFor } from "@/lib/accent"
-import { defaultFlashSaleEnd, getFlashSaleItems } from "@/lib/mock/flash-sale"
+import { useFlashSale } from "@/lib/api/queries"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
 export function FlashSaleStrip() {
   const t = useTranslations("flashSale")
-  const items = getFlashSaleItems()
+  const { data: flashSales = [] } = useFlashSale()
 
-  // Target akhir di-set saat mount agar konsisten dengan hydration.
-  const [end] = useState(defaultFlashSaleEnd)
+  // Map DB flash sales to display items
+  const items = flashSales.map((fs: any) => ({
+    product: { id: fs.product.id, slug: fs.product.slug, name: fs.product.name, logo: fs.product.logo, accent: fs.product.accent },
+    salePrice: fs.salePrice,
+    originalPrice: fs.variant.price,
+    off: Math.round((1 - fs.salePrice / fs.variant.price) * 100),
+    soldCount: fs.sold,
+    claimedRatio: fs.quota ? fs.sold / fs.quota : 0,
+  }))
+
+  // Use earliest ending flash sale as countdown target
+  const [end] = useState(() => {
+    if (flashSales.length > 0) return flashSales[0].endsAt
+    return new Date(Date.now() + 86400000).toISOString()
+  })
 
   if (items.length === 0) return null
 
@@ -45,7 +58,7 @@ export function FlashSaleStrip() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {items.map((item, i) => (
+          {items.map((item: any, i: number) => (
             <motion.div
               key={item.product.id}
               initial={{ opacity: 0, y: 16 }}

@@ -64,7 +64,8 @@ const STATUS_LABEL: Record<string, string> = Object.fromEntries(
 const DESTRUCTIVE: ReadonlySet<OrderStatus> = new Set(["refund", "dibatalkan"])
 
 export default function AdminOrdersPage() {
-  const { data: orders, isLoading } = useOrders()
+  const { data: ordersResult, isLoading } = useOrders()
+  const orders = (ordersResult?.data ?? []) as any[]
   const overlay = useAdminOverlay((s) => s.orderStatus)
   const setOrderStatus = useAdminOverlay((s) => s.setOrderStatus)
   const viewMode = useUI((s) => s.pipelineViews.orders)
@@ -89,12 +90,11 @@ export default function AdminOrdersPage() {
   }
 
   const filtered = useMemo(() => {
-    if (!orders) return []
     const q = search.toLowerCase().trim()
-    return orders.filter((o) => {
+    return orders.filter((o: any) => {
       if (status !== "semua" && eff(o.invoice, o.status) !== status) return false
       if (!q) return true
-      return o.invoice.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q)
+      return o.invoice?.toLowerCase().includes(q) || o.customerName?.toLowerCase().includes(q)
     })
   }, [orders, search, status, eff])
 
@@ -114,7 +114,7 @@ export default function AdminOrdersPage() {
   }
 
   const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [activeOrder, setActiveOrder] = useState<Order | null>(null)
+  const [activeOrder, setActiveOrder] = useState<any | null>(null)
   const { page, setPage, pageCount, paged, total, pageSize } = usePagination(filtered, 10)
 
   function toggleRow(invoice: string, checked: boolean) {
@@ -126,7 +126,7 @@ export default function AdminOrdersPage() {
     })
   }
 
-  const pageIds = paged.map((o) => o.invoice)
+  const pageIds = paged.map((o: any) => o.invoice)
   const allOnPageSelected = pageIds.length > 0 && pageIds.every((id) => selected.has(id))
   const someOnPageSelected = pageIds.some((id) => selected.has(id))
 
@@ -162,11 +162,11 @@ export default function AdminOrdersPage() {
   }
 
   function exportSelectedCsv() {
-    const rows = filtered.filter((o) => selected.has(o.invoice))
+    const rows = filtered.filter((o: any) => selected.has(o.invoice))
     if (rows.length === 0) return
     downloadCsv(
       "pesanan-terpilih.csv",
-      rows.map((o) => ({
+      rows.map((o: any) => ({
         invoice: o.invoice,
         pelanggan: o.customerName,
         email: o.customerEmail,
@@ -292,7 +292,7 @@ export default function AdminOrdersPage() {
                     </Badge>
                   </div>
                   <p className="mt-3 line-clamp-2 text-xs text-foreground/60">
-                    {order.items.map((item) => item.productName).join(", ")}
+                    {order.items.map((item: any) => item.productName).join(", ")}
                   </p>
                   <div className="mt-3 flex items-center justify-between gap-3 border-t-2 border-dashed border-border pt-3">
                     <span className="font-heading text-sm font-extrabold">
@@ -347,7 +347,7 @@ export default function AdminOrdersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paged.map((o) => (
+                  {paged.map((o: any) => (
                     <TableRow
                       key={o.id}
                       className={selected.has(o.invoice) ? "bg-main/20" : undefined}
@@ -376,7 +376,7 @@ export default function AdminOrdersPage() {
                       </TableCell>
                       <TableCell className="max-w-48">
                         <span className="line-clamp-1 text-foreground/70">
-                          {o.items.map((it) => it.productName).join(", ")}
+                          {o.items.map((it: any) => it.productName).join(", ")}
                         </span>
                       </TableCell>
                       <TableCell className="font-heading font-bold">{formatIDR(o.total)}</TableCell>

@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { analyticsMetrics, customerSegments, revenueSeries } from "@/lib/mock/enterprise"
+import { useDashboardStats } from "@/lib/api/queries"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
 
 const METRIC_TONE = {
@@ -44,19 +44,77 @@ const segmentActions = ["Semua", "Beli lagi", "Reseller", "Retention", "First pu
 export function AdminAnalyticsView() {
   const [focus, setFocus] = useState<(typeof segmentActions)[number]>("Semua")
   const [rangePreset, setRangePreset] = useState<DateRangePreset>("30d")
-  const series = rangePreset === "7d" ? revenueSeries.slice(-7) : revenueSeries
-  const maxRevenue = Math.max(...series.map((item) => item.value))
+  const { data: stats, isLoading } = useDashboardStats()
 
+  // Map server stats to the metric cards
+  const metrics = useMemo(() => {
+    if (!stats) return []
+    return [
+      { label: "Revenue", value: formatIDR(stats.revenue, { compact: true }), delta: "Total", tone: "lime" as const },
+      { label: "Orders (30d)", value: formatNumber(stats.orders), delta: "Last 30 days", tone: "cyan" as const },
+      { label: "Customers", value: formatNumber(stats.customers), delta: "Total", tone: "pink" as const },
+      { label: "Open Tickets", value: formatNumber(stats.tickets), delta: "Active", tone: "purple" as const },
+    ]
+  }, [stats])
+
+  // Map revenueByDay to chart series
+  const series = useMemo(() => {
+    if (!stats?.revenueByDay) return []
+    const data = rangePreset === "7d" ? stats.revenueByDay.slice(-7) : stats.revenueByDay
+    return data.map((item) => ({
+      day: item.date.slice(5), // MM-DD
+      value: item.value,
+    }))
+  }, [stats, rangePreset])
+  const maxRevenue = Math.max(...series.map((item) => item.value), 1)
+
+  // Map salesByProduct to segment table
   const filteredSegments = useMemo(() => {
-    if (focus === "Semua") return customerSegments
+    if (!stats?.salesByProduct) return []
+    const segments = stats.salesByProduct.map((item, i) => ({
+      id: `product-${i}`,
+      name: item.name,
+      customers: item.qty,
+      revenue: item.revenue,
+      conversion: 0,
+      signal: `${item.qty} unit terjual`,
+      action: item.revenue > 0 ? "Tawarkan bundle" : "Evaluasi",
+    }))
+    if (focus === "Semua") return segments
     const q = focus.toLowerCase()
-    return customerSegments.filter(
+    return segments.filter(
       (segment) =>
         segment.action.toLowerCase().includes(q) ||
         segment.name.toLowerCase().includes(q) ||
         segment.signal.toLowerCase().includes(q),
     )
-  }, [focus])
+  }, [stats, focus])
+
+  // Payment distribution for funnel visualization
+  const paymentFunnel = useMemo(() => {
+    if (!stats?.paymentDistribution?.length) {
+      return [
+        { label: "Product view", value: 100, count: "—" },
+        { label: "Add to cart", value: 42, count: "—" },
+        { label: "Checkout", value: 19, count: "—" },
+        { label: "Paid", value: 8, count: "—" },
+      ]
+    }
+    const total = stats.paymentDistribution.reduce((sum, p) => sum + p.count, 0) || 1
+    return stats.paymentDistribution.map((p, i) => ({
+      label: p.method,
+      value: Math.round((p.count / total) * 100),
+      count: formatNumber(p.count),
+    }))
+  }, [stats])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-w-0 flex-col gap-6">
+        <p className="text-sm text-foreground/60">Memuat analytics...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
@@ -64,7 +122,7 @@ export function AdminAnalyticsView() {
         <div>
           <h2 className="font-heading text-2xl font-extrabold">Analytics & Segmentasi</h2>
           <p className="text-sm text-foreground/60">
-            Dashboard mock untuk GMV, cohort, customer segment, dan aksi CRM.
+            Dashboard real-time untuk GMV, product sales, dan payment distribution.
           </p>
         </div>
         <Button variant="neutral">
@@ -73,7 +131,7 @@ export function AdminAnalyticsView() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {analyticsMetrics.map((metric) => (
+        {metrics.map((metric) => (
           <div
             key={metric.label}
             className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow"
@@ -108,14 +166,13 @@ export function AdminAnalyticsView() {
               <h2 className="flex items-center gap-2 font-heading text-lg font-extrabold">
                 <LineChart className="size-5" /> Tren Pendapatan
               </h2>
-              <p className="text-sm text-foreground/60">Visualisasi ringan tanpa library chart.</p>
+              <p className="text-sm text-foreground/60">Revenue 30 hari terakhir.</p>
             </div>
             <div className="flex items-center gap-2">
               <DateRangeFilter value={rangePreset} onChange={setRangePreset} />
-              <Badge variant="lime">+18% WoW</Badge>
             </div>
           </div>
-          <div className="mt-6 flex h-64 items-end justify-between gap-3">
+          <div className="mt-6 flex h-64 items-end justify-between gap-1">
             {series.map((item) => (
               <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
                 <span className="text-[10px] font-bold text-foreground/50">
@@ -133,15 +190,10 @@ export function AdminAnalyticsView() {
 
         <section className="min-w-0 rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <h2 className="flex items-center gap-2 font-heading text-lg font-extrabold">
-            <PieChart className="size-5" /> Funnel Checkout
+            <PieChart className="size-5" /> Distribusi Pembayaran
           </h2>
           <div className="mt-5 flex flex-col gap-3">
-            {[
-              { label: "Product view", value: 100, count: "18.420" },
-              { label: "Add to cart", value: 42, count: "7.736" },
-              { label: "Checkout", value: 19, count: "3.500" },
-              { label: "Paid", value: 8, count: "1.474" },
-            ].map((step) => (
+            {paymentFunnel.map((step) => (
               <div key={step.label}>
                 <div className="mb-1 flex justify-between text-xs font-bold">
                   <span>{step.label}</span>
@@ -154,10 +206,10 @@ export function AdminAnalyticsView() {
             ))}
           </div>
           <div className="mt-5 rounded-base border-2 border-dashed border-border bg-background p-3 text-sm">
-            <p className="font-heading font-bold">Insight UI</p>
+            <p className="font-heading font-bold">Fulfillment Performance</p>
             <p className="text-foreground/60">
-              Drop terbesar ada di checkout. Rekomendasi: tampilkan status pembayaran, trust badge,
-              dan metode bayar favorit lebih awal.
+              Avg SLA: {stats?.fulfillmentPerformance?.avgSla ?? 0} menit ·{" "}
+              {stats?.fulfillmentPerformance?.totalTasks ?? 0} task selesai
             </p>
           </div>
         </section>
@@ -167,10 +219,10 @@ export function AdminAnalyticsView() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 font-heading text-lg font-extrabold">
-              <Users className="size-5" /> Segmentasi Pelanggan
+              <Users className="size-5" /> Sales by Product
             </h2>
             <p className="text-sm text-foreground/60">
-              Segment berbasis sinyal belanja untuk campaign dan prioritas CS.
+              Top 10 produk berdasarkan revenue.
             </p>
           </div>
           <Select value={focus} onValueChange={(value) => setFocus(value as typeof focus)}>
@@ -191,10 +243,9 @@ export function AdminAnalyticsView() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Segment</TableHead>
-                <TableHead>Pelanggan</TableHead>
+                <TableHead>Produk</TableHead>
+                <TableHead>Qty</TableHead>
                 <TableHead>Revenue</TableHead>
-                <TableHead>Conversion</TableHead>
                 <TableHead>Rekomendasi</TableHead>
               </TableRow>
             </TableHeader>
@@ -215,11 +266,6 @@ export function AdminAnalyticsView() {
                   <TableCell className="font-bold">{formatNumber(segment.customers)}</TableCell>
                   <TableCell className="font-bold">
                     {formatIDR(segment.revenue, { compact: true })}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={segment.conversion >= 15 ? "lime" : "warning"}>
-                      {segment.conversion}%
-                    </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex max-w-sm items-start gap-2 text-sm text-foreground/70">

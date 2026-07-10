@@ -16,6 +16,12 @@ import { useLocale } from "next-intl"
 import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
+import {
+  requestEmailVerification,
+  requestPasswordReset,
+  resetPassword,
+  verifyEmailToken,
+} from "@/app/actions/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,9 +37,11 @@ const emailSchema = z.string().email()
 export function AuthRecoveryView({
   mode,
   expired = false,
+  token = null,
 }: {
   mode: RecoveryMode
   expired?: boolean
+  token?: string | null
 }) {
   const isEn = useLocale() === "en"
   const profile = useUser((state) => state.profile)
@@ -45,6 +53,7 @@ export function AuthRecoveryView({
   const [email, setEmail] = useState(profile.email)
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
+  const [actionToken, setActionToken] = useState(token ?? "")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
 
@@ -73,27 +82,36 @@ export function AuthRecoveryView({
   }[mode]
   const Icon = content.icon
 
-  function runLoading(callback: () => void) {
-    setState("loading")
-    window.setTimeout(callback, 800)
-  }
-
-  function submitEmail(event: React.FormEvent) {
+  async function submitEmail(event: React.FormEvent) {
     event.preventDefault()
     setError("")
     if (!emailSchema.safeParse(email).success) {
       setError(isEn ? "Enter a valid email address." : "Masukkan alamat email yang valid.")
       return
     }
-    runLoading(() => {
-      setState("sent")
-      toast.success(isEn ? "Reset link sent" : "Tautan reset dikirim")
-    })
+    setState("loading")
+    const result = await requestPasswordReset(email)
+    if (!result.ok) {
+      setState("idle")
+      setError(result.message)
+      return
+    }
+    if (result.token) setActionToken(result.token)
+    setState("sent")
+    toast.success(isEn ? "Reset link sent" : "Tautan reset dikirim")
   }
 
-  function submitPassword(event: React.FormEvent) {
+  async function submitPassword(event: React.FormEvent) {
     event.preventDefault()
     setError("")
+    if (!actionToken) {
+      setError(
+        isEn
+          ? "Open the reset link from your email first."
+          : "Buka tautan reset dari email terlebih dahulu.",
+      )
+      return
+    }
     if (password.length < 8 || !/\d/.test(password)) {
       setError(
         isEn
@@ -106,25 +124,57 @@ export function AuthRecoveryView({
       setError(isEn ? "Passwords do not match." : "Konfirmasi kata sandi tidak cocok.")
       return
     }
-    runLoading(() => {
-      setState("success")
-      toast.success(isEn ? "Password updated" : "Kata sandi diperbarui")
-    })
+    setState("loading")
+    const result = await resetPassword({ token: actionToken, password })
+    if (!result.ok) {
+      setState("idle")
+      setError(result.message)
+      return
+    }
+    setState("success")
+    toast.success(isEn ? "Password updated" : "Kata sandi diperbarui")
   }
 
-  function verifyEmail() {
-    runLoading(() => {
+  async function verifyEmail() {
+    setError("")
+    setState("loading")
+    if (actionToken) {
+      const result = await verifyEmailToken(actionToken)
+      if (!result.ok) {
+        setState("idle")
+        setError(result.message)
+        return
+      }
       setEmailVerified(true)
       setState("success")
       toast.success(isEn ? "Email verified" : "Email berhasil diverifikasi")
-    })
+      return
+    }
+
+    const result = await requestEmailVerification(email || profile.email)
+    if (!result.ok) {
+      setState("idle")
+      setError(result.message)
+      return
+    }
+    if (result.token) setActionToken(result.token)
+    setState("sent")
+    toast.success(isEn ? "Verification link sent" : "Tautan verifikasi dikirim")
   }
 
-  function resend() {
-    runLoading(() => {
-      setState("sent")
-      toast.success(isEn ? "A new link has been sent" : "Tautan baru telah dikirim")
-    })
+  async function resend() {
+    setError("")
+    setState("loading")
+    const result =
+      mode === "verify" ? await requestEmailVerification(email) : await requestPasswordReset(email)
+    if (!result.ok) {
+      setState("idle")
+      setError(result.message)
+      return
+    }
+    if (result.token) setActionToken(result.token)
+    setState("sent")
+    toast.success(isEn ? "A new link has been sent" : "Tautan baru telah dikirim")
   }
 
   const invalidLink = expired && state !== "sent" && state !== "success"
@@ -200,7 +250,15 @@ export function AuthRecoveryView({
               </p>
               <div className="mt-5 flex justify-center gap-2">
                 <Button asChild>
-                  <Link href="/reset-sandi">{isEn ? "Open demo link" : "Buka Tautan Demo"}</Link>
+                  <Link
+                    href={
+                      actionToken
+                        ? `/reset-sandi?token=${encodeURIComponent(actionToken)}`
+                        : "/reset-sandi"
+                    }
+                  >
+                    {isEn ? "Open reset link" : "Buka Tautan Reset"}
+                  </Link>
                 </Button>
                 <Button variant="neutral" onClick={resend}>
                   <RefreshCcw className="size-4" /> {isEn ? "Resend" : "Kirim Ulang"}
@@ -261,6 +319,12 @@ export function AuthRecoveryView({
               <p className="rounded-base border-2 border-dashed border-border bg-background p-4 font-heading text-sm font-bold">
                 {profile.email}
               </p>
+              {state === "sent" && (
+                <p className="mt-3 text-sm font-bold text-accent-cyan">
+                  {isEn ? "Verification link has been sent." : "Tautan verifikasi sudah dikirim."}
+                </p>
+              )}
+              {error && <p className="mt-3 text-sm font-bold text-danger">{error}</p>}
               <Button className="mt-5" onClick={verifyEmail} disabled={state === "loading"}>
                 {state === "loading" ? (
                   <LoaderCircle className="size-4 animate-spin" />

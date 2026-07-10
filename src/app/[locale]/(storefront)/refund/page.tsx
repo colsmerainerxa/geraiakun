@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { setRequestLocale } from "next-intl/server"
 import { RefundCenterView } from "@/components/storefront/refund-center-view"
 import { seoAlternates } from "@/lib/seo/site"
+import { requireCustomerSession } from "@/lib/server/auth-guards"
 
 export async function generateMetadata({
   params,
@@ -20,5 +21,6 @@ export async function generateMetadata({
 export default async function RefundPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
+  await requireCustomerSession(locale, "/refund")
   return <RefundCenterView />
 }

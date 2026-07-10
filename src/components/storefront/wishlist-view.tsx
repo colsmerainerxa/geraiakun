@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
-import { products } from "@/lib/mock/products"
+import { useProducts } from "@/lib/api/queries"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/stores/cart"
 import { useWishlist } from "@/stores/wishlist"
@@ -40,6 +40,7 @@ export function WishlistView() {
 
   const slugs = useWishlist((s) => s.slugs)
   const clear = useWishlist((s) => s.clear)
+  const { data: allProducts } = useProducts()
   const addItem = useCart((s) => s.addItem)
 
   const [sort, setSort] = useState<SortKey>("recent")
@@ -47,7 +48,7 @@ export function WishlistView() {
   const wished: Product[] = useMemo(() => {
     if (!mounted) return []
     return slugs
-      .map((s) => products.find((p) => p.slug === s))
+      .map((s) => (allProducts ?? []).find((p) => p.slug === s))
       .filter((p): p is Product => Boolean(p))
   }, [slugs, mounted])
 

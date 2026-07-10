@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/shared/section-heading"
 import { TicketForm } from "@/components/storefront/ticket-form"
 import { TicketTracker } from "@/components/storefront/ticket-tracker"
 import { seoAlternates } from "@/lib/seo/site"
+import { requireCustomerSession } from "@/lib/server/auth-guards"
 
 export async function generateMetadata({
   params,
@@ -32,6 +33,7 @@ export default async function TicketPage({
   const { locale } = await params
   const { inv } = await searchParams
   setRequestLocale(locale)
+  await requireCustomerSession(locale, "/bantuan/tiket")
   const t = await getTranslations("tickets")
 
   return (

@@ -19,8 +19,38 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
-import { resellerOrders, resellerPlans } from "@/lib/mock/enterprise"
+import { useResellerPortal } from "@/lib/api/queries"
 import { cn, formatIDR, formatNumber } from "@/lib/utils"
+
+const RESELLER_PLANS = [
+  {
+    id: "starter",
+    name: "Starter Reseller",
+    minTopup: 250000,
+    discount: "8%",
+    margin: "Rp5rb - Rp12rb / order",
+    accent: "bg-accent-cyan",
+    perks: ["Katalog reseller", "Harga grosir", "Kode referral reseller"],
+  },
+  {
+    id: "pro",
+    name: "Pro Agency",
+    minTopup: 1000000,
+    discount: "15%",
+    margin: "Rp12rb - Rp30rb / order",
+    accent: "bg-accent-purple",
+    perks: ["Seat tim", "Prioritas stok", "Invoice white-label"],
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise Partner",
+    minTopup: 5000000,
+    discount: "Custom",
+    margin: "Margin kontrak",
+    accent: "bg-accent-lime",
+    perks: ["SLA khusus", "Bulk activation", "Account manager"],
+  },
+] as const
 
 const ORDER_STATUS_KEY = {
   paid: "statusPaid",
@@ -35,15 +65,17 @@ const ORDER_STATUS_VARIANT = {
 
 export function ResellerPortalView() {
   const t = useTranslations("resellerPortal")
+  const { data: portalData } = useResellerPortal()
+  const resellerOrders = (portalData?.orders ?? []) as any[]
   const [topup, setTopup] = useState(1000000)
   const [monthlyOrders, setMonthlyOrders] = useState(80)
 
   const selectedPlan = useMemo(() => {
-    return [...resellerPlans].reverse().find((plan) => topup >= plan.minTopup) ?? resellerPlans[0]
+    return [...RESELLER_PLANS].reverse().find((plan) => topup >= plan.minTopup) ?? RESELLER_PLANS[0]
   }, [topup])
 
   const estimatedMargin = Math.round(monthlyOrders * 14500)
-  const nextPlan = resellerPlans.find((plan) => topup < plan.minTopup)
+  const nextPlan = RESELLER_PLANS.find((plan) => topup < plan.minTopup)
   const nextProgress = nextPlan ? Math.min(100, (topup / nextPlan.minTopup) * 100) : 100
 
   return (
@@ -72,7 +104,7 @@ export function ResellerPortalView() {
 
         <div className="grid gap-5 p-6 lg:grid-cols-[1fr_360px]">
           <div className="grid gap-4 md:grid-cols-3">
-            {resellerPlans.map((plan) => (
+            {RESELLER_PLANS.map((plan) => (
               <div
                 key={plan.id}
                 className={cn(
@@ -203,8 +235,8 @@ export function ResellerPortalView() {
                 {t("orderQty", { qty: order.qty, product: order.product })}
               </p>
               <p className="font-heading text-sm font-extrabold">{formatIDR(order.margin)}</p>
-              <Badge variant={ORDER_STATUS_VARIANT[order.status]}>
-                {t(ORDER_STATUS_KEY[order.status])}
+              <Badge variant={ORDER_STATUS_VARIANT[order.status as keyof typeof ORDER_STATUS_VARIANT]}>
+                {t(ORDER_STATUS_KEY[order.status as keyof typeof ORDER_STATUS_KEY])}
               </Badge>
             </div>
           ))}

@@ -5,6 +5,7 @@ import { ActivationGuideView } from "@/components/storefront/activation-guide-vi
 import { getActivationGuide } from "@/lib/mock/activation-guide"
 import { products } from "@/lib/mock/products"
 import { seoAlternates } from "@/lib/seo/site"
+import { getCatalogProduct } from "@/lib/server/catalog"
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }))
@@ -16,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
   const { locale, slug } = await params
-  const product = products.find((p) => p.slug === slug)
+  const product = await getCatalogProduct(slug)
   if (!product) return {}
   const isEn = locale === "en"
   return {
@@ -36,7 +37,7 @@ export default async function ActivationPage({
 }) {
   const { locale, slug } = await params
   setRequestLocale(locale)
-  const product = products.find((p) => p.slug === slug)
+  const product = await getCatalogProduct(slug)
   if (!product) notFound()
 
   const guide = getActivationGuide(product.brand, product.category)

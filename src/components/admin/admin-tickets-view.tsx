@@ -1,5 +1,6 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   ArrowRight,
   Clock,
@@ -34,12 +35,55 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
+import { replyTicket, updateTicketStatus } from "@/app/actions/admin-tickets"
 import { useFilterState } from "@/lib/hooks/use-filter-state"
+import { useAdminTickets } from "@/lib/api/queries"
 import { cn, formatDate, formatNumber, initials } from "@/lib/utils"
 import { useAdminGamification } from "@/stores/admin-gamification"
-import { useTickets } from "@/stores/tickets"
 import { useUI } from "@/stores/ui"
-import type { Ticket, TicketStatus } from "@/types"
+import type { Ticket, TicketMessage, TicketStatus, TicketType, TicketPriority } from "@/types"
+
+const TICKET_STATUS_MAP: Record<string, TicketStatus> = {
+  NEW: "baru",
+  REVIEWING: "ditinjau",
+  PROCESSING: "diproses",
+  DONE: "selesai",
+  REJECTED: "ditolak",
+}
+
+const TICKET_TYPE_MAP: Record<string, TicketType> = {
+  WARRANTY: "garansi",
+  PAYMENT: "pembayaran",
+  ACCOUNT: "akun",
+  OTHER: "lainnya",
+}
+
+const TICKET_PRIORITY_MAP: Record<string, TicketPriority> = {
+  LOW: "rendah",
+  NORMAL: "normal",
+  HIGH: "tinggi",
+}
+
+function mapTicket(row: Record<string, unknown>): Ticket {
+  return {
+    id: row.id as string,
+    code: row.code as string,
+    type: TICKET_TYPE_MAP[row.type as string] ?? "lainnya",
+    subject: row.subject as string,
+    description: (row.description as string) ?? "",
+    invoice: (row.invoice as string) ?? null,
+    productId: (row.productId as string) ?? null,
+    productName: (row.productName as string) ?? null,
+    priority: TICKET_PRIORITY_MAP[row.priority as string] ?? "normal",
+    status: TICKET_STATUS_MAP[row.status as string] ?? "baru",
+    customerName: row.customerName as string,
+    customerEmail: row.customerEmail as string,
+    whatsapp: (row.whatsapp as string) ?? "",
+    messages: (row.messages as TicketMessage[]) ?? [],
+    createdAt: (row.createdAt as string) ?? "",
+    updatedAt: (row.updatedAt as string) ?? "",
+  }
+}
 
 const STATUS_META: Record<
   TicketStatus,
@@ -69,14 +113,14 @@ const TICKET_COLUMNS = STATUS_OPTIONS.map((status) => ({
             : "bg-danger",
 }))
 
-const TYPE_LABEL: Record<Ticket["type"], string> = {
+const TYPE_LABEL: Record<TicketType, string> = {
   garansi: "Garansi",
   pembayaran: "Pembayaran",
   akun: "Akun",
   lainnya: "Lainnya",
 }
 
-const PRIORITY_VARIANT: Record<Ticket["priority"], "neutral" | "warning" | "danger"> = {
+const PRIORITY_VARIANT: Record<TicketPriority, "neutral" | "warning" | "danger"> = {
   rendah: "neutral",
   normal: "warning",
   tinggi: "danger",
@@ -91,10 +135,22 @@ const FILTERS: { value: TicketStatus | "semua"; label: string }[] = [
   { value: "ditolak", label: "Ditolak" },
 ]
 
+// Reverse map for sending to API
+const STATUS_TO_API: Record<TicketStatus, string> = {
+  baru: "NEW",
+  ditinjau: "REVIEWING",
+  diproses: "PROCESSING",
+  selesai: "DONE",
+  ditolak: "REJECTED",
+}
+
 export function AdminTicketsView() {
-  const tickets = useTickets((s) => s.tickets)
-  const setStatus = useTickets((s) => s.setStatus)
-  const adminReply = useTickets((s) => s.adminReply)
+  const queryClient = useQueryClient()
+  const { data: ticketsData } = useAdminTickets()
+  const tickets: Ticket[] = useMemo(
+    () => (ticketsData?.data ?? []).map(mapTicket),
+    [ticketsData],
+  )
   const award = useAdminGamification((s) => s.award)
   const [search, setSearch] = useFilterState<string>("tickets", "search", "")
   const [status, setStatusFilter] = useFilterState<TicketStatus | "semua">(
@@ -106,6 +162,21 @@ export function AdminTicketsView() {
   const [reply, setReply] = useState("")
   const viewMode = useUI((state) => state.pipelineViews.tickets)
   const setPipelineView = useUI((state) => state.setPipelineView)
+
+  const replyMutation = useMutation({
+    mutationFn: (input: { ticketId: string; message: string }) => replyTicket(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "tickets"] })
+    },
+  })
+
+  const statusMutation = useMutation({
+    mutationFn: ({ ticketId, status }: { ticketId: string; status: string }) =>
+      updateTicketStatus(ticketId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "tickets"] })
+    },
+  })
 
   const stats = useMemo(() => {
     const list = tickets
@@ -170,7 +241,7 @@ export function AdminTicketsView() {
   function bulkSetStatus(next: TicketStatus) {
     if (selected.size === 0) return
     selected.forEach((id) => {
-      setStatus(id, next)
+      statusMutation.mutate({ ticketId: id, status: STATUS_TO_API[next] })
     })
     if (next === "selesai") award("ticket.resolved")
     toast.success(`${selected.size} tiket diubah ke "${STATUS_META[next].label}"`)
@@ -181,9 +252,15 @@ export function AdminTicketsView() {
     if (!active) return
     const text = reply.trim()
     if (!text) return
-    adminReply(active.id, { author: "CS geraiakun", message: text })
+    replyMutation.mutate(
+      { ticketId: active.id, message: text },
+      {
+        onSuccess: () => {
+          toast.success(`Balasan terkirim ke ${active.code}`)
+        },
+      },
+    )
     setReply("")
-    toast.success(`Balasan terkirim ke ${active.code}`)
   }
 
   return (
@@ -439,9 +516,16 @@ export function AdminTicketsView() {
                     <Select
                       value={active.status}
                       onValueChange={(v) => {
-                        setStatus(active.id, v as TicketStatus)
-                        if (v === "selesai") award("ticket.resolved")
-                        toast.success(`Status diubah: ${STATUS_META[v as TicketStatus].label}`)
+                        const nextStatus = v as TicketStatus
+                        statusMutation.mutate(
+                          { ticketId: active.id, status: STATUS_TO_API[nextStatus] },
+                          {
+                            onSuccess: () => {
+                              if (nextStatus === "selesai") award("ticket.resolved")
+                              toast.success(`Status diubah: ${STATUS_META[nextStatus].label}`)
+                            },
+                          },
+                        )
                       }}
                     >
                       <SelectTrigger id="status-sel" className="w-40">
@@ -544,7 +628,7 @@ export function AdminTicketsView() {
                     <span className="text-xs text-foreground/50">
                       Membalas akan mengubah status tiket jadi "Ditinjau".
                     </span>
-                    <Button onClick={sendReply} disabled={!reply.trim()}>
+                    <Button onClick={sendReply} disabled={!reply.trim() || replyMutation.isPending}>
                       <Send className="size-4" /> Kirim
                     </Button>
                   </div>

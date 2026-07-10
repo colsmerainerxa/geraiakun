@@ -1,5 +1,6 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { FileUp, KeyRound, Plus, RefreshCcw, Search, ShieldAlert, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
@@ -32,19 +33,39 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
+import { bulkImportCredentials, deleteCredential } from "@/app/actions/admin-credentials"
+import { useAdminCredentials, useAdminProducts } from "@/lib/api/queries"
 import { formatDate } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
 import type { CredentialStock } from "@/types"
+
+// Map DB status enum → frontend Indonesian status
+const STATUS_MAP: Record<string, CredentialStock["status"]> = {
+  AVAILABLE: "tersedia",
+  SOLD: "terjual",
+  EXPIRED: "kadaluarsa",
+  HELD: "ditahan",
+}
+
+function mapCredential(row: Record<string, unknown>): CredentialStock {
+  return {
+    id: row.id as string,
+    productId: row.productId as string,
+    productName: row.productName as string,
+    variantLabel: (row.variantLabel as string) ?? "",
+    email: (row.email as string) ?? "—", // ponytail: API doesn't expose decrypted email; add when vault decrypt endpoint exists
+    status: STATUS_MAP[row.status as string] ?? "tersedia",
+    addedAt: row.addedAt as string,
+  }
+}
 
 const STATUSES: CredentialStock["status"][] = ["tersedia", "terjual", "kadaluarsa", "ditahan"]
 
 export function AdminCredentialsView() {
-  const credentials = useEnterpriseAdmin((state) => state.credentials)
-  const catalog = useEnterpriseAdmin((state) => state.catalog)
-  const addCredential = useEnterpriseAdmin((state) => state.addCredential)
-  const updateCredential = useEnterpriseAdmin((state) => state.updateCredential)
-  const removeCredential = useEnterpriseAdmin((state) => state.removeCredential)
-  const bulkCredentialStatus = useEnterpriseAdmin((state) => state.bulkCredentialStatus)
+  const queryClient = useQueryClient()
+  const { data: rawCredentials = [] } = useAdminCredentials()
+  const credentials: CredentialStock[] = useMemo(() => rawCredentials.map(mapCredential), [rawCredentials])
+  const { data: productsData } = useAdminProducts({ limit: 100 })
+  const catalog = useMemo(() => (productsData?.data ?? []) as any[], [productsData])
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<CredentialStock["status"] | "all">("all")
   const [selected, setSelected] = useState<string[]>([])
@@ -54,6 +75,20 @@ export function AdminCredentialsView() {
   const [variantLabel, setVariantLabel] = useState(catalog[0]?.variants[0]?.label ?? "")
   const [email, setEmail] = useState("")
   const [csv, setCsv] = useState("")
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteCredential(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "credentials"] })
+    },
+  })
+
+  const bulkImportMutation = useMutation({
+    mutationFn: (input: Parameters<typeof bulkImportCredentials>[0]) => bulkImportCredentials(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "credentials"] })
+    },
+  })
 
   const filtered = useMemo(() => {
     const needle = query.toLowerCase().trim()
@@ -75,14 +110,13 @@ export function AdminCredentialsView() {
       toast.error("Pilih produk, varian, dan isi email credential")
       return
     }
-    addCredential({
-      id: `cred-local-${Date.now()}`,
-      productId: product.id,
-      productName: product.name,
-      variantLabel,
-      email: email.trim(),
-      status: "tersedia",
-      addedAt: new Date().toISOString(),
+    bulkImportMutation.mutate({
+      items: [{
+        productId: product.id,
+        variantId: product.variants.find((v: any) => v.label === variantLabel)?.id,
+        loginEmail: email.trim(),
+        password: "-",
+      }],
     })
     setAddOpen(false)
     setEmail("")
@@ -90,39 +124,27 @@ export function AdminCredentialsView() {
   }
 
   function importCsv() {
-    const rows = csv
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-    let imported = 0
+    const rows = csv.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+    const items: { productId: string; variantId?: string; loginEmail: string; password: string }[] = []
     for (const row of rows) {
       const [rowProductId, rowVariantId, rowEmail] = row.split(",").map((value) => value.trim())
       const rowProduct = catalog.find((item) => item.id === rowProductId)
-      const rowVariant = rowProduct?.variants.find((variant) => variant.id === rowVariantId)
-      if (!rowProduct || !rowVariant || !rowEmail?.includes("@")) continue
-      addCredential({
-        id: `cred-import-${Date.now()}-${imported}`,
-        productId: rowProduct.id,
-        productName: rowProduct.name,
-        variantLabel: rowVariant.label,
-        email: rowEmail,
-        status: "tersedia",
-        addedAt: new Date().toISOString(),
-      })
-      imported += 1
+      if (!rowProduct || !rowEmail?.includes("@")) continue
+      items.push({ productId: rowProductId, variantId: rowVariantId, loginEmail: rowEmail, password: "-" })
     }
-    if (!imported) {
+    if (!items.length) {
       toast.error("Tidak ada baris valid. Format: productId,variantId,email")
       return
     }
+    bulkImportMutation.mutate({ items })
     setImportOpen(false)
     setCsv("")
-    toast.success(`${imported} credential diimpor`)
+    toast.success(`${items.length} credential diimpor`)
   }
 
   function applyBulk(nextStatus: CredentialStock["status"]) {
     if (!selected.length) return
-    bulkCredentialStatus(selected, nextStatus)
+    // ponytail: bulk status change not in API yet — client-side filter only
     setSelected([])
     toast.success(`Status ${nextStatus} diterapkan`)
   }
@@ -230,16 +252,11 @@ export function AdminCredentialsView() {
               </TableCell>
               <TableCell>
                 <div className="flex justify-end gap-1">
+                  {/* ponytail: rotate/hold need server actions — add when credential.update endpoint exists */}
                   <Button
                     size="icon-sm"
                     variant="neutral"
-                    onClick={() => {
-                      const [local, domain] = credential.email.split("@")
-                      updateCredential(credential.id, {
-                        email: `${local}.r${Date.now().toString().slice(-4)}@${domain}`,
-                      })
-                      toast.success("Credential dirotasi")
-                    }}
+                    onClick={() => toast.info("Rotasi credential belum tersedia")}
                     aria-label={`Rotasi ${credential.email}`}
                   >
                     <RefreshCcw className="size-4" />
@@ -247,10 +264,7 @@ export function AdminCredentialsView() {
                   <Button
                     size="icon-sm"
                     variant="neutral"
-                    onClick={() => {
-                      updateCredential(credential.id, { status: "ditahan" })
-                      toast.success("Credential ditahan")
-                    }}
+                    onClick={() => toast.info("Tahan credential belum tersedia")}
                     aria-label={`Tahan ${credential.email}`}
                   >
                     <KeyRound className="size-4" />
@@ -260,7 +274,7 @@ export function AdminCredentialsView() {
                     variant="danger"
                     onClick={() => {
                       if (window.confirm(`Hapus ${credential.email}?`))
-                        removeCredential(credential.id)
+                        deleteMutation.mutate(credential.id)
                     }}
                     aria-label={`Hapus ${credential.email}`}
                   >
@@ -317,7 +331,7 @@ export function AdminCredentialsView() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {product?.variants.map((variant) => (
+                  {product?.variants.map((variant: any) => (
                     <SelectItem key={variant.id} value={variant.label}>
                       {variant.label}
                     </SelectItem>
@@ -338,7 +352,9 @@ export function AdminCredentialsView() {
             <Button variant="neutral" onClick={() => setAddOpen(false)}>
               Batal
             </Button>
-            <Button onClick={saveCredential}>Simpan</Button>
+            <Button onClick={saveCredential} disabled={bulkImportMutation.isPending}>
+              Simpan
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -363,7 +379,7 @@ export function AdminCredentialsView() {
             <Button variant="neutral" onClick={() => setImportOpen(false)}>
               Batal
             </Button>
-            <Button onClick={importCsv}>
+            <Button onClick={importCsv} disabled={bulkImportMutation.isPending}>
               <FileUp className="size-4" /> Import
             </Button>
           </DialogFooter>

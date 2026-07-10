@@ -25,7 +25,9 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
-import { useEnterpriseAdmin } from "@/stores/enterprise-admin"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useAdminPromos } from "@/lib/api/queries"
+import { createPromo, updatePromo, deletePromo } from "@/app/actions/admin-promos"
 import type { Promo, PromoType } from "@/types"
 
 function emptyPromo(): Promo {
@@ -46,15 +48,45 @@ function emptyPromo(): Promo {
 }
 
 export function AdminPromosView() {
-  const promos = useEnterpriseAdmin((state) => state.promos)
-  const savePromo = useEnterpriseAdmin((state) => state.savePromo)
-  const removePromo = useEnterpriseAdmin((state) => state.removePromo)
+  const { data: promos = [] } = useAdminPromos()
+  const queryClient = useQueryClient()
+  const saveMutation = useMutation({
+    mutationFn: async (promo: any) => {
+      const input = {
+        code: promo.code,
+        description: promo.description,
+        type: (promo.type === "persen" ? "PERCENT" : "NOMINAL") as "PERCENT" | "NOMINAL",
+        value: promo.value,
+        minSpend: promo.minSpend ?? 0,
+        maxDiscount: promo.maxDiscount,
+        quota: promo.quota,
+        expiresAt: promo.expiresAt,
+        active: promo.active,
+        scope: promo.scope,
+      } as any
+      if (promo.id && !promo.id.startsWith("promo-local-")) {
+        return updatePromo(promo.id, input)
+      }
+      return createPromo(input)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "promos"] })
+    },
+  })
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deletePromo(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "promos"] })
+    },
+  })
+  const savePromo = (promo: any) => saveMutation.mutate(promo)
+  const removePromo = (id: string) => deleteMutation.mutate(id)
   const [query, setQuery] = useState("")
   const [draft, setDraft] = useState<Promo | null>(null)
   const filtered = useMemo(() => {
     const needle = query.toLowerCase().trim()
     if (!needle) return promos
-    return promos.filter((promo) =>
+    return promos.filter((promo: any) =>
       [promo.code, promo.description, promo.scope].join(" ").toLowerCase().includes(needle),
     )
   }, [promos, query])
@@ -106,7 +138,7 @@ export function AdminPromosView() {
       </div>
 
       <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((promo) => {
+        {filtered.map((promo: any) => {
           const usage = promo.quota
             ? Math.min(100, Math.round((promo.used / promo.quota) * 100))
             : 0
@@ -198,7 +230,7 @@ export function AdminPromosView() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {promos.some((promo) => promo.id === draft?.id) ? "Edit Promo" : "Promo Baru"}
+              {promos.some((promo: any) => promo.id === draft?.id) ? "Edit Promo" : "Promo Baru"}
             </DialogTitle>
             <DialogDescription>
               Atur nilai, scope, kuota, periode, dan status promo.

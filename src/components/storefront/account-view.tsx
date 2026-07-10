@@ -20,10 +20,11 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
-import { useOrders } from "@/lib/api/queries"
-import { products } from "@/lib/mock/products"
+import { useCurrentUserOrders } from "@/lib/api/queries"
+import { useProducts } from "@/lib/api/queries"
 import { cn, formatDate, formatIDR, formatNumber, initials } from "@/lib/utils"
 import { getTier, useLoyalty } from "@/stores/loyalty"
+import { usePurchasedOrders } from "@/stores/orders"
 import { useUser } from "@/stores/user"
 import { useWishlist } from "@/stores/wishlist"
 import type { OrderStatus } from "@/types"
@@ -50,16 +51,18 @@ export function AccountView() {
   const mounted = useMounted()
   const profile = useUser((s) => s.profile)
   const wishedSlugs = useWishlist((s) => s.slugs)
+  const { data: allProducts } = useProducts()
   const wished = mounted
     ? wishedSlugs
-        .map((s) => products.find((p) => p.slug === s))
+        .map((s) => (allProducts ?? []).find((p) => p.slug === s))
         .filter((p): p is NonNullable<typeof p> => Boolean(p))
     : []
   const locale = useLocale()
   const dateLocale = locale === "en" ? "en-US" : "id-ID"
-  const { data: orders, isLoading } = useOrders()
+  const localOrders = usePurchasedOrders((s) => s.orders)
+  const { data: orders, isLoading } = useCurrentUserOrders()
 
-  const list = orders ?? []
+  const list = orders?.length ? orders : mounted ? localOrders : []
   const totalOrders = list.length
   const activeCount = list.filter((o) => o.status === "selesai").length
   const totalSpent = list.filter((o) => o.paidAt).reduce((s, o) => s + o.total, 0)
