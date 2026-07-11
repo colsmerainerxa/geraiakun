@@ -155,7 +155,6 @@ export function ProductDetail({
               bgFor(product.accent),
             )}
           >
-            <div className="bg-dots pointer-events-none absolute inset-0 opacity-10" />
             <motion.span
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

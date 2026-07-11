@@ -157,7 +157,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Container className="py-16">
         <Reveal>
           <div className="relative overflow-hidden rounded-base border-2 border-border bg-main p-10 text-center shadow-shadow-lg sm:p-16">
-            <div className="bg-dots pointer-events-none absolute inset-0 opacity-10" />
             <h2 className="relative font-heading text-3xl font-extrabold text-main-foreground text-balance sm:text-5xl">
               {t("ctaTitle")}
             </h2>

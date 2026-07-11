@@ -27,8 +27,6 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden border-b-2 border-border bg-background">
-      <div className="bg-dots pointer-events-none absolute inset-0 opacity-[0.07]" />
-
       {/* Floating brand chips (desktop) */}
       {floatingLogos.map((f) => (
         <motion.div
