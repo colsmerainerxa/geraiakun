@@ -14,13 +14,13 @@ import type { Locale } from "@/i18n/routing"
 
 // SVG flags — cross-platform, no emoji font dependency
 const FlagID = () => (
-  <svg viewBox="0 0 24 16" className="size-5 rounded-[3px] ring-1 ring-border" aria-hidden>
+  <svg viewBox="0 0 24 16" className="h-3.5 w-5 rounded-[3px] ring-1 ring-border" aria-hidden>
     <rect width="24" height="16" fill="#fff" />
     <rect width="24" height="8" y="0" fill="#e70011" />
   </svg>
 )
 const FlagEN = () => (
-  <svg viewBox="0 0 24 16" className="size-5 rounded-[3px] ring-1 ring-border" aria-hidden>
+  <svg viewBox="0 0 24 16" className="h-3.5 w-5 rounded-[3px] ring-1 ring-border" aria-hidden>
     <rect width="24" height="16" fill="#012169" />
     <path d="M0,0 L24,16 M24,0 L0,16" stroke="#fff" strokeWidth="3" />
     <path d="M0,0 L24,16 M24,0 L0,16" stroke="#C8102E" strokeWidth="1.5" />
@@ -54,7 +54,7 @@ export function LocaleSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         disabled={isPending}
-        className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background transition-all hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-60"
+        className="flex h-9 items-center justify-center gap-1 rounded-base border-2 border-border bg-secondary-background px-2 transition-all hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-60"
         aria-label={t("changeLanguage")}
       >
         <current.Flag />
