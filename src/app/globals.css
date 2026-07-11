@@ -41,7 +41,7 @@
   --secondary-background: #262833;
   --foreground: #e8e8ec;
   --main-foreground: #0a0a0a;
-  --main: #ffd23f;
+  --main: #e8b830;
   /* Soft gray border — visible on dark bg but not blinding like pure white.
      Neobrutalism needs bold borders, but #fff at 2px on #1c1d24 is ~15:1
      contrast — eye strain. #4a4e5c is ~3:1, readable & comfortable. */
@@ -51,6 +51,19 @@
   --shadow: 4px 4px 0px 0px #4a4e5c;
   --shadow-sm: 2px 2px 0px 0px #4a4e5c;
   --shadow-lg: 6px 6px 0px 0px #4a4e5c;
+
+  /* Dimmed accents — ~75% brightness of light mode. Still vibrant for
+     neobrutalism but doesn't burn on dark bg. Light-mode values kept
+     in :root; these only apply in .dark. */
+  --accent-pink: #d94a72;
+  --accent-cyan: #42b8c2;
+  --accent-lime: #8bc230;
+  --accent-purple: #a380ee;
+  --accent-blue: #4a8ae0;
+
+  --success: #28a865;
+  --warning: #e8a020;
+  --danger: #e84545;
 }
 
 @theme inline {

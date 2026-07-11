@@ -65,7 +65,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </Container>
 
       {/* Featured products */}
-      <div className="border-y-2 border-border bg-secondary-background/50">
+      <div className="border-y-2 border-border bg-secondary-background">
         <Container className="py-16">
           <SectionHeading
             eyebrow="🔥 Hot"
@@ -121,7 +121,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </Container>
 
       {/* Trust / why us */}
-      <div className="border-y-2 border-border bg-secondary-background/50">
+      <div className="border-y-2 border-border bg-secondary-background">
         <Container className="py-16">
           <SectionHeading align="center" title={t("trustTitle")} />
           <RevealGroup className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
