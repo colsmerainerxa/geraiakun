@@ -23,9 +23,7 @@ function useNavLinks() {
     { href: "/", label: t("home") },
     { href: "/katalog", label: t("catalog") },
     { href: "/rekomendasi", label: t("recommendation") },
-    { href: "/artikel", label: t("blog") },
     { href: "/lacak", label: t("track") },
-    { href: "/bantuan", label: t("help") },
   ] as const
 }
 
