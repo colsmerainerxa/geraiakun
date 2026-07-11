@@ -50,8 +50,8 @@ function badgeLabel(value: string, isEn: boolean) {
 
 const PRICE_RANGES = [
   { label: "< Rp50rb", min: 0, max: 50000 },
-  { label: "Rp50rb�100rb", min: 50000, max: 100000 },
-  { label: "Rp100rb�300rb", min: 100000, max: 300000 },
+  { label: "Rp50rb–100rb", min: 50000, max: 100000 },
+  { label: "Rp100rb–300rb", min: 100000, max: 300000 },
   { label: "> Rp300rb", min: 300000, max: Number.POSITIVE_INFINITY },
 ]
 
@@ -296,7 +296,7 @@ export function CatalogView() {
     <Container className="py-10">
       <div className="mb-6">
         <h1 className="font-heading text-3xl font-extrabold sm:text-4xl">
-          {initialSearch ? `${t("searchResultsFor")} �${initialSearch}�` : t("title")}
+          {initialSearch ? `${t("searchResultsFor")} —${initialSearch}—` : t("title")}
         </h1>
         <p className="mt-1 text-foreground/60">{t("subtitle")}</p>
       </div>

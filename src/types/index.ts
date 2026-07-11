@@ -1,5 +1,5 @@
 // ============================================================
-// Domain types � marketplace akun digital
+// Domain types — marketplace akun digital
 // ============================================================
 
 export type ID = string
@@ -287,7 +287,7 @@ export interface QaQuestion {
 }
 
 // ============================================================
-// Support � Ticketing & notifikasi
+// Support — Ticketing & notifikasi
 // ============================================================
 
 export type TicketType =

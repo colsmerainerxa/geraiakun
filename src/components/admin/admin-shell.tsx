@@ -249,7 +249,7 @@ function LevelBadge() {
   return (
     <span
       className="hidden items-center gap-2 rounded-base border-2 border-border bg-secondary-background px-2 py-1 shadow-shadow-sm sm:flex"
-      title={`Level ${level} � ${xp} XP � streak ${streak} hari`}
+      title={`Level ${level} — ${xp} XP — streak ${streak} hari`}
     >
       <span className="flex size-6 items-center justify-center rounded-base border-2 border-border bg-main font-heading text-[11px] font-extrabold text-main-foreground">
         {level}

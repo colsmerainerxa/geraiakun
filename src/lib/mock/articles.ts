@@ -27,9 +27,9 @@ export const articles: Article[] = [
     title: "Stack AI Hemat untuk Mahasiswa di 2026",
     titleEn: "An Affordable AI Stack for Students in 2026",
     excerpt:
-      "Tiga tools AI yang saling melengkapi untuk menulis, riset, dan ngoding � semua dengan budget anak kos.",
+      "Tiga tools AI yang saling melengkapi untuk menulis, riset, dan ngoding — semua dengan budget anak kos.",
     excerptEn:
-      "Three complementary AI tools for writing, research, and coding � all on a student budget.",
+      "Three complementary AI tools for writing, research, and coding — all on a student budget.",
     category: "Panduan",
     categoryEn: "Guide",
     emoji: "🎓",
@@ -47,9 +47,9 @@ export const articles: Article[] = [
       {
         heading: "Susunan stack-nya",
         headingEn: "The stack",
-        body: "ChatGPT Plus untuk menulis esai, menjelaskan konsep sulit, dan brainstorming. Gemini Pro untuk riset mendalam plus integrasi langsung ke Gmail, Docs, dan Sheets. API Key untuk kamu yang mulai ngoding bot atau automasi sendiri � mulai gratis lewat varian Trial.",
+        body: "ChatGPT Plus untuk menulis esai, menjelaskan konsep sulit, dan brainstorming. Gemini Pro untuk riset mendalam plus integrasi langsung ke Gmail, Docs, dan Sheets. API Key untuk kamu yang mulai ngoding bot atau automasi sendiri — mulai gratis lewat varian Trial.",
         bodyEn:
-          "ChatGPT Plus for essays, explaining hard concepts, and brainstorming. Gemini Pro for deep research plus direct integration with Gmail, Docs, and Sheets. An API Key for those starting to build bots or automation � start free with the Trial variant.",
+          "ChatGPT Plus for essays, explaining hard concepts, and brainstorming. Gemini Pro for deep research plus direct integration with Gmail, Docs, and Sheets. An API Key for those starting to build bots or automation — start free with the Trial variant.",
       },
       {
         heading: "Tips biar maksimal",
@@ -66,9 +66,9 @@ export const articles: Article[] = [
     title: "ChatGPT Plus vs Versi Gratis: Masih Worth It di 2026?",
     titleEn: "ChatGPT Plus vs Free: Still Worth It in 2026?",
     excerpt:
-      "Versi gratis makin pintar � tapi apakah Plus masih layak dibeli? Ini perbandingan jujurnya.",
+      "Versi gratis makin pintar — tapi apakah Plus masih layak dibeli? Ini perbandingan jujurnya.",
     excerptEn:
-      "The free tier keeps getting smarter � but is Plus still worth it? Here's the honest comparison.",
+      "The free tier keeps getting smarter — but is Plus still worth it? Here's the honest comparison.",
     category: "Review",
     categoryEn: "Review",
     emoji: "🤖",
@@ -86,16 +86,16 @@ export const articles: Article[] = [
       {
         heading: "Kapan versi gratis sudah cukup",
         headingEn: "When the free tier is enough",
-        body: "Kalau kamu cuma sesekali bertanya hal ringan, versi gratis 2026 sudah sangat mumpuni. Plus jadi worth it ketika AI sudah jadi bagian alur kerja harian � coding, menulis panjang, atau riset intens.",
+        body: "Kalau kamu cuma sesekali bertanya hal ringan, versi gratis 2026 sudah sangat mumpuni. Plus jadi worth it ketika AI sudah jadi bagian alur kerja harian — coding, menulis panjang, atau riset intens.",
         bodyEn:
-          "If you only occasionally ask light questions, the 2026 free tier is already very capable. Plus becomes worth it once AI is part of your daily workflow � coding, long-form writing, or intense research.",
+          "If you only occasionally ask light questions, the 2026 free tier is already very capable. Plus becomes worth it once AI is part of your daily workflow — coding, long-form writing, or intense research.",
       },
       {
         heading: "Putusan akhir",
         headingEn: "The verdict",
         body: "Untuk pelajar dan profesional yang produktif, Plus tetap salah satu langganan dengan ROI terbaik. Apalagi kalau kamu bisa dapat dengan harga yang lebih ramah kantong.",
         bodyEn:
-          "For productive students and professionals, Plus remains one of the best-ROI subscriptions � especially if you can get it at a more budget-friendly price.",
+          "For productive students and professionals, Plus remains one of the best-ROI subscriptions — especially if you can get it at a more budget-friendly price.",
       },
     ],
     relatedSlugs: ["chatgpt-plus", "gemini-pro"],
@@ -144,9 +144,9 @@ export const articles: Article[] = [
     title: "Panduan API Key untuk Pemula: Trial, Basic, atau Pro?",
     titleEn: "API Key Guide for Beginners: Trial, Basic, or Pro?",
     excerpt:
-      "Mau bikin bot atau automasi sendiri? Mulai dari sini � pahami token dan pilih paket yang pas.",
+      "Mau bikin bot atau automasi sendiri? Mulai dari sini — pahami token dan pilih paket yang pas.",
     excerptEn:
-      "Want to build your own bot or automation? Start here � understand tokens and pick the right plan.",
+      "Want to build your own bot or automation? Start here — understand tokens and pick the right plan.",
     category: "Panduan",
     categoryEn: "Guide",
     emoji: "🔑",
@@ -157,16 +157,16 @@ export const articles: Article[] = [
       {
         heading: "API key & token itu apa, sih?",
         headingEn: "What are API keys and tokens?",
-        body: "API key adalah kunci yang membuat aplikasimu bisa memanggil model AI lewat kode. Setiap permintaan menghabiskan token � satuan kecil potongan teks. Makin panjang prompt dan jawaban, makin banyak token terpakai.",
+        body: "API key adalah kunci yang membuat aplikasimu bisa memanggil model AI lewat kode. Setiap permintaan menghabiskan token — satuan kecil potongan teks. Makin panjang prompt dan jawaban, makin banyak token terpakai.",
         bodyEn:
-          "An API key is a key that lets your app call AI models through code. Each request consumes tokens � tiny chunks of text. The longer your prompt and response, the more tokens are used.",
+          "An API key is a key that lets your app call AI models through code. Each request consumes tokens — tiny chunks of text. The longer your prompt and response, the more tokens are used.",
       },
       {
         heading: "Beda Trial, Basic, dan Pro",
         headingEn: "Trial, Basic, and Pro compared",
-        body: "Trial gratis cocok untuk coba-coba dan belajar. Basic memberi 10 juta token untuk eksperimen yang lebih serius. Pro memberi 5 juta token untuk model kelas atas � jumlah token lebih sedikit karena modelnya lebih canggih dan 'berat'.",
+        body: "Trial gratis cocok untuk coba-coba dan belajar. Basic memberi 10 juta token untuk eksperimen yang lebih serius. Pro memberi 5 juta token untuk model kelas atas — jumlah token lebih sedikit karena modelnya lebih canggih dan 'berat'.",
         bodyEn:
-          "The free Trial is great for testing and learning. Basic gives 10 million tokens for more serious experiments. Pro gives 5 million tokens for higher-tier models � fewer tokens because the models are more advanced and 'heavier'.",
+          "The free Trial is great for testing and learning. Basic gives 10 million tokens for more serious experiments. Pro gives 5 million tokens for higher-tier models — fewer tokens because the models are more advanced and 'heavier'.",
       },
       {
         heading: "Tips hemat token",
@@ -196,9 +196,9 @@ export const articles: Article[] = [
       {
         heading: "Apa beda Via Invite dan Via Login?",
         headingEn: "Invite vs Login: what's the difference?",
-        body: "Via Invite berarti kamu diundang ke sebuah grup/family, lalu login memakai email Google milikmu sendiri � paling nyaman karena data tetap di akunmu. Via Login berarti kamu diberi kredensial untuk masuk ke akun yang sudah Pro.",
+        body: "Via Invite berarti kamu diundang ke sebuah grup/family, lalu login memakai email Google milikmu sendiri — paling nyaman karena data tetap di akunmu. Via Login berarti kamu diberi kredensial untuk masuk ke akun yang sudah Pro.",
         bodyEn:
-          "Via Invite means you're invited into a group/family, then sign in with your own Google email � the most comfortable since your data stays on your account. Via Login means you're given credentials to sign in to an already-Pro account.",
+          "Via Invite means you're invited into a group/family, then sign in with your own Google email — the most comfortable since your data stays on your account. Via Login means you're given credentials to sign in to an already-Pro account.",
       },
       {
         heading: "Langkah aktivasi Via Invite",
@@ -242,9 +242,9 @@ export const articles: Article[] = [
       {
         heading: "Solusi cepat",
         headingEn: "Quick fixes",
-        body: "Login ulang dengan kredensial yang sama dan jangan mengubah password. Kalau masih sering ke-logout, hubungi CS kami � selama masa garansi kami bantu cek atau ganti akun tanpa biaya.",
+        body: "Login ulang dengan kredensial yang sama dan jangan mengubah password. Kalau masih sering ke-logout, hubungi CS kami — selama masa garansi kami bantu cek atau ganti akun tanpa biaya.",
         bodyEn:
-          "Sign in again with the same credentials and don't change the password. If it keeps logging out, contact our support � within the warranty period we'll check or replace it free of charge.",
+          "Sign in again with the same credentials and don't change the password. If it keeps logging out, contact our support — within the warranty period we'll check or replace it free of charge.",
       },
       {
         heading: "Biar lebih stabil",
@@ -281,9 +281,9 @@ export const articles: Article[] = [
       {
         heading: "Kekuatan Gemini Pro",
         headingEn: "Where Gemini Pro shines",
-        body: "Unggul untuk riset mendalam dengan sumber, plus integrasi mulus ke Gmail, Docs, dan Sheets � ditambah bonus Google One 2TB. Cocok kalau kamu hidup di ekosistem Google.",
+        body: "Unggul untuk riset mendalam dengan sumber, plus integrasi mulus ke Gmail, Docs, dan Sheets — ditambah bonus Google One 2TB. Cocok kalau kamu hidup di ekosistem Google.",
         bodyEn:
-          "Excels at deep, sourced research, plus seamless integration with Gmail, Docs, and Sheets � with a Google One 2TB bonus. Ideal if you live in the Google ecosystem.",
+          "Excels at deep, sourced research, plus seamless integration with Gmail, Docs, and Sheets — with a Google One 2TB bonus. Ideal if you live in the Google ecosystem.",
       },
       {
         heading: "Jadi, pilih yang mana?",
@@ -313,9 +313,9 @@ export const articles: Article[] = [
       {
         heading: "1 token itu seberapa?",
         headingEn: "How big is one token?",
-        body: "Sebagai patokan kasar, 1 token kira-kira setara 4 karakter atau sekitar 0,75 kata dalam bahasa Inggris. Jadi 1.000 token kira-kira 750 kata � gabungan prompt dan jawaban.",
+        body: "Sebagai patokan kasar, 1 token kira-kira setara 4 karakter atau sekitar 0,75 kata dalam bahasa Inggris. Jadi 1.000 token kira-kira 750 kata — gabungan prompt dan jawaban.",
         bodyEn:
-          "As a rough rule, 1 token is about 4 characters or roughly 0.75 English words. So 1,000 tokens is about 750 words � combining the prompt and the response.",
+          "As a rough rule, 1 token is about 4 characters or roughly 0.75 English words. So 1,000 tokens is about 750 words — combining the prompt and the response.",
       },
       {
         heading: "Contoh estimasi pemakaian",
@@ -339,9 +339,9 @@ export const articles: Article[] = [
     title: "Cara Bayar QRIS untuk Akun Premium (Anti Ribet)",
     titleEn: "How to Pay with QRIS for Premium Accounts (Hassle-Free)",
     excerpt:
-      "QRIS bikin bayar akun premium gampang banget � satu scan dari e-wallet mana pun. Ini langkahnya.",
+      "QRIS bikin bayar akun premium gampang banget — satu scan dari e-wallet mana pun. Ini langkahnya.",
     excerptEn:
-      "QRIS makes paying for premium accounts super easy � one scan from any e-wallet. Here are the steps.",
+      "QRIS makes paying for premium accounts super easy — one scan from any e-wallet. Here are the steps.",
     category: "Panduan",
     categoryEn: "Guide",
     emoji: "💳",
@@ -352,9 +352,9 @@ export const articles: Article[] = [
       {
         heading: "Kenapa QRIS?",
         headingEn: "Why QRIS?",
-        body: "QRIS bisa dibayar dari hampir semua e-wallet dan m-banking � GoPay, OVO, DANA, ShopeePay, sampai mobile banking. Cukup satu kode, tanpa pusing pilih channel. Pembayaran terverifikasi otomatis.",
+        body: "QRIS bisa dibayar dari hampir semua e-wallet dan m-banking — GoPay, OVO, DANA, ShopeePay, sampai mobile banking. Cukup satu kode, tanpa pusing pilih channel. Pembayaran terverifikasi otomatis.",
         bodyEn:
-          "QRIS can be paid from almost any e-wallet and mobile bank � GoPay, OVO, DANA, ShopeePay, even mobile banking. Just one code, no need to pick a channel. Payment is auto-verified.",
+          "QRIS can be paid from almost any e-wallet and mobile bank — GoPay, OVO, DANA, ShopeePay, even mobile banking. Just one code, no need to pick a channel. Payment is auto-verified.",
       },
       {
         heading: "Langkah bayar",

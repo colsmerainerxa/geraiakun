@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 
 // URL-synced filter state for admin list views. Each filter value is mirrored
-// to a search-param (`<module>.<key>`) via history.replaceState � shareable
+// to a search-param (`<module>.<key>`) via history.replaceState — shareable
 // URLs + working back/forward, without the Suspense boundary that
 // useSearchParams() forces on static-rendered routes and without re-render
 // storms from router.push. Defaults clear the param so URLs stay clean.

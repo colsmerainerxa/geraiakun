@@ -10,7 +10,7 @@ import {
 } from "@/stores/admin-gamification"
 
 // Dashboard gamification card: level, XP progress, daily streak, and the
-// milestone-badge grid (locked vs unlocked). Pure motivational UI � never
+// milestone-badge grid (locked vs unlocked). Pure motivational UI — never
 // gates real admin permissions.
 export function AchievementsPanel() {
   const xp = useAdminGamification((s) => s.xp)

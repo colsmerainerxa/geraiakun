@@ -56,7 +56,7 @@ export function Pagination({
       )}
     >
       <p className="text-xs font-bold text-foreground/60">
-        Menampilkan {from}�{to} dari {total}
+        Menampilkan {from}—{to} dari {total}
       </p>
       <div className="flex items-center gap-2">
         <Button

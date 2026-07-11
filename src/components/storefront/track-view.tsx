@@ -84,7 +84,7 @@ function OrderResult({ order }: { order: Order }) {
             <span className="text-xs text-foreground/60">{t("status")}</span>
             <p className="font-heading text-2xl font-extrabold">{order.invoice}</p>
             <p className="mt-1 text-sm text-foreground/60">
-              {order.customerName} � {formatDate(order.createdAt)}
+              {order.customerName} — {formatDate(order.createdAt)}
             </p>
           </div>
           <Badge variant={meta.variant} className="gap-1.5 px-3 py-1.5">
@@ -160,7 +160,7 @@ function OrderResult({ order }: { order: Order }) {
               <div className="flex-1">
                 <p className="font-heading text-sm font-bold leading-tight">{item.productName}</p>
                 <p className="text-xs text-foreground/60">
-                  {item.variantLabel} � {item.qty}
+                  {item.variantLabel} — {item.qty}
                 </p>
               </div>
               <span className="font-heading text-sm font-bold">
@@ -267,7 +267,7 @@ export function TrackView() {
           />
         </div>
         <Button type="submit" disabled={!input.trim() || isLoading}>
-          {isLoading ? "�" : t("button")}
+          {isLoading ? "…" : t("button")}
         </Button>
       </form>
       <p className="mt-2 text-center text-xs text-foreground/50">{t("tryExample")}</p>

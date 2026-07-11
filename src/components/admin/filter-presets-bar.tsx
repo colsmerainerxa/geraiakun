@@ -7,7 +7,7 @@ import { type FilterPreset, useFilterPresets } from "@/stores/filter-presets"
 
 // Compact preset bar: lists saved presets (click to apply, hover-X to delete)
 // plus a "Simpan" button that snapshots the current filter values. Pair with
-// `useFilterState` � presets persist across sessions; URL carries the live view.
+// `useFilterState` — presets persist across sessions; URL carries the live view.
 
 // Stable empty array so the zustand selector never returns a fresh [] (which
 // would trip useSyncExternalStore's "getServerSnapshot should be cached" /

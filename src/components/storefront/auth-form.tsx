@@ -120,7 +120,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           {isRegister ? t("registerSubtitle") : t("loginSubtitle")}
         </p>
 
-        {/* Demo banner � dev only */}
+        {/* Demo banner — dev only */}
         {DEV_TOOLS && (
           <div className="mt-5 rounded-base border-2 border-dashed border-border bg-warning/20 px-3 py-2 text-center text-xs font-bold text-foreground/70">
             {t("demoNote")}

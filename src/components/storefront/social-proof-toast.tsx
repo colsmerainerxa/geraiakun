@@ -67,7 +67,7 @@ function buildEvent(i: number, products: { slug: string; name: string; logo: str
 
 /**
  * Toast social-proof rotasi yang muncul di pojok kiri-bawah. Muncul 6s,
- * jeda 9�14s, lalu event berikutnya. Dimulai ~5s setelah mount agar tidak
+ * jeda 9—14s, lalu event berikutnya. Dimulai ~5s setelah mount agar tidak
  * mengganggu first paint.
  */
 export function SocialProofToast() {
@@ -132,7 +132,7 @@ export function SocialProofToast() {
                   {current.productName}
                 </p>
                 <p className="text-[10px] text-foreground/50">
-                  {isEn ? current.city : current.city} � {current.minutesAgo} {t("minutesAgo")}
+                  {isEn ? current.city : current.city} — {current.minutesAgo} {t("minutesAgo")}
                 </p>
               </div>
             </Link>
@@ -144,7 +144,7 @@ export function SocialProofToast() {
 }
 
 /**
- * "X orang sedang melihat ini" � badge kecil untuk halaman produk.
+ * "X orang sedang melihat ini" — badge kecil untuk halaman produk.
  * Angka berubah per beberapa detik untuk efek live.
  */
 export function ViewersBadge({ initial = 0 }: { initial?: number }) {

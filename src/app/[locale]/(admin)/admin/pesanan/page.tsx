@@ -59,7 +59,7 @@ const ORDER_COLUMNS = STATUS_OPTIONS.map((filter) => ({
 const STATUS_LABEL: Record<string, string> = Object.fromEntries(
   STATUS_FILTERS.map((f) => [f.value, f.label]),
 )
-// Transitions that are financially impactful / hard to undo � guard with a
+// Transitions that are financially impactful / hard to undo — guard with a
 // confirmation so a misclick can't silently flip an order to refund/cancelled.
 const DESTRUCTIVE: ReadonlySet<OrderStatus> = new Set(["refund", "dibatalkan"])
 
@@ -387,7 +387,7 @@ export default function AdminOrdersPage() {
                         {formatDate(o.createdAt)}
                       </TableCell>
                       <TableCell>
-                        {/* Inline status editor � audited via enterprise audit log */}
+                        {/* Inline status editor — audited via enterprise audit log */}
                         <Select
                           value={eff(o.invoice, o.status)}
                           onValueChange={(v) =>

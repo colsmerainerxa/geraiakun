@@ -116,7 +116,7 @@ export function ProductDetail({
   function handleAddToCart() {
     addItem(buildCartItem())
     toast.success(t("addedToCart"), {
-      description: `${product.name} � ${isEn ? variant.labelEn : variant.label}`,
+      description: `${product.name} — ${isEn ? variant.labelEn : variant.label}`,
     })
   }
 
@@ -219,7 +219,7 @@ export function ProductDetail({
             <a href="#reviews" className="text-foreground/60 underline-offset-2 hover:underline">
               {formatNumber(product.reviewCount)} {tc("reviews")}
             </a>
-            <span className="text-foreground/40">�</span>
+            <span className="text-foreground/40">—</span>
             <span className="text-foreground/60">
               {formatNumber(product.soldCount)} {tc("sold")}
             </span>
@@ -296,10 +296,10 @@ export function ProductDetail({
                     <span className="text-xs font-semibold">
                       {formatPrice(v.price, isEn)}
                       {vOut ? (
-                        <span className="ml-1 opacity-70">� {tc("outOfStock")}</span>
+                        <span className="ml-1 opacity-70">— {tc("outOfStock")}</span>
                       ) : (
                         <span className="ml-1 opacity-70">
-                          � {v.stock} {t("stockLeft")}
+                          — {v.stock} {t("stockLeft")}
                         </span>
                       )}
                     </span>

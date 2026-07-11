@@ -21,7 +21,7 @@ const TICKET_STATUS: Record<
   ditolak: { label: "Ditolak", variant: "danger" },
 }
 
-// Mock risk heuristic � real backend would score fraud/chargeback history.
+// Mock risk heuristic — real backend would score fraud/chargeback history.
 function riskFor(orderCount: number, ticketCount: number) {
   if (ticketCount >= 3) return { label: "Sedang", variant: "warning" as const }
   if (orderCount === 0) return { label: "Baru", variant: "cyan" as const }
