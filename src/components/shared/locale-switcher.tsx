@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
-import { useTransition } from "react"
+import { useTransition, type ReactElement } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +12,26 @@ import {
 import { usePathname, useRouter } from "@/i18n/navigation"
 import type { Locale } from "@/i18n/routing"
 
-const LOCALES: { code: Locale; label: string; flag: string }[] = [
-  { code: "id", label: "Indonesia", flag: "🇮🇩" },
-  { code: "en", label: "English", flag: "🇬🇧" },
+// SVG flags — cross-platform, no emoji font dependency
+const FlagID = () => (
+  <svg viewBox="0 0 24 16" className="size-4 rounded-[2px]" aria-hidden>
+    <rect width="24" height="16" fill="#fff" />
+    <rect width="24" height="8" y="0" fill="#e70011" />
+  </svg>
+)
+const FlagEN = () => (
+  <svg viewBox="0 0 24 16" className="size-4 rounded-[2px]" aria-hidden>
+    <rect width="24" height="16" fill="#012169" />
+    <path d="M0,0 L24,16 M24,0 L0,16" stroke="#fff" strokeWidth="3" />
+    <path d="M0,0 L24,16 M24,0 L0,16" stroke="#C8102E" strokeWidth="1.5" />
+    <path d="M12,0 V16 M0,8 H24" stroke="#fff" strokeWidth="5" />
+    <path d="M12,0 V16 M0,8 H24" stroke="#C8102E" strokeWidth="3" />
+  </svg>
+)
+
+const LOCALES: { code: Locale; label: string; Flag: () => ReactElement }[] = [
+  { code: "id", label: "Bahasa Indonesia", Flag: FlagID },
+  { code: "en", label: "English", Flag: FlagEN },
 ]
 
 export function LocaleSwitcher() {
@@ -37,16 +54,15 @@ export function LocaleSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         disabled={isPending}
-        className="flex h-9 items-center gap-1.5 rounded-base border-2 border-border bg-secondary-background px-2.5 font-heading text-sm font-bold transition-all hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-60"
+        className="flex size-9 items-center justify-center rounded-base border-2 border-border bg-secondary-background transition-all hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-60"
         aria-label={t("changeLanguage")}
       >
-        <span className="text-base leading-none">{current.flag}</span>
-        <span className="uppercase">{current.code}</span>
+        <current.Flag />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {LOCALES.map((l) => (
           <DropdownMenuItem key={l.code} onClick={() => onSelect(l.code)}>
-            <span className="text-base">{l.flag}</span>
+            <l.Flag />
             {l.label}
           </DropdownMenuItem>
         ))}

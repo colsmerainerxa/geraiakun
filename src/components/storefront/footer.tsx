@@ -16,7 +16,6 @@ export function Footer() {
       title: t("explore"),
       links: [
         { href: "/katalog", label: tn("catalog") },
-        { href: "/reseller", label: t("reseller") },
         { href: "/wishlist", label: t("wishlist") },
         { href: "/akun/vault", label: t("vault") },
         { href: "/artikel", label: tn("blog") },
@@ -39,8 +38,6 @@ export function Footer() {
       title: t("company"),
       links: [
         { href: "/tentang", label: t("about") },
-        { href: "/referensi", label: t("referral") },
-        { href: "/reward", label: t("rewards") },
         { href: "/kontak", label: t("contact") },
       ],
     },
