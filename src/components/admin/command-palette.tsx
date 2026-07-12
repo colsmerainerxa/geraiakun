@@ -260,14 +260,14 @@ export function CommandPalette() {
             <DialogDescription>Cari modul atau aksi admin.</DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-2 border-b-2 border-border px-4 py-3">
-            <Search className="size-4 text-foreground/50" />
+            <Search className="size-4 text-foreground/60" />
             <input
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={onKeyDown}
               placeholder="Ketik perintah atau modul…"
-              className="min-w-0 flex-1 bg-transparent font-heading text-sm font-bold outline-none placeholder:text-foreground/40"
+              className="min-w-0 flex-1 bg-transparent font-heading text-sm font-bold outline-none placeholder:text-foreground/60"
             />
             <kbd className="rounded-base border-2 border-border bg-background px-1.5 py-0.5 text-[10px] font-bold text-foreground/60">
               esc
@@ -275,7 +275,7 @@ export function CommandPalette() {
           </div>
           <div ref={listRef} className="max-h-[50vh] overflow-y-auto p-2">
             {filtered.length === 0 && (
-              <p className="px-3 py-6 text-center text-sm font-bold text-foreground/50">
+              <p className="px-3 py-6 text-center text-sm font-bold text-foreground/60">
                 Tidak ada yang cocok.
               </p>
             )}
@@ -286,7 +286,7 @@ export function CommandPalette() {
               return (
                 <div key={cmd.id}>
                   {showGroup && (
-                    <p className="mt-2 px-3 pb-1 text-[10px] font-extrabold uppercase text-foreground/40">
+                    <p className="mt-2 px-3 pb-1 text-[10px] font-extrabold uppercase text-foreground/60">
                       {cmd.group}
                     </p>
                   )}
@@ -334,7 +334,7 @@ export function CommandPalette() {
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-extrabold uppercase text-foreground/40">Umum</p>
+              <p className="text-[10px] font-extrabold uppercase text-foreground/60">Umum</p>
               <ul className="flex flex-col gap-1.5 text-sm font-bold">
                 <li className="flex items-center justify-between gap-3">
                   <span>Buka command palette</span>
@@ -351,7 +351,7 @@ export function CommandPalette() {
               </ul>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-extrabold uppercase text-foreground/40">
+              <p className="text-[10px] font-extrabold uppercase text-foreground/60">
                 Lompat ke modul (g lalu huruf)
               </p>
               <div className="grid grid-cols-2 gap-1.5">

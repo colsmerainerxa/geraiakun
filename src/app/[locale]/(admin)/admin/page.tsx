@@ -84,7 +84,7 @@ export default function AdminDashboardPage() {
           <div className="mt-6 flex h-52 items-end justify-between gap-1 sm:gap-2">
             {data.revenueByDay.slice(-14).map((d) => (
               <div key={d.date} className="flex flex-1 flex-col items-center gap-1">
-                <span className="text-[9px] font-bold text-foreground/50">
+                <span className="text-[9px] font-bold text-foreground/60">
                   {formatIDR(d.value, { compact: true })}
                 </span>
                 <div
@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
             <h2 className="font-heading text-lg font-bold">Distribusi Pembayaran</h2>
             <div className="mt-4 flex flex-col gap-2">
               {data.paymentDistribution.length === 0 && (
-                <p className="text-sm text-foreground/50">Belum ada data pembayaran.</p>
+                <p className="text-sm text-foreground/60">Belum ada data pembayaran.</p>
               )}
               {data.paymentDistribution.map((p) => {
                 const total = data.paymentDistribution.reduce((s, x) => s + x.count, 0) || 1
@@ -157,7 +157,7 @@ export default function AdminDashboardPage() {
         <h2 className="font-heading text-lg font-bold">Produk Terlaris</h2>
         <div className="mt-4 flex flex-col gap-2">
           {data.salesByProduct.length === 0 && (
-            <p className="text-sm text-foreground/50">Belum ada penjualan.</p>
+            <p className="text-sm text-foreground/60">Belum ada penjualan.</p>
           )}
           {data.salesByProduct.map((p, i) => (
             <div

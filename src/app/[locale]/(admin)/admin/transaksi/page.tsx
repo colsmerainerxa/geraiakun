@@ -129,7 +129,7 @@ export default function AdminTransactionsPage() {
               ))}
               {total === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
+                  <TableCell colSpan={7} className="py-12 text-center text-foreground/60">
                     Belum ada transaksi.
                   </TableCell>
                 </TableRow>

@@ -158,7 +158,7 @@ export function AdminTeamView() {
                   <p className="truncate font-heading text-sm font-bold">{member.name}</p>
                   <p className="truncate text-xs text-foreground/55">{member.email}</p>
                   {member.lastActiveAt && (
-                    <p className="text-[11px] text-foreground/40">
+                    <p className="text-[11px] text-foreground/60">
                       Aktif {formatDate(member.lastActiveAt)}
                     </p>
                   )}
@@ -329,7 +329,7 @@ export function AdminTeamView() {
               <code className="mt-2 block rounded-base border-2 border-border bg-background p-3 text-xs">
                 GERAIAKUN-{securityMember?.id.toUpperCase()}
               </code>
-              <p className="mt-3 text-xs font-bold text-foreground/50">Recovery codes</p>
+              <p className="mt-3 text-xs font-bold text-foreground/60">Recovery codes</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {RECOVERY_CODES.map((code) => (
                   <code

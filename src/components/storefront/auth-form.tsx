@@ -132,7 +132,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
             <div className="grid gap-1.5">
               <Label htmlFor="name">{t("name")}</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+                <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
                 <Input
                   id="name"
                   className="pl-9"
@@ -152,7 +152,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <div className="grid gap-1.5">
             <Label htmlFor="email">{t("email")}</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+              <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
               <Input
                 id="email"
                 type="email"
@@ -173,7 +173,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <div className="grid gap-1.5">
             <Label htmlFor="password">{t("password")}</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+              <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
               <Input
                 id="password"
                 type={showPw ? "text" : "password"}
@@ -185,7 +185,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
               <button
                 type="button"
                 onClick={() => setShowPw((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground"
                 aria-label={showPw ? "Sembunyikan sandi" : "Tampilkan sandi"}
               >
                 {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -202,7 +202,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
             <div className="grid gap-1.5">
               <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+                <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -242,7 +242,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         {/* Social (decorative) */}
         <div className="mt-5 flex items-center gap-3">
           <span className="h-0.5 flex-1 bg-border" />
-          <span className="text-xs font-bold text-foreground/40">{t("orContinue")}</span>
+          <span className="text-xs font-bold text-foreground/60">{t("orContinue")}</span>
           <span className="h-0.5 flex-1 bg-border" />
         </div>
         <div className="mt-4">

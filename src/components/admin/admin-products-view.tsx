@@ -249,7 +249,7 @@ export function AdminProductsView() {
     <div className="flex min-w-0 flex-col gap-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative min-w-0 max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -306,7 +306,7 @@ export function AdminProductsView() {
                   </span>
                   <div>
                     <p className="font-bold">{product.name}</p>
-                    <p className="text-xs text-foreground/45">
+                    <p className="text-xs text-foreground/60">
                       {product.brand} - /{product.slug}
                     </p>
                   </div>
@@ -357,7 +357,7 @@ export function AdminProductsView() {
           ))}
           {filtered.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="py-14 text-center font-bold text-foreground/50">
+              <TableCell colSpan={7} className="py-14 text-center font-bold text-foreground/60">
                 Belum ada produk yang cocok. Gunakan Produk Baru untuk membuat katalog.
               </TableCell>
             </TableRow>
@@ -472,7 +472,7 @@ export function AdminProductsView() {
                 <div className="flex items-center justify-between rounded-base border-2 border-border p-3">
                   <div>
                     <p className="font-heading text-sm font-bold">Featured</p>
-                    <p className="text-xs text-foreground/50">Tampilkan pada rekomendasi utama.</p>
+                    <p className="text-xs text-foreground/60">Tampilkan pada rekomendasi utama.</p>
                   </div>
                   <Switch
                     checked={draft.featured}
@@ -484,7 +484,7 @@ export function AdminProductsView() {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <h3 className="font-heading text-sm font-extrabold">Varian</h3>
-                      <p className="text-xs text-foreground/50">
+                      <p className="text-xs text-foreground/60">
                         Setiap varian memiliki tipe, durasi, harga, dan stok sendiri.
                       </p>
                     </div>
@@ -660,7 +660,7 @@ export function AdminProductsView() {
                   >
                     <div>
                       <p className="font-bold">{variant.label}</p>
-                      <p className="text-xs text-foreground/50">
+                      <p className="text-xs text-foreground/60">
                         {variant.type} - stok {variant.stock}
                       </p>
                     </div>

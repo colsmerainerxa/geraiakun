@@ -28,7 +28,7 @@ export function ArticleList() {
 
   if (articles.length === 0) {
     return (
-      <p className="py-8 text-center text-foreground/50">
+      <p className="py-8 text-center text-foreground/60">
         {isEn ? "No articles yet." : "Belum ada artikel."}
       </p>
     )
@@ -80,7 +80,7 @@ export function ArticleList() {
               <p className="line-clamp-2 text-sm text-foreground/70">
                 {a.excerpt}
               </p>
-              <span className="mt-auto pt-2 text-xs text-foreground/50">
+              <span className="mt-auto pt-2 text-xs text-foreground/60">
                 {formatDate(a.publishedAt, isEn ? "en-US" : "id-ID")}
               </span>
             </div>

@@ -92,7 +92,7 @@ export function CountdownTimer({
             </span>
           </div>
           {i < UNITS.length - 1 && (
-            <span className="font-heading text-lg font-extrabold text-foreground/40">:</span>
+            <span className="font-heading text-lg font-extrabold text-foreground/60">:</span>
           )}
         </div>
       ))}

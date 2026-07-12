@@ -139,7 +139,7 @@ export function AdminResellersView() {
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <section className="min-w-0">
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -171,7 +171,7 @@ export function AdminResellersView() {
                 </div>
                 <div className="mt-3 flex items-end justify-between gap-3 border-t-2 border-dashed border-border pt-3">
                   <div>
-                    <p className="text-xs font-bold text-foreground/45">Saldo</p>
+                    <p className="text-xs font-bold text-foreground/60">Saldo</p>
                     <p className="font-heading font-extrabold">{formatIDR(item.balance)}</p>
                   </div>
                   <span className="rounded-base border-2 border-border bg-main px-2 py-1 text-xs font-bold">
@@ -213,7 +213,7 @@ export function AdminResellersView() {
                       key={label}
                       className="rounded-base border-2 border-border bg-background p-3"
                     >
-                      <dt className="text-xs font-bold text-foreground/45">{label}</dt>
+                      <dt className="text-xs font-bold text-foreground/60">{label}</dt>
                       <dd className="mt-1 font-bold">{value}</dd>
                     </div>
                   ))}
@@ -272,7 +272,7 @@ export function AdminResellersView() {
                       >
                         <div>
                           <p className="text-sm font-bold">{entry.note}</p>
-                          <p className="text-xs text-foreground/45">
+                          <p className="text-xs text-foreground/60">
                             {formatDate(entry.createdAt)} - {entry.kind}
                           </p>
                         </div>
@@ -286,14 +286,14 @@ export function AdminResellersView() {
                             {entry.amount >= 0 ? "+" : ""}
                             {formatIDR(entry.amount)}
                           </p>
-                          <p className="text-xs text-foreground/45">
+                          <p className="text-xs text-foreground/60">
                             {formatIDR(entry.balanceAfter)}
                           </p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="p-6 text-center text-sm text-foreground/50">Belum ada ledger.</p>
+                    <p className="p-6 text-center text-sm text-foreground/60">Belum ada ledger.</p>
                   )}
                 </div>
                 <h3 className="mt-5 font-heading text-sm font-extrabold">Bulk order</h3>
@@ -306,7 +306,7 @@ export function AdminResellersView() {
                       >
                         <div>
                           <p className="font-heading text-sm font-bold">{order.id}</p>
-                          <p className="text-xs text-foreground/45">
+                          <p className="text-xs text-foreground/60">
                             {order.lines.length} baris - {formatDate(order.createdAt)}
                           </p>
                         </div>
@@ -317,7 +317,7 @@ export function AdminResellersView() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-foreground/50">Belum ada bulk order.</p>
+                    <p className="text-sm text-foreground/60">Belum ada bulk order.</p>
                   )}
                 </div>
               </div>

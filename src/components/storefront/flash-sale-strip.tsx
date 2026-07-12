@@ -76,7 +76,7 @@ export function FlashSaleStrip() {
                     bgFor(item.product.accent),
                   )}
                 >
-                  <span className="text-4xl drop-shadow-[2px_2px_0_rgba(0,0,0,0.25)]">
+                  <span className="text-4xl drop-shadow-[2px_2px_0_var(--border)]">
                     {item.product.logo}
                   </span>
                   <Badge variant="danger" className="absolute left-1.5 top-1.5">
@@ -92,7 +92,7 @@ export function FlashSaleStrip() {
                       {formatIDR(item.salePrice, { compact: true })}
                     </span>
                   </div>
-                  <span className="text-[10px] text-foreground/50 line-through">
+                  <span className="text-[10px] text-foreground/60 line-through">
                     {formatIDR(item.originalPrice, { compact: true })}
                   </span>
 

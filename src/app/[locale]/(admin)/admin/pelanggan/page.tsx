@@ -52,7 +52,7 @@ export default function AdminCustomersPage() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -113,7 +113,7 @@ export default function AdminCustomersPage() {
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="font-bold">{c.name}</span>
-                        <span className="text-xs text-foreground/50">{c.email}</span>
+                        <span className="text-xs text-foreground/60">{c.email}</span>
                       </div>
                     </div>
                   </TableCell>
@@ -133,13 +133,13 @@ export default function AdminCustomersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <ChevronRight className="ml-auto size-4 text-foreground/40" />
+                    <ChevronRight className="ml-auto size-4 text-foreground/60" />
                   </TableCell>
                 </TableRow>
               ))}
               {total === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center text-foreground/50">
+                  <TableCell colSpan={7} className="py-12 text-center text-foreground/60">
                     Tidak ada pelanggan yang cocok.
                   </TableCell>
                 </TableRow>

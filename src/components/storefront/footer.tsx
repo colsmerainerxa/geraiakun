@@ -97,7 +97,7 @@ export function Footer() {
             <Shield className="size-3.5" /> {t("secure")}
           </span>
         </div>
-        <p className="mt-4 text-[11px] leading-relaxed text-foreground/40">{t("disclaimer")}</p>
+        <p className="mt-4 text-[11px] leading-relaxed text-foreground/60">{t("disclaimer")}</p>
       </Container>
     </footer>
   )

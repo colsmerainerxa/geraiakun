@@ -231,7 +231,7 @@ export function AdminRefundsView() {
         <section className="flex min-w-0 flex-col gap-4">
           <div className="grid gap-2">
             <div className="relative min-w-0">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
@@ -341,7 +341,7 @@ export function AdminRefundsView() {
                       onCheckedChange={(v) => toggleAllOnPage(!!v)}
                       aria-label="Pilih semua di halaman ini"
                     />
-                    <span className="text-[10px] font-extrabold uppercase text-foreground/40">
+                    <span className="text-[10px] font-extrabold uppercase text-foreground/60">
                       Pilih semua
                     </span>
                   </div>
@@ -380,13 +380,13 @@ export function AdminRefundsView() {
                       <p className="mt-3 line-clamp-2 text-sm text-foreground/70">{item.reason}</p>
                       <div className="mt-3 flex items-center justify-between gap-3 border-t-2 border-dashed border-border pt-3 text-xs">
                         <span className="font-bold">{item.owner}</span>
-                        <span className="text-foreground/50">{formatDate(item.updatedAt)}</span>
+                        <span className="text-foreground/60">{formatDate(item.updatedAt)}</span>
                       </div>
                     </button>
                   </div>
                 ))}
                 {total === 0 && (
-                  <div className="rounded-base border-2 border-dashed border-border p-8 text-center text-sm font-bold text-foreground/50">
+                  <div className="rounded-base border-2 border-dashed border-border p-8 text-center text-sm font-bold text-foreground/60">
                     Tidak ada kasus yang cocok.
                   </div>
                 )}
@@ -442,16 +442,16 @@ export function AdminRefundsView() {
                 <h3 className="font-heading text-sm font-extrabold">Konteks kasus</h3>
                 <dl className="mt-3 grid gap-3 text-sm">
                   <div className="rounded-base border-2 border-border bg-background p-3">
-                    <dt className="text-xs font-bold text-foreground/45">Alasan</dt>
+                    <dt className="text-xs font-bold text-foreground/60">Alasan</dt>
                     <dd className="mt-1 font-semibold">{selected.reason}</dd>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="rounded-base border-2 border-border bg-background p-3">
-                      <dt className="text-xs font-bold text-foreground/45">Ticket</dt>
+                      <dt className="text-xs font-bold text-foreground/60">Ticket</dt>
                       <dd className="mt-1 font-bold">{selected.ticketId ?? "-"}</dd>
                     </div>
                     <div className="rounded-base border-2 border-border bg-background p-3">
-                      <dt className="text-xs font-bold text-foreground/45">Produk</dt>
+                      <dt className="text-xs font-bold text-foreground/60">Produk</dt>
                       <dd className="mt-1 font-bold">{selected.productName}</dd>
                     </div>
                   </div>
@@ -469,7 +469,7 @@ export function AdminRefundsView() {
                     </div>
                   ))}
                   {selected.evidence.length === 0 && (
-                    <p className="text-sm text-foreground/50">Belum ada bukti.</p>
+                    <p className="text-sm text-foreground/60">Belum ada bukti.</p>
                   )}
                 </div>
               </div>
@@ -488,7 +488,7 @@ export function AdminRefundsView() {
                         {step.done ? <Check className="size-3.5" /> : index + 1}
                       </span>
                       <p
-                        className={cn("pt-1 text-sm font-bold", !step.done && "text-foreground/45")}
+                        className={cn("pt-1 text-sm font-bold", !step.done && "text-foreground/60")}
                       >
                         {step.label}
                       </p>
@@ -496,7 +496,7 @@ export function AdminRefundsView() {
                   ))}
                 </ol>
                 <div className="mt-6 rounded-base border-2 border-dashed border-border p-4">
-                  <p className="text-xs font-bold uppercase text-foreground/45">
+                  <p className="text-xs font-bold uppercase text-foreground/60">
                     Keputusan operator
                   </p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -515,7 +515,7 @@ export function AdminRefundsView() {
             </div>
           </section>
         ) : (
-          <div className="rounded-base border-2 border-dashed border-border p-10 text-center text-foreground/50">
+          <div className="rounded-base border-2 border-dashed border-border p-10 text-center text-foreground/60">
             Pilih kasus untuk melihat detail.
           </div>
         )}

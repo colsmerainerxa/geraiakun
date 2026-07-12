@@ -118,11 +118,11 @@ export function Customer360Drawer({
         </div>
 
         <section className="flex flex-col gap-2">
-          <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/50">
+          <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/60">
             Pesanan terbaru
           </h3>
           {custOrders.length === 0 ? (
-            <p className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
+            <p className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/60">
               Belum ada pesanan.
             </p>
           ) : (
@@ -151,11 +151,11 @@ export function Customer360Drawer({
         </section>
 
         <section className="flex flex-col gap-2">
-          <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/50">
+          <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/60">
             Tiket bantuan
           </h3>
           {custTickets.length === 0 ? (
-            <p className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
+            <p className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/60">
               Tidak ada tiket.
             </p>
           ) : (
@@ -166,11 +166,11 @@ export function Customer360Drawer({
                   className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-secondary-background p-3"
                 >
                   <div className="min-w-0">
-                    <p className="font-heading text-xs font-extrabold text-foreground/50">
+                    <p className="font-heading text-xs font-extrabold text-foreground/60">
                       {t.code}
                     </p>
                     <p className="truncate text-sm font-bold">{t.subject}</p>
-                    <p className="text-xs text-foreground/50">{formatDate(t.updatedAt)}</p>
+                    <p className="text-xs text-foreground/60">{formatDate(t.updatedAt)}</p>
                   </div>
                   <Badge variant={(TICKET_STATUS as any)[t.status]?.variant ?? "neutral"} className="shrink-0">
                     {(TICKET_STATUS as any)[t.status]?.label ?? t.status}

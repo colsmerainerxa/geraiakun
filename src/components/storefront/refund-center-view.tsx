@@ -106,7 +106,7 @@ export function RefundCenterView() {
       <div className="mt-8 grid gap-6 lg:grid-cols-[390px_1fr]">
         <section className="flex flex-col gap-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -170,7 +170,7 @@ export function RefundCenterView() {
                   </p>
                 </div>
                 <div className="rounded-base border-2 border-border bg-secondary-background px-4 py-3 text-right shadow-shadow-sm">
-                  <p className="text-xs font-bold uppercase text-foreground/50">{t("estValue")}</p>
+                  <p className="text-xs font-bold uppercase text-foreground/60">{t("estValue")}</p>
                   <p className="font-heading text-xl font-extrabold">
                     {formatIDR(selected.amount)}
                   </p>
@@ -199,7 +199,7 @@ export function RefundCenterView() {
                           </span>
                           <div>
                             <p className="font-heading text-sm font-bold">{step.label}</p>
-                            <p className="text-xs text-foreground/50">
+                            <p className="text-xs text-foreground/60">
                               {step.done ? t("stepDone") : t("stepPending")}
                             </p>
                           </div>
@@ -213,19 +213,19 @@ export function RefundCenterView() {
                   <p className="font-heading text-sm font-extrabold">{t("ownerSlaTitle")}</p>
                   <dl className="mt-3 grid gap-3 text-sm">
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">
+                      <dt className="text-xs font-bold uppercase text-foreground/60">
                         {t("ownerHandled")}
                       </dt>
                       <dd className="font-bold">{selected.owner}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">
+                      <dt className="text-xs font-bold uppercase text-foreground/60">
                         {t("updatedAt")}
                       </dt>
                       <dd className="font-bold">{formatDate(selected.updatedAt)}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-bold uppercase text-foreground/50">
+                      <dt className="text-xs font-bold uppercase text-foreground/60">
                         {t("policy")}
                       </dt>
                       <dd className="font-bold">{t("policyRefund")}</dd>
@@ -310,7 +310,7 @@ function CaseButton({
         <Badge variant={statusVariant}>{statusLabel}</Badge>
       </div>
       <p className="mt-2 line-clamp-2 text-sm text-foreground/70">{item.reason}</p>
-      <p className="mt-3 text-xs font-bold text-foreground/50">{item.productName}</p>
+      <p className="mt-3 text-xs font-bold text-foreground/60">{item.productName}</p>
     </button>
   )
 }
@@ -337,7 +337,7 @@ function ResolutionStat({
         <Icon className="size-5" />
       </span>
       <div className="min-w-0">
-        <p className="truncate text-xs font-bold uppercase tracking-wide text-foreground/50">
+        <p className="truncate text-xs font-bold uppercase tracking-wide text-foreground/60">
           {label}
         </p>
         <p className="truncate font-heading text-xl font-extrabold">{value}</p>

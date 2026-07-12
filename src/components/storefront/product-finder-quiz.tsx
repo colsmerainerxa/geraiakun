@@ -472,7 +472,7 @@ export function ProductFinderQuiz() {
                       </div>
                       <div className="text-right">
                         <p className="font-heading text-2xl font-extrabold">{result.score}%</p>
-                        <p className="text-[10px] font-bold uppercase text-foreground/50">
+                        <p className="text-[10px] font-bold uppercase text-foreground/60">
                           {t("score")}
                         </p>
                       </div>
@@ -490,7 +490,7 @@ export function ProductFinderQuiz() {
 
                     <div className="mt-4 flex flex-wrap items-center gap-3 border-t-2 border-dashed border-border pt-3">
                       <div className="mr-auto">
-                        <p className="text-xs font-bold text-foreground/50">
+                        <p className="text-xs font-bold text-foreground/60">
                           {isEn ? variant.labelEn : variant.label}
                         </p>
                         <p className="font-heading text-lg font-extrabold">

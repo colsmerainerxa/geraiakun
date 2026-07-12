@@ -112,7 +112,7 @@ export function ReferralView() {
           </Button>
         </div>
         <div className="p-6">
-          <Label className="text-xs font-bold uppercase tracking-wide text-foreground/50">
+          <Label className="text-xs font-bold uppercase tracking-wide text-foreground/60">
             {t("refLink")}
           </Label>
           <div className="mt-1.5 flex flex-col gap-2 sm:flex-row">
@@ -305,7 +305,7 @@ export function ReferralView() {
                         +{e.reward} {t("pts")} · {formatIDR(e.commission)}
                       </span>
                     ) : (
-                      <span className="text-foreground/40">{t("pending")}</span>
+                      <span className="text-foreground/60">{t("pending")}</span>
                     )}
                   </span>
                 </li>
@@ -369,7 +369,7 @@ function Stat({
         <Icon className="size-5" />
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">{label}</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">{label}</p>
         <p className="truncate font-heading text-xl font-extrabold">{value}</p>
       </div>
     </div>

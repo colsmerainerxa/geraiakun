@@ -92,7 +92,7 @@ export function ResellerPortalView() {
             </p>
           </div>
           <div className="rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
-            <p className="text-xs font-bold uppercase text-foreground/50">{t("estMargin")}</p>
+            <p className="text-xs font-bold uppercase text-foreground/60">{t("estMargin")}</p>
             <p className="mt-1 font-heading text-3xl font-extrabold">
               {formatIDR(estimatedMargin)}
             </p>
@@ -267,7 +267,7 @@ function PartnerStat({
       >
         <Icon className="size-5" />
       </span>
-      <p className="mt-3 text-xs font-bold uppercase tracking-wide text-foreground/50">{label}</p>
+      <p className="mt-3 text-xs font-bold uppercase tracking-wide text-foreground/60">{label}</p>
       <p className="truncate font-heading text-lg font-extrabold">{value}</p>
     </div>
   )

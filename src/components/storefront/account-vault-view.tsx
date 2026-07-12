@@ -327,7 +327,7 @@ export function AccountVaultView() {
                     <div className="min-w-0">
                       <p className="font-heading text-sm font-bold">{activity.title}</p>
                       <p className="text-sm text-foreground/70">{activity.body}</p>
-                      <p className="mt-1 text-xs text-foreground/45">{formatDate(activity.date)}</p>
+                      <p className="mt-1 text-xs text-foreground/60">{formatDate(activity.date)}</p>
                     </div>
                   </div>
                 ))}
@@ -362,7 +362,7 @@ function VaultStat({
         <Icon className="size-5" />
       </span>
       <div>
-        <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">{label}</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">{label}</p>
         <p className="font-heading text-xl font-extrabold">{value}</p>
       </div>
     </div>
@@ -382,7 +382,7 @@ function InfoTile({
 }) {
   return (
     <div className="rounded-base border-2 border-border bg-background p-4">
-      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-foreground/50">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-foreground/60">
         <Icon className="size-4" /> {label}
       </div>
       <p className={cn("mt-2 truncate font-heading text-sm font-extrabold", mono && "font-mono")}>

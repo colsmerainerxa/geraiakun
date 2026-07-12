@@ -47,7 +47,7 @@ export function FilterPresetsBar({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase text-foreground/45">
+      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase text-foreground/60">
         <Bookmark className="size-3.5" /> Preset
       </span>
       {presets.map((preset) => (
@@ -64,7 +64,7 @@ export function FilterPresetsBar({
           </button>
           <button
             type="button"
-            className="flex size-5 items-center justify-center rounded-base border-2 border-transparent text-foreground/50 hover:border-border hover:bg-main hover:text-main-foreground"
+            className="flex size-5 items-center justify-center rounded-base border-2 border-transparent text-foreground/60 hover:border-border hover:bg-main hover:text-main-foreground"
             onClick={() => remove(preset.id, preset.name)}
             aria-label={`Hapus preset ${preset.name}`}
           >

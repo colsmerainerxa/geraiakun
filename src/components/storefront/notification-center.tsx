@@ -151,7 +151,7 @@ export function NotificationCenter() {
                             <p className="mt-0.5 line-clamp-2 text-[11px] text-foreground/60">
                               {n.body}
                             </p>
-                            <p className="mt-1 text-[10px] font-semibold text-foreground/40">
+                            <p className="mt-1 text-[10px] font-semibold text-foreground/60">
                               {timeAgo(n.createdAt, isEn, t)}
                             </p>
                           </div>

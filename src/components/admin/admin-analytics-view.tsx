@@ -138,7 +138,7 @@ export function AdminAnalyticsView() {
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">
+                <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">
                   {metric.label}
                 </p>
                 <p className="mt-1 font-heading text-2xl font-extrabold">{metric.value}</p>
@@ -175,7 +175,7 @@ export function AdminAnalyticsView() {
           <div className="mt-6 flex h-64 items-end justify-between gap-1">
             {series.map((item) => (
               <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
-                <span className="text-[10px] font-bold text-foreground/50">
+                <span className="text-[10px] font-bold text-foreground/60">
                   {formatIDR(item.value, { compact: true })}
                 </span>
                 <div

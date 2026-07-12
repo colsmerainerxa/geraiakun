@@ -70,7 +70,7 @@ export function CartDrawer() {
                         <button
                           type="button"
                           onClick={() => removeItem(item.variantId)}
-                          className="text-foreground/40 hover:text-danger"
+                          className="text-foreground/60 hover:text-danger"
                           aria-label={t("remove")}
                         >
                           <Trash2 className="size-4" />

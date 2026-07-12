@@ -75,7 +75,7 @@ export function AchievementsPanel() {
       </div>
 
       <div className="mt-4">
-        <p className="mb-2 text-[10px] font-extrabold uppercase text-foreground/45">Lencana</p>
+        <p className="mb-2 text-[10px] font-extrabold uppercase text-foreground/60">Lencana</p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {ACHIEVEMENTS.map((a) => {
             const have = unlocked.includes(a.id)
@@ -93,7 +93,7 @@ export function AchievementsPanel() {
                 <p
                   className={cn(
                     "text-[10px] font-bold",
-                    have ? "text-main-foreground/70" : "text-foreground/45",
+                    have ? "text-main-foreground/70" : "text-foreground/60",
                   )}
                 >
                   {have ? "Terbuka" : `${a.threshold} XP`}
@@ -107,7 +107,7 @@ export function AchievementsPanel() {
       <button
         type="button"
         onClick={reset}
-        className="mt-4 text-xs font-bold text-foreground/45 underline-offset-2 hover:text-foreground/70 hover:underline"
+        className="mt-4 text-xs font-bold text-foreground/60 underline-offset-2 hover:text-foreground/70 hover:underline"
       >
         Reset progres (demo)
       </button>

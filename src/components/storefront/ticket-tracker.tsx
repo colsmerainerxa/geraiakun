@@ -203,7 +203,7 @@ function TicketDetail({
       <div className="grid grid-cols-2 gap-3 border-b-2 border-border p-5 sm:grid-cols-3 lg:grid-cols-5">
         {meta.map((m) => (
           <div key={m.label}>
-            <p className="text-[10px] font-bold uppercase text-foreground/50">{m.label}</p>
+            <p className="text-[10px] font-bold uppercase text-foreground/60">{m.label}</p>
             <div className="mt-1 text-sm font-bold">{m.value}</div>
           </div>
         ))}
@@ -248,7 +248,7 @@ function TicketDetail({
           </form>
         )}
 
-        <div className="mt-4 flex items-center justify-between text-xs text-foreground/50">
+        <div className="mt-4 flex items-center justify-between text-xs text-foreground/60">
           <span>
             {ticket.customerEmail} — {ticket.whatsapp}
           </span>

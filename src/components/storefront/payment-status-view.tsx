@@ -285,7 +285,7 @@ export function PaymentStatusView({ invoice }: { invoice: string }) {
             </div>
             {activePayment && (
               <div className="rounded-base border-2 border-border bg-secondary-background px-4 py-2 text-right shadow-shadow-sm">
-                <p className="text-xs font-bold uppercase text-foreground/50">
+                <p className="text-xs font-bold uppercase text-foreground/60">
                   {isEn ? "Time left" : "Sisa waktu"}
                 </p>
                 <p className="font-mono text-xl font-extrabold">{formatCountdown(remaining)}</p>
@@ -315,14 +315,14 @@ export function PaymentStatusView({ invoice }: { invoice: string }) {
             </div>
 
             <div className="min-w-0">
-              <p className="text-xs font-bold uppercase text-foreground/50">
+              <p className="text-xs font-bold uppercase text-foreground/60">
                 {isEn ? "Payment method" : "Metode pembayaran"}
               </p>
               <p className="mt-1 font-heading text-lg font-extrabold">
                 {paymentLabel(attempt.method)}
               </p>
               <div className="mt-4 rounded-base border-2 border-border bg-background p-4">
-                <p className="text-xs font-bold text-foreground/50">
+                <p className="text-xs font-bold text-foreground/60">
                   {attempt.method === "qris"
                     ? "QR reference"
                     : isEn
@@ -424,7 +424,7 @@ export function PaymentStatusView({ invoice }: { invoice: string }) {
                   >
                     {step.done ? <Check className="size-3.5" /> : index + 1}
                   </span>
-                  <p className={cn("pt-1 text-sm font-bold", !step.done && "text-foreground/50")}>
+                  <p className={cn("pt-1 text-sm font-bold", !step.done && "text-foreground/60")}>
                     {step.label}
                   </p>
                 </li>

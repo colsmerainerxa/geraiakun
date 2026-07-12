@@ -374,7 +374,7 @@ function PasswordField({
           <button
             type="button"
             onClick={toggle}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60"
             aria-label={show ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
           >
             {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}

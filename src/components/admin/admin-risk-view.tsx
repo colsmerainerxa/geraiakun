@@ -94,7 +94,7 @@ export function AdminRiskView() {
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <section className="min-w-0">
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -127,7 +127,7 @@ export function AdminRiskView() {
                 </div>
                 <div className="mt-3 flex items-end justify-between gap-4">
                   <div>
-                    <p className="text-xs font-bold text-foreground/45">Risk score</p>
+                    <p className="text-xs font-bold text-foreground/60">Risk score</p>
                     <p className="font-heading text-2xl font-extrabold">{item.score}</p>
                   </div>
                   <span
@@ -146,7 +146,7 @@ export function AdminRiskView() {
               </button>
             ))}
             {filtered.length === 0 && (
-              <div className="rounded-base border-2 border-dashed border-border p-8 text-center text-sm font-bold text-foreground/50">
+              <div className="rounded-base border-2 border-dashed border-border p-8 text-center text-sm font-bold text-foreground/60">
                 Tidak ada review yang cocok.
               </div>
             )}
@@ -166,7 +166,7 @@ export function AdminRiskView() {
                 </p>
               </div>
               <div className="rounded-base border-2 border-border bg-secondary-background px-4 py-2 text-right shadow-shadow-sm">
-                <p className="text-xs font-bold text-foreground/45">Risk score</p>
+                <p className="text-xs font-bold text-foreground/60">Risk score</p>
                 <p className="font-heading text-2xl font-extrabold">{selected.score}/100</p>
               </div>
             </div>
@@ -185,11 +185,11 @@ export function AdminRiskView() {
                 </ul>
                 <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                   <div className="rounded-base border-2 border-border bg-background p-3">
-                    <p className="text-xs font-bold text-foreground/45">Assigned to</p>
+                    <p className="text-xs font-bold text-foreground/60">Assigned to</p>
                     <p className="mt-1 font-bold">{selected.assignedTo}</p>
                   </div>
                   <div className="rounded-base border-2 border-border bg-background p-3">
-                    <p className="text-xs font-bold text-foreground/45">Updated</p>
+                    <p className="text-xs font-bold text-foreground/60">Updated</p>
                     <p className="mt-1 font-bold">{formatDate(selected.updatedAt)}</p>
                   </div>
                 </div>

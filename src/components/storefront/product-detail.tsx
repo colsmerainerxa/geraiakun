@@ -159,7 +159,7 @@ export function ProductDetail({
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="relative text-[8rem] drop-shadow-[4px_4px_0_rgba(0,0,0,0.25)] sm:text-[10rem]"
+              className="relative text-[8rem] drop-shadow-[4px_4px_0_var(--border)] sm:text-[10rem]"
             >
               {product.logo}
             </motion.span>
@@ -195,7 +195,7 @@ export function ProductDetail({
         <div className="flex flex-col gap-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/50">
+              <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground/60">
                 {product.brand}
               </span>
               <h1 className="mt-1 font-heading text-3xl font-extrabold leading-tight sm:text-4xl">
@@ -219,7 +219,7 @@ export function ProductDetail({
             <a href="#reviews" className="text-foreground/60 underline-offset-2 hover:underline">
               {formatNumber(product.reviewCount)} {tc("reviews")}
             </a>
-            <span className="text-foreground/40">—</span>
+            <span className="text-foreground/60">—</span>
             <span className="text-foreground/60">
               {formatNumber(product.soldCount)} {tc("sold")}
             </span>
@@ -232,7 +232,7 @@ export function ProductDetail({
           <div className="flex items-end gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">
             <div>
               {variant.originalPrice && (
-                <span className="block text-sm text-foreground/50 line-through">
+                <span className="block text-sm text-foreground/60 line-through">
                   {formatIDR(variant.originalPrice)}
                 </span>
               )}
@@ -389,7 +389,7 @@ export function ProductDetail({
           />
 
           {/* Trademark / non-affiliation disclaimer (nominative use) */}
-          <p className="text-xs leading-relaxed text-foreground/50">
+          <p className="text-xs leading-relaxed text-foreground/60">
             {t("trademark", { brand: product.brand })}
           </p>
         </div>
@@ -552,7 +552,7 @@ export function ProductDetail({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 px-3 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2">
           <div className="min-w-0 flex-1">
-            <span className="block truncate text-[11px] font-bold text-foreground/50">
+            <span className="block truncate text-[11px] font-bold text-foreground/60">
               {isEn ? variant.labelEn : variant.label}
             </span>
             <span className="font-heading text-lg font-extrabold">

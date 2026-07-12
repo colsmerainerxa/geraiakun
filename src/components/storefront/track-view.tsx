@@ -189,14 +189,14 @@ function OrderResult({ order }: { order: Order }) {
                 <div className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <span className="text-xs text-foreground/50">Email</span>
+                      <span className="text-xs text-foreground/60">Email</span>
                       <p className="truncate font-mono text-sm font-bold">{c.email}</p>
                     </div>
                     <CopyButton value={c.email} label="Email" />
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <span className="text-xs text-foreground/50">Password</span>
+                      <span className="text-xs text-foreground/60">Password</span>
                       <p className="truncate font-mono text-sm font-bold">{c.password}</p>
                     </div>
                     <CopyButton value={c.password} label="Password" />
@@ -204,7 +204,7 @@ function OrderResult({ order }: { order: Order }) {
                   {c.pin && (
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <span className="text-xs text-foreground/50">PIN</span>
+                        <span className="text-xs text-foreground/60">PIN</span>
                         <p className="font-mono text-sm font-bold">{c.pin}</p>
                       </div>
                       <CopyButton value={c.pin} label="PIN" />
@@ -257,7 +257,7 @@ export function TrackView() {
         className="mx-auto mt-8 flex max-w-md gap-2"
       >
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -270,7 +270,7 @@ export function TrackView() {
           {isLoading ? "…" : t("button")}
         </Button>
       </form>
-      <p className="mt-2 text-center text-xs text-foreground/50">{t("tryExample")}</p>
+      <p className="mt-2 text-center text-xs text-foreground/60">{t("tryExample")}</p>
 
       {mounted && query && isFetched && !order && (
         <div className="mx-auto mt-8 max-w-md rounded-base border-2 border-dashed border-danger bg-danger/10 p-5 text-center text-sm font-bold text-danger">

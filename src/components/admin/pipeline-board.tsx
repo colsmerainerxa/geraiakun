@@ -58,7 +58,7 @@ export function PipelineBoard<
               {columnItems.length > 0 ? (
                 columnItems.map((item) => <div key={item.id}>{renderCard(item)}</div>)
               ) : (
-                <div className="rounded-base border-2 border-dashed border-border p-4 text-center text-xs font-bold text-foreground/45">
+                <div className="rounded-base border-2 border-dashed border-border p-4 text-center text-xs font-bold text-foreground/60">
                   {emptyLabel}
                 </div>
               )}

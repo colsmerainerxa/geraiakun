@@ -125,7 +125,7 @@ export function AdminReviewsView() {
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-foreground/50">
+                          <div className="flex items-center gap-1.5 text-xs text-foreground/60">
                             <span className="inline-flex">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
@@ -159,7 +159,7 @@ export function AdminReviewsView() {
                     <p className="mt-1 text-sm text-foreground/80">{r.comment}</p>
                     <div className="mt-3 flex items-center justify-between border-t-2 border-dashed border-border pt-2.5">
                       <Badge variant="neutral">{productName(r.productId)}</Badge>
-                      <span className="text-[10px] text-foreground/40">{r.id}</span>
+                      <span className="text-[10px] text-foreground/60">{r.id}</span>
                     </div>
                   </div>
                 ))}
@@ -197,7 +197,7 @@ export function AdminReviewsView() {
                         </Avatar>
                         <div>
                           <span className="text-sm font-bold">{q.author}</span>
-                          <p className="text-xs text-foreground/50">
+                          <p className="text-xs text-foreground/60">
                             {productName(q.productId)} — {formatDate(q.date)}
                           </p>
                         </div>
@@ -270,7 +270,7 @@ export function AdminReviewsView() {
                       </Avatar>
                       <div>
                         <span className="text-sm font-bold">{q.author}</span>
-                        <p className="text-xs text-foreground/50">
+                        <p className="text-xs text-foreground/60">
                           {productName(q.productId)} — {formatDate(q.date)}
                         </p>
                       </div>

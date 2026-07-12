@@ -73,7 +73,7 @@ export function CompareButton({
         "flex size-9 items-center justify-center rounded-base border-2 border-border shadow-shadow-sm transition-all",
         active
           ? "bg-accent-purple text-foreground"
-          : "bg-secondary-background/90 backdrop-blur hover:bg-main",
+          : "bg-secondary-background backdrop-blur hover:bg-main",
         className,
       )}
     >
@@ -135,7 +135,7 @@ export function CompareBar() {
                     type="button"
                     onClick={() => remove(slug)}
                     aria-label="Hapus"
-                    className="text-foreground/40 hover:text-danger"
+                    className="text-foreground/60 hover:text-danger"
                   >
                     <X className="size-3.5" />
                   </button>
@@ -197,7 +197,7 @@ export function CompareDrawer() {
       render: (p) => (
         <span className="inline-flex items-center gap-1 font-bold">
           <Star className="size-3.5 fill-warning text-warning" /> {p.rating}
-          <span className="text-foreground/50">
+          <span className="text-foreground/60">
             ({p.reviewCount.toLocaleString(isEn ? "en-US" : "id-ID")})
           </span>
         </span>
@@ -289,7 +289,7 @@ export function CompareDrawer() {
                         <button
                           type="button"
                           onClick={() => remove(p.slug)}
-                          className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-foreground/40 hover:text-danger"
+                          className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-foreground/60 hover:text-danger"
                         >
                           <X className="size-3" /> {t("remove")}
                         </button>
@@ -302,7 +302,7 @@ export function CompareDrawer() {
                     <tr key={row.label}>
                       <td
                         className={cn(
-                          "sticky left-0 w-32 bg-background p-3 align-top text-xs font-extrabold uppercase tracking-wide text-foreground/50",
+                          "sticky left-0 w-32 bg-background p-3 align-top text-xs font-extrabold uppercase tracking-wide text-foreground/60",
                           ri > 0 && "border-t-2 border-border",
                         )}
                       >
@@ -332,7 +332,7 @@ export function CompareDrawer() {
                           <Button size="sm" asChild className="w-full">
                             <Link href={`/produk/${p.slug}`}>{tc("viewDetail")}</Link>
                           </Button>
-                          <span className="mt-1 block text-[10px] text-foreground/40">
+                          <span className="mt-1 block text-[10px] text-foreground/60">
                             {isEn ? minV.labelEn : minV.label}
                           </span>
                         </td>

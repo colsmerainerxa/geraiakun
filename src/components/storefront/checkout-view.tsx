@@ -460,7 +460,7 @@ export function CheckoutView() {
                     {errors.email.message}
                   </span>
                 ) : (
-                  <span id="email-note" className="text-xs text-foreground/50">
+                  <span id="email-note" className="text-xs text-foreground/60">
                     {t("emailNote")}
                   </span>
                 )}
@@ -593,7 +593,7 @@ export function CheckoutView() {
                 </>
               )}
             </Button>
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-foreground/50">
+            <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-foreground/60">
               <ShieldCheck className="size-3.5" /> {t("agreeNote")}
             </p>
           </div>
@@ -605,7 +605,7 @@ export function CheckoutView() {
         <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-border bg-background/95 p-3 backdrop-blur lg:hidden">
           <div className="mx-auto flex max-w-md items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold uppercase text-foreground/50">{tc("total")}</p>
+              <p className="text-[10px] font-bold uppercase text-foreground/60">{tc("total")}</p>
               <p className="font-heading text-lg font-extrabold leading-none">{formatIDR(total)}</p>
             </div>
             <Button

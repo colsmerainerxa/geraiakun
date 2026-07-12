@@ -124,7 +124,7 @@ export function AdminPromosView() {
     <div className="flex min-w-0 flex-col gap-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative min-w-0 max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -174,7 +174,7 @@ export function AdminPromosView() {
                 </span>
               </div>
               <p className="mt-3 text-sm text-foreground/70">{promo.description}</p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-foreground/50">
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-foreground/60">
                 <span>Scope: {promo.scope ?? "all"}</span>
                 <span>Min. {formatIDR(promo.minSpend)}</span>
                 <span>Exp. {formatDate(promo.expiresAt)}</span>
@@ -220,7 +220,7 @@ export function AdminPromosView() {
           )
         })}
         {filtered.length === 0 && (
-          <div className="col-span-full rounded-base border-2 border-dashed border-border p-12 text-center font-bold text-foreground/50">
+          <div className="col-span-full rounded-base border-2 border-dashed border-border p-12 text-center font-bold text-foreground/60">
             Tidak ada promo. Buat promo baru untuk mulai menyusun aturan.
           </div>
         )}
@@ -330,7 +330,7 @@ export function AdminPromosView() {
                   <CalendarClock className="size-4" />
                   <div>
                     <p className="text-sm font-bold">Promo aktif</p>
-                    <p className="text-xs text-foreground/50">
+                    <p className="text-xs text-foreground/60">
                       Dapat digunakan selama aturan terpenuhi.
                     </p>
                   </div>

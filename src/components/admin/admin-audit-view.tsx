@@ -96,7 +96,7 @@ export function AdminAuditView() {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative min-w-0 flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -144,14 +144,14 @@ export function AdminAuditView() {
                   </TableCell>
                   <TableCell>
                     <p className="font-bold">{event.actorName}</p>
-                    <p className="text-xs text-foreground/45">{event.ipAddress}</p>
+                    <p className="text-xs text-foreground/60">{event.ipAddress}</p>
                   </TableCell>
                   <TableCell>
                     <Badge variant="neutral">{event.action}</Badge>
                   </TableCell>
                   <TableCell>
                     <p className="font-bold">{event.targetLabel}</p>
-                    <p className="text-xs text-foreground/45">{event.module}</p>
+                    <p className="text-xs text-foreground/60">{event.module}</p>
                   </TableCell>
                   <TableCell>
                     {event.outcome === "success" ? (
@@ -164,7 +164,7 @@ export function AdminAuditView() {
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-12 text-center font-bold text-foreground/50">
+                  <TableCell colSpan={5} className="py-12 text-center font-bold text-foreground/60">
                     Tidak ada event yang cocok.
                   </TableCell>
                 </TableRow>
@@ -200,14 +200,14 @@ export function AdminAuditView() {
                     key={label}
                     className="rounded-base border-2 border-border bg-background p-3"
                   >
-                    <dt className="text-xs font-bold text-foreground/45">{label}</dt>
+                    <dt className="text-xs font-bold text-foreground/60">{label}</dt>
                     <dd className="mt-1 break-words font-bold">{value}</dd>
                   </div>
                 ))}
               </dl>
             </>
           ) : (
-            <p className="text-sm text-foreground/50">Pilih event untuk melihat detail.</p>
+            <p className="text-sm text-foreground/60">Pilih event untuk melihat detail.</p>
           )}
         </aside>
       </div>

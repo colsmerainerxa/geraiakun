@@ -288,7 +288,7 @@ export function AdminTicketsView() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -378,7 +378,7 @@ export function AdminTicketsView() {
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-heading text-xs font-extrabold text-foreground/50">
+                    <span className="font-heading text-xs font-extrabold text-foreground/60">
                       {ticket.code}
                     </span>
                     <Badge variant={PRIORITY_VARIANT[ticket.priority]}>
@@ -410,13 +410,13 @@ export function AdminTicketsView() {
                       onCheckedChange={(v) => toggleAllOnPage(!!v)}
                       aria-label="Pilih semua di halaman ini"
                     />
-                    <span className="text-[10px] font-extrabold uppercase text-foreground/40">
+                    <span className="text-[10px] font-extrabold uppercase text-foreground/60">
                       Pilih semua
                     </span>
                   </div>
                 )}
                 {total === 0 ? (
-                  <div className="rounded-base border-2 border-dashed border-border py-12 text-center text-sm text-foreground/50">
+                  <div className="rounded-base border-2 border-dashed border-border py-12 text-center text-sm text-foreground/60">
                     Tidak ada tiket.
                   </div>
                 ) : (
@@ -444,7 +444,7 @@ export function AdminTicketsView() {
                         className="min-w-0 flex-1 text-left"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-heading text-xs font-extrabold text-foreground/50">
+                          <span className="font-heading text-xs font-extrabold text-foreground/60">
                             {t.code}
                           </span>
                           <Badge variant={STATUS_META[t.status].variant}>
@@ -490,7 +490,7 @@ export function AdminTicketsView() {
               <div className="rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <span className="font-heading text-xs font-extrabold text-foreground/50">
+                    <span className="font-heading text-xs font-extrabold text-foreground/60">
                       {active.code}
                     </span>
                     <h2 className="font-heading text-xl font-extrabold">{active.subject}</h2>
@@ -573,7 +573,7 @@ export function AdminTicketsView() {
 
               {/* Conversation */}
               <div className="flex flex-col gap-3">
-                <h3 className="font-heading text-sm font-extrabold uppercase tracking-wide text-foreground/50">
+                <h3 className="font-heading text-sm font-extrabold uppercase tracking-wide text-foreground/60">
                   Percakapan ({formatNumber(active.messages.length)})
                 </h3>
                 {active.messages.map((m) => (
@@ -602,7 +602,7 @@ export function AdminTicketsView() {
                         </Badge>
                       </div>
                       <p className="leading-relaxed">{m.message}</p>
-                      <span className="mt-1 block text-[10px] text-foreground/50">
+                      <span className="mt-1 block text-[10px] text-foreground/60">
                         {formatDate(m.date)}
                       </span>
                     </div>
@@ -625,7 +625,7 @@ export function AdminTicketsView() {
                     className="mt-2"
                   />
                   <div className="mt-2 flex items-center justify-between gap-2">
-                    <span className="text-xs text-foreground/50">
+                    <span className="text-xs text-foreground/60">
                       Membalas akan mengubah status tiket jadi "Ditinjau".
                     </span>
                     <Button onClick={sendReply} disabled={!reply.trim() || replyMutation.isPending}>

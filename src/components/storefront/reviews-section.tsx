@@ -380,7 +380,7 @@ export function ReviewsSection({
                     )}
                     {r.userGenerated && <Badge variant="lime">{t("yourReview")}</Badge>}
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-foreground/50">
+                  <div className="flex items-center gap-2 text-xs text-foreground/60">
                     <StarRow rating={r.rating} />
                     <span>— {r.variantLabel}</span>
                     <span>— {formatDate(r.date, dateLocale)}</span>

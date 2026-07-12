@@ -37,7 +37,7 @@ export function OrderDetailDrawer({
             <div className="min-w-0">
               <h2 className="font-heading text-lg font-extrabold">{order.invoice}</h2>
               <p className="truncate text-xs text-foreground/60">{order.customerName}</p>
-              <p className="truncate text-xs text-foreground/50">{order.customerEmail}</p>
+              <p className="truncate text-xs text-foreground/60">{order.customerEmail}</p>
             </div>
             <OrderStatusBadge status={order.status} />
           </div>
@@ -51,7 +51,7 @@ export function OrderDetailDrawer({
         </div>
 
         <section className="flex flex-col gap-2">
-          <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/50">
+          <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/60">
             Line items
           </h3>
           <ul className="flex flex-col gap-2">
@@ -68,7 +68,7 @@ export function OrderDetailDrawer({
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-xs text-foreground/50">{it.qty}×</p>
+                  <p className="text-xs text-foreground/60">{it.qty}×</p>
                   <p className="font-heading text-sm font-extrabold">
                     {formatIDR(it.price * it.qty)}
                   </p>
@@ -90,12 +90,12 @@ export function OrderDetailDrawer({
         <section className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <ShieldCheck className="size-4 text-accent-lime" />
-            <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/50">
+            <h3 className="font-heading text-sm font-extrabold uppercase text-foreground/60">
               Credential terkirim
             </h3>
           </div>
           {order.credentials.length === 0 ? (
-            <p className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
+            <p className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/60">
               Belum ada credential terkirim untuk pesanan ini.
             </p>
           ) : (
@@ -106,7 +106,7 @@ export function OrderDetailDrawer({
                   className="flex flex-col gap-2 rounded-base border-2 border-border bg-secondary-background p-3"
                 >
                   <div className="flex items-center gap-2 text-sm">
-                    <Mail className="size-4 text-foreground/50" />
+                    <Mail className="size-4 text-foreground/60" />
                     <span className="font-mono font-bold">{c.email}</span>
                   </div>
                   <p className="font-mono text-xs text-foreground/60">Password: {c.password}</p>
@@ -132,7 +132,7 @@ export function OrderDetailDrawer({
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-base border-2 border-border bg-background p-2.5">
-      <p className="text-[10px] font-extrabold uppercase text-foreground/45">{label}</p>
+      <p className="text-[10px] font-extrabold uppercase text-foreground/60">{label}</p>
       <p className="truncate font-bold">{value}</p>
     </div>
   )

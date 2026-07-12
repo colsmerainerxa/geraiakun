@@ -178,7 +178,7 @@ export function ActivationGuideView({
               >
                 <AccordionTrigger className="text-left">
                   <span className="flex items-center gap-2">
-                    <HelpCircle className="size-4 text-foreground/50" />
+                    <HelpCircle className="size-4 text-foreground/60" />
                     {lang(item.q)}
                   </span>
                 </AccordionTrigger>

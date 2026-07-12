@@ -131,7 +131,7 @@ export function SocialProofToast() {
                 <p className="truncate text-xs font-semibold text-foreground/70">
                   {current.productName}
                 </p>
-                <p className="text-[10px] text-foreground/50">
+                <p className="text-[10px] text-foreground/60">
                   {isEn ? current.city : current.city} — {current.minutesAgo} {t("minutesAgo")}
                 </p>
               </div>

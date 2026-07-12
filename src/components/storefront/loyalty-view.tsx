@@ -90,7 +90,7 @@ export function LoyaltyView() {
                 <span className="font-bold">
                   {t("nextTier", { name: next.name, pts: formatNumber(next.min - lifetime) })}
                 </span>
-                <span className="text-foreground/50">{Math.round(progress)}%</span>
+                <span className="text-foreground/60">{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} />
             </>
@@ -149,11 +149,11 @@ export function LoyaltyView() {
                       ✓
                     </Badge>
                   ) : (
-                    <span className="text-[10px] font-bold text-foreground/40">🔒</span>
+                    <span className="text-[10px] font-bold text-foreground/60">🔒</span>
                   )}
                 </div>
                 <p className="mt-2 font-heading text-sm font-bold">{tt.name}</p>
-                <p className="text-xs text-foreground/50">
+                <p className="text-xs text-foreground/60">
                   {formatNumber(tt.min)} {t("pts")}
                 </p>
                 <p className="mt-1.5 text-xs text-foreground/70">{tt.perk}</p>
@@ -229,7 +229,7 @@ export function LoyaltyView() {
                 </span>
                 <div>
                   <p className="text-sm font-bold">{h.reason}</p>
-                  <p className="text-xs text-foreground/50">{formatDate(h.date, dateLocale)}</p>
+                  <p className="text-xs text-foreground/60">{formatDate(h.date, dateLocale)}</p>
                 </div>
               </div>
               <span

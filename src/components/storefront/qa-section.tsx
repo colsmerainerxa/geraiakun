@@ -125,7 +125,7 @@ export function QaSection({ product }: { product: Product }) {
                   </Avatar>
                   <div className="flex-1">
                     <span className="text-xs font-bold">{q.author}</span>
-                    <span className="ml-2 text-[10px] text-foreground/50">
+                    <span className="ml-2 text-[10px] text-foreground/60">
                       {formatDate(q.date, dateLocale)}
                     </span>
                   </div>
@@ -140,7 +140,7 @@ export function QaSection({ product }: { product: Product }) {
                     <p className="mt-1 text-sm text-foreground/80">{q.answer}</p>
                   </div>
                 ) : (
-                  <p className="mt-2 text-xs italic text-foreground/40">
+                  <p className="mt-2 text-xs italic text-foreground/60">
                     {isEn ? "Awaiting seller reply..." : "Menunggu balasan penjual..."}
                   </p>
                 )}

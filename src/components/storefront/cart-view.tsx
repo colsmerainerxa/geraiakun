@@ -51,7 +51,7 @@ export function CartView() {
     <Container className="py-10">
       <h1 className="mb-8 font-heading text-3xl font-extrabold sm:text-4xl">
         {t("title")}{" "}
-        <span className="text-foreground/40">
+        <span className="text-foreground/60">
           ({items.length} {t("item")})
         </span>
       </h1>
@@ -92,7 +92,7 @@ export function CartView() {
                     <button
                       type="button"
                       onClick={() => removeItem(item.variantId)}
-                      className="text-foreground/40 hover:text-danger"
+                      className="text-foreground/60 hover:text-danger"
                       aria-label={tc("remove")}
                     >
                       <Trash2 className="size-4.5" />

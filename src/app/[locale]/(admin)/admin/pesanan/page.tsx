@@ -182,7 +182,7 @@ export default function AdminOrdersPage() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -371,7 +371,7 @@ export default function AdminOrdersPage() {
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-bold">{o.customerName}</span>
-                          <span className="text-xs text-foreground/50">{o.customerEmail}</span>
+                          <span className="text-xs text-foreground/60">{o.customerEmail}</span>
                         </div>
                       </TableCell>
                       <TableCell className="max-w-48">
@@ -410,7 +410,7 @@ export default function AdminOrdersPage() {
                   ))}
                   {total === 0 && (
                     <TableRow>
-                      <TableCell colSpan={8} className="py-12 text-center text-foreground/50">
+                      <TableCell colSpan={8} className="py-12 text-center text-foreground/60">
                         Tidak ada pesanan yang cocok.
                       </TableCell>
                     </TableRow>

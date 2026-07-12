@@ -151,7 +151,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
         if (items.length === 0) return null
         return (
           <div key={group.label}>
-            <p className="mb-1.5 px-3 text-[10px] font-extrabold uppercase text-foreground/40">
+            <p className="mb-1.5 px-3 text-[10px] font-extrabold uppercase text-foreground/60">
               {group.label}
             </p>
             <div className="flex flex-col gap-1">
@@ -190,7 +190,7 @@ function Brand() {
       </span>
       <span className="font-heading text-lg font-extrabold">
         beli<span className="text-accent-pink">akun</span>
-        <span className="ml-1 align-top text-[10px] font-bold uppercase text-foreground/50">
+        <span className="ml-1 align-top text-[10px] font-bold uppercase text-foreground/60">
           admin
         </span>
       </span>
@@ -203,7 +203,7 @@ function RoleSwitcher() {
 
   return (
     <div className="rounded-base border-2 border-dashed border-border p-3">
-      <p className="mb-2 text-[10px] font-extrabold uppercase text-foreground/45">Pratinjau role</p>
+      <p className="mb-2 text-[10px] font-extrabold uppercase text-foreground/60">Pratinjau role</p>
       <Select value={activeStaffId} onValueChange={setActiveStaff}>
         <SelectTrigger className="h-10 bg-secondary-background text-xs">
           <SelectValue />
@@ -334,7 +334,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </Avatar>
               <div className="hidden sm:block">
                 <p className="text-xs font-bold leading-tight">{member.name}</p>
-                <p className="text-[10px] text-foreground/50">{ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}</p>
+                <p className="text-[10px] text-foreground/60">{ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}</p>
               </div>
             </div>
           </div>

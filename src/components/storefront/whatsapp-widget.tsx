@@ -88,7 +88,7 @@ export function WhatsAppWidget() {
               <div className="max-w-[85%] rounded-base rounded-tl-none border-2 border-border bg-background p-3 shadow-shadow-sm">
                 <p className="text-xs leading-relaxed text-foreground/80">{t("waGreeting")}</p>
               </div>
-              <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-foreground/50">
+              <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-foreground/60">
                 <Clock className="size-3" /> {t("waTypical")}
               </div>
             </div>

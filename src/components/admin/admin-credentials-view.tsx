@@ -153,7 +153,7 @@ export function AdminCredentialsView() {
     <div className="flex min-w-0 flex-col gap-5">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
         <div className="relative min-w-0 flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/45" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -241,7 +241,7 @@ export function AdminCredentialsView() {
               </TableCell>
               <TableCell>
                 <p className="font-bold">{credential.productName}</p>
-                <p className="text-xs text-foreground/45">{credential.variantLabel}</p>
+                <p className="text-xs text-foreground/60">{credential.variantLabel}</p>
               </TableCell>
               <TableCell className="font-mono text-xs">{credential.email}</TableCell>
               <TableCell className="whitespace-nowrap text-sm text-foreground/60">
@@ -286,7 +286,7 @@ export function AdminCredentialsView() {
           ))}
           {filtered.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="py-14 text-center font-bold text-foreground/50">
+              <TableCell colSpan={6} className="py-14 text-center font-bold text-foreground/60">
                 Tidak ada credential yang cocok.
               </TableCell>
             </TableRow>

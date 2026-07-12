@@ -54,7 +54,7 @@ export function StatCard({
         <div className="min-w-0">
           <p className="text-sm font-bold text-foreground/60">{label}</p>
           <p className="mt-1 truncate font-heading text-2xl font-extrabold">{value}</p>
-          {hint && <p className="mt-1 text-xs text-foreground/50">{hint}</p>}
+          {hint && <p className="mt-1 text-xs text-foreground/60">{hint}</p>}
         </div>
         <span
           className={cn(

@@ -48,7 +48,7 @@ export function ProductCard({ product }: { product: Product }) {
               bgFor(product.accent),
             )}
           >
-            <span className="text-6xl drop-shadow-[2px_2px_0_rgba(0,0,0,0.25)]">
+            <span className="text-6xl drop-shadow-[2px_2px_0_var(--border)]">
               {product.logo}
             </span>
             <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
@@ -77,7 +77,7 @@ export function ProductCard({ product }: { product: Product }) {
                 <Star className="size-3.5 fill-warning text-warning" />
                 {product.rating}
               </span>
-              <span className="text-foreground/50">
+              <span className="text-foreground/60">
                 {formatNumber(product.soldCount)} {t("sold")}
               </span>
             </div>
@@ -99,7 +99,7 @@ export function ProductCard({ product }: { product: Product }) {
             <div className="mt-auto flex items-end justify-between pt-2">
               <div className="flex flex-col">
                 {original && (
-                  <span className="text-xs text-foreground/50 line-through">
+                  <span className="text-xs text-foreground/60 line-through">
                     {formatIDR(original)}
                   </span>
                 )}

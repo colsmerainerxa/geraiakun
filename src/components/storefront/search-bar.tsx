@@ -153,7 +153,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
         }}
         className="relative w-full"
       >
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
         <Input
           ref={inputRef}
           value={q}
@@ -179,7 +179,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
               setQ("")
               inputRef.current?.focus()
             }}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground"
             aria-label="Clear"
           >
             <X className="size-4" />
@@ -227,7 +227,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold">{m.label}</p>
                       {m.sub && (
-                        <p className="truncate text-xs text-foreground/50">
+                        <p className="truncate text-xs text-foreground/60">
                           {m.sub}
                           {m.price !== undefined && m.price > 0
                             ? ` — ${formatPrice(m.price, isEn)}`
@@ -245,7 +245,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
                           : ts("categories")}
                     </Badge>
                     {active === i && (
-                      <CornerDownLeft className="size-3.5 shrink-0 text-foreground/40" />
+                      <CornerDownLeft className="size-3.5 shrink-0 text-foreground/60" />
                     )}
                   </button>
                 </li>
@@ -261,7 +261,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
               className="flex w-full items-center justify-between border-t-2 border-border bg-secondary-background px-3.5 py-2.5 text-left text-sm font-bold hover:bg-main/10"
             >
               <span>
-                {ts("allResults")} <span className="text-foreground/50">—{q}—</span>
+                {ts("allResults")} <span className="text-foreground/60">—{q}—</span>
               </span>
               <CornerDownLeft className="size-3.5" />
             </button>
@@ -272,7 +272,7 @@ export function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
       {/* Trending chips (desktop, when focused & empty) */}
       {open && q.trim().length === 0 && trending.length > 0 && (
         <div className="absolute left-0 right-0 top-12 z-50 rounded-base border-2 border-border bg-background p-3 shadow-shadow-lg">
-          <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold uppercase text-foreground/50">
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold uppercase text-foreground/60">
             <TrendingUp className="size-3.5" /> {ts("trending")}
           </p>
           <div className="flex flex-wrap gap-1.5">

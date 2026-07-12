@@ -127,7 +127,7 @@ export function AccountView() {
               <s.icon className="size-6" />
             </span>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-foreground/50">
+              <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">
                 {s.label}
               </p>
               <p className="font-heading text-xl font-extrabold">{s.value}</p>

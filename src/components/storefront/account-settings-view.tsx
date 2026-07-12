@@ -210,7 +210,7 @@ export function AccountSettingsView() {
                   </span>
                 )}
               </p>
-              <p className="text-xs text-foreground/40">
+              <p className="text-xs text-foreground/60">
                 {isEn ? "Member since" : "Bergabung sejak"}{" "}
                 {formatDate(profile.joinedAt, dateLocale)}
               </p>
@@ -387,7 +387,7 @@ export function AccountSettingsView() {
                   <ShieldCheck className="size-4" /> {t("twoFactorConfirm")}
                 </Button>
               </div>
-              <p className="mt-2 text-[11px] text-foreground/50">{t("twoFactorHint")}</p>
+              <p className="mt-2 text-[11px] text-foreground/60">{t("twoFactorHint")}</p>
             </div>
           )}
         </section>
@@ -410,7 +410,7 @@ export function AccountSettingsView() {
                 className="flex items-center justify-between gap-3 rounded-base border-2 border-border bg-background p-3"
               >
                 <div className="flex items-center gap-2.5">
-                  <CreditCard className="size-4 text-foreground/50" />
+                  <CreditCard className="size-4 text-foreground/60" />
                   <div>
                     <p className="font-heading text-sm font-bold">{m.label}</p>
                     <p className="font-mono text-xs text-foreground/60">{m.number}</p>
@@ -427,7 +427,7 @@ export function AccountSettingsView() {
               </li>
             ))}
             {savedMethods.length === 0 && (
-              <li className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/50">
+              <li className="rounded-base border-2 border-dashed border-border p-4 text-center text-sm text-foreground/60">
                 {t("paymentsEmpty")}
               </li>
             )}
@@ -489,7 +489,7 @@ export function AccountSettingsView() {
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold leading-snug">{a.message}</p>
-                    <p className="text-xs text-foreground/50">{formatDate(a.date, dateLocale)}</p>
+                    <p className="text-xs text-foreground/60">{formatDate(a.date, dateLocale)}</p>
                   </div>
                 </li>
               )
@@ -542,7 +542,7 @@ export function AccountSettingsView() {
                       <p className="mt-1 flex items-center gap-1 text-xs text-foreground/60">
                         <MapPin className="size-3" /> {session.location} - {session.ipAddress}
                       </p>
-                      <p className="mt-1 text-xs text-foreground/45">
+                      <p className="mt-1 text-xs text-foreground/60">
                         {isEn ? "Last active" : "Aktif terakhir"}{" "}
                         {formatDate(session.lastActiveAt, dateLocale)}
                       </p>
@@ -629,7 +629,7 @@ function Field({
       <Label htmlFor={id}>{label}</Label>
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/50" />
+          <Icon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
         )}
         {children}
       </div>
@@ -644,7 +644,7 @@ function TogglePw({ show, setShow }: { show: boolean; setShow: (v: boolean) => v
       type="button"
       onClick={() => setShow(!show)}
       className={cn(
-        "absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground",
+        "absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground",
       )}
       aria-label={show ? "Sembunyikan" : "Tampilkan"}
     >
