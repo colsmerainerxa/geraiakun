@@ -134,7 +134,7 @@ export function AdminReviewsView() {
                                     "size-3",
                                     i < r.rating
                                       ? "fill-warning text-warning"
-                                      : "text-foreground/20",
+                                      : "text-foreground/30",
                                   )}
                                 />
                               ))}

@@ -65,7 +65,7 @@ function StarRow({ rating, size = "size-3" }: { rating: number; size?: string })
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={cn(size, i < rating ? "fill-warning text-warning" : "text-foreground/20")}
+          className={cn(size, i < rating ? "fill-warning text-warning" : "text-foreground/30")}
         />
       ))}
     </span>
@@ -176,7 +176,7 @@ function ReviewForm({ productId, productName }: { productId: string; productName
               <Star
                 className={cn(
                   "size-7 transition-transform hover:scale-110",
-                  (hover || rating) >= s ? "fill-warning text-warning" : "text-foreground/20",
+                  (hover || rating) >= s ? "fill-warning text-warning" : "text-foreground/30",
                 )}
               />
             </button>

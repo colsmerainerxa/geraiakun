@@ -316,7 +316,7 @@ export function AdminTeamView() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-[140px_1fr]">
-            <div className="grid aspect-square grid-cols-7 gap-1 border-4 border-border bg-background p-3">
+            <div className="grid aspect-square grid-cols-7 gap-1 border-2 border-border bg-background p-3">
               {Array.from({ length: 49 }, (_, index) => (
                 <span
                   key={index}

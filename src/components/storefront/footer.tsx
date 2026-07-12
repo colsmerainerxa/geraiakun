@@ -93,7 +93,7 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col gap-4 border-t-2 border-dashed border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-foreground/60">© 2026 geraiakun. {t("rights")}</p>
-          <span className="inline-flex items-center gap-1.5 rounded-base border-2 border-border bg-success px-2.5 py-1 text-xs font-bold text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-base border-2 border-border bg-success px-2.5 py-1 text-xs font-bold text-main-foreground">
             <Shield className="size-3.5" /> {t("secure")}
           </span>
         </div>

@@ -45,7 +45,7 @@ export function PromoInput({ subtotal }: { subtotal: number }) {
         <button
           type="button"
           onClick={clear}
-          className="flex size-7 shrink-0 items-center justify-center rounded-base border-2 border-border bg-secondary-background hover:bg-danger hover:text-white"
+          className="flex size-7 shrink-0 items-center justify-center rounded-base border-2 border-border bg-secondary-background hover:bg-danger hover:text-main-foreground"
           aria-label={t("promoCode")}
         >
           <X className="size-3.5" />
