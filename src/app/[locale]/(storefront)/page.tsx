@@ -51,7 +51,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* Categories */}
       <Container className="py-16">
         <SectionHeading
-          eyebrow="Kategori"
+          eyebrow={t("categoriesEyebrow")}
           title={t("categoriesTitle")}
           subtitle={t("categoriesSubtitle")}
         />
@@ -68,7 +68,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <div className="border-y-2 border-border bg-secondary-background">
         <Container className="py-16">
           <SectionHeading
-            eyebrow="🔥 Hot"
+            eyebrow={t("featuredEyebrow")}
             title={t("featuredTitle")}
             subtitle={t("featuredSubtitle")}
             action={
@@ -146,7 +146,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Container className="py-16">
         <SectionHeading
           align="center"
-          eyebrow="💬 Testimoni"
+          eyebrow={t("testimonialsEyebrow")}
           title={t("testimonialsTitle")}
           subtitle={t("testimonialsSubtitle")}
         />

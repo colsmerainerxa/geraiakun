@@ -45,7 +45,7 @@ export function CategoryCard({ category }: { category: Category }) {
           </p>
         </div>
         <span className="mt-auto text-xs font-bold text-foreground/60">
-          {category.productCount} produk
+          {category.productCount} {isEn ? "products" : "produk"}
         </span>
       </Link>
     </motion.div>
