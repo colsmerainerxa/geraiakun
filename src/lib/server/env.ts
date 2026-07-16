@@ -44,8 +44,20 @@ function isFilled(value: string | undefined) {
   return Boolean(value && !value.includes("USER:PASSWORD@HOST") && !value.includes("replace-with"))
 }
 
+function withVerifyFull(url: string | undefined) {
+  if (!url) return url
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== "postgres:" && parsed.protocol !== "postgresql:") return url
+    parsed.searchParams.set("sslmode", "verify-full")
+    return parsed.toString()
+  } catch {
+    return url
+  }
+}
+
 export const serverEnv = {
-  DATABASE_URL: raw.DATABASE_URL ?? fallbackDatabaseUrl,
+  DATABASE_URL: withVerifyFull(raw.DATABASE_URL) ?? fallbackDatabaseUrl,
   AUTH_SECRET: (() => {
     const fallback = "geraiakun-dev-auth-secret-change-me"
     if (raw.AUTH_SECRET) return raw.AUTH_SECRET
