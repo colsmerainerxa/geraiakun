@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next"
 import { routing } from "@/i18n/routing"
-import { articles } from "@/lib/mock/articles"
 import { categories } from "@/lib/mock/categories"
 import { products } from "@/lib/mock/products"
-import { backendFlags } from "@/lib/server/env"
+import { type ArticleSitemapPair, articleSitemapEntries } from "@/lib/seo/articles"
 import { SITE_URL } from "@/lib/seo/site"
+import { backendFlags } from "@/lib/server/env"
 
 // Stable content-update date — avoids the "lying lastmod" of new Date() that
 // changes on every build/deploy. Bump when content materially changes.
@@ -69,10 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     slug: p.slug,
     updatedAt: LAST_UPDATED,
   }))
-  let articleRoutes: { slug: string; updatedAt: string }[] = articles.map((a) => ({
-    slug: a.slug,
-    updatedAt: a.date,
-  }))
+  let articlePairs: ArticleSitemapPair[] = []
 
   if (backendFlags.databaseConfigured) {
     try {
@@ -85,7 +82,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }),
         prisma.article.findMany({
           where: { published: true },
-          select: { slug: true, updatedAt: true },
+          select: {
+            updatedAt: true,
+            translations: { select: { locale: true, slug: true } },
+          },
         }),
       ])
       categorySlugs = dbCats.map((c) => c.slug)
@@ -93,25 +93,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         slug: p.slug,
         updatedAt: p.updatedAt.toISOString().split("T")[0],
       }))
-      articleRoutes = dbArticles.map((a) => ({
-        slug: a.slug,
-        updatedAt: a.updatedAt.toISOString().split("T")[0],
-      }))
+      articlePairs = dbArticles.flatMap((article) => {
+        const idSlug = article.translations.find((item) => item.locale === "id")?.slug
+        const enSlug = article.translations.find((item) => item.locale === "en")?.slug
+        return idSlug && enSlug
+          ? [{ idSlug, enSlug, updatedAt: article.updatedAt.toISOString().split("T")[0] }]
+          : []
+      })
     } catch (error) {
       if (!isDbUnavailable(error)) throw error
-      // fall back to mock data (already set above)
+      articlePairs = []
     }
   }
 
-  const categoryRoutes = categorySlugs.map((slug) =>
-    entry(`/kategori/${slug}`, "weekly", 0.7),
-  )
+  const categoryRoutes = categorySlugs.map((slug) => entry(`/kategori/${slug}`, "weekly", 0.7))
   const productEntries = productRoutes.map((p) =>
     entry(`/produk/${p.slug}`, "weekly", 0.8, p.updatedAt),
   )
-  const articleEntries = articleRoutes.map((a) =>
-    entry(`/artikel/${a.slug}`, "monthly", 0.6, a.updatedAt),
-  )
+  const articleEntries = articleSitemapEntries(articlePairs)
 
   return [...staticRoutes, ...categoryRoutes, ...productEntries, ...articleEntries]
 }

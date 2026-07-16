@@ -83,7 +83,7 @@ export async function processRefund(input: z.input<typeof refundActionSchema>) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const refund = await prisma.refundCase.findUnique({ where: { id: parsed.data.refundId } })
   if (!refund) throw new Error("Refund tidak ditemukan.")

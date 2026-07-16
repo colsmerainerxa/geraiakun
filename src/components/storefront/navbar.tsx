@@ -31,7 +31,13 @@ function SearchBar({ onSubmit }: { onSubmit?: () => void }) {
   return <SearchBarAutocomplete onSubmit={onSubmit} />
 }
 
-export function Navbar() {
+type NavbarProps = {
+  user: {
+    name: string | null
+  } | null
+}
+
+export function Navbar({ user }: NavbarProps) {
   const t = useTranslations("nav")
   const links = useNavLinks()
   const { setCartOpen } = useUI()
@@ -39,6 +45,7 @@ export function Navbar() {
   const count = useCart((s) => s.items.reduce((a, i) => a + i.qty, 0))
   const wishCount = useWishlist((s) => s.slugs.length)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const displayName = user?.name?.trim() || t("account")
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70">
@@ -96,21 +103,23 @@ export function Navbar() {
             </Link>
           </Button>
 
-          <Button variant="default" size="sm" className="hidden sm:inline-flex" asChild>
-            <Link href="/masuk">{t("login")}</Link>
-          </Button>
-
-          <Button
-            variant="neutral"
-            size="icon-sm"
-            className="hidden sm:inline-flex"
-            asChild
-            aria-label={t("account")}
-          >
-            <Link href="/akun">
-              <User className="size-4" />
-            </Link>
-          </Button>
+          {user ? (
+            <Button
+              variant="neutral"
+              size="sm"
+              className="hidden max-w-40 sm:inline-flex"
+              asChild
+            >
+              <Link href="/akun" title={displayName}>
+                <User className="size-4 shrink-0" />
+                <span className="truncate">{displayName}</span>
+              </Link>
+            </Button>
+          ) : (
+            <Button variant="default" size="sm" className="hidden sm:inline-flex" asChild>
+              <Link href="/masuk">{t("login")}</Link>
+            </Button>
+          )}
 
           {/* Cart */}
           <button
@@ -167,7 +176,7 @@ export function Navbar() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <Link href="/akun">
-                    <User className="size-4" /> {t("account")}
+                    <User className="size-4" /> {user ? displayName : t("account")}
                   </Link>
                 </Button>
                 <Button
@@ -191,22 +200,26 @@ export function Navbar() {
                   </Link>
                 </Button>
                 <div className="my-1 h-0.5 bg-border" />
-                <Button
-                  variant="default"
-                  className="justify-start"
-                  asChild
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <Link href="/masuk">{t("login")}</Link>
-                </Button>
-                <Button
-                  variant="neutral"
-                  className="justify-start"
-                  asChild
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <Link href="/daftar">{t("register")}</Link>
-                </Button>
+                {!user && (
+                  <>
+                    <Button
+                      variant="default"
+                      className="justify-start"
+                      asChild
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Link href="/masuk">{t("login")}</Link>
+                    </Button>
+                    <Button
+                      variant="neutral"
+                      className="justify-start"
+                      asChild
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Link href="/daftar">{t("register")}</Link>
+                    </Button>
+                  </>
+                )}
               </nav>
               <div className="mt-auto flex items-center justify-between">
                 <LocaleSwitcher />

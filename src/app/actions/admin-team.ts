@@ -4,6 +4,8 @@ import { z } from "zod"
 import { auth } from "@/auth"
 import { backendFlags } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { createStaffInvite } from "@/lib/server/staff-invite"
+import { revokeAllUserAuth } from "@/lib/server/trusted-devices"
 
 export async function listStaff() {
   const session = await auth()
@@ -18,10 +20,9 @@ export async function listStaff() {
   })
 }
 
-const addStaffSchema = z.object({
+const addStaffSchema = z.strictObject({
   email: z.string().email(),
   name: z.string().min(2),
-  password: z.string().min(6),
 })
 
 export async function addStaff(input: z.input<typeof addStaffSchema>) {
@@ -32,22 +33,14 @@ export async function addStaff(input: z.input<typeof addStaffSchema>) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
-  const { hashPassword } = await import("@/lib/server/password")
   const email = parsed.data.email.toLowerCase()
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) throw new Error("Email sudah terdaftar.")
 
-  const user = await prisma.user.create({
-    data: {
-      name: parsed.data.name,
-      email,
-      passwordHash: await hashPassword(parsed.data.password),
-      role: "ADMIN",
-      adminStaff: { create: { status: "active" } },
-    },
-  })
+  const invitation = await createStaffInvite({ name: parsed.data.name, email })
+  const { user } = invitation
 
   await prisma.auditEvent.create({
     data: {
@@ -62,7 +55,7 @@ export async function addStaff(input: z.input<typeof addStaffSchema>) {
     },
   })
 
-  return { ok: true, id: user.id }
+  return { ok: true, id: user.id, previewUrl: invitation.previewUrl }
 }
 
 export async function removeStaff(userId: string) {
@@ -70,7 +63,7 @@ export async function removeStaff(userId: string) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
   if (userId === session.user.id) throw new Error("Tidak dapat menghapus diri sendiri.")
 
   await prisma.adminStaff.delete({ where: { userId } })
@@ -100,14 +93,27 @@ export async function toggleStaffStatus(userId: string) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const staff = await prisma.adminStaff.findUnique({ where: { userId } })
   if (!staff) throw new Error("Staf tidak ditemukan.")
 
-  await prisma.adminStaff.update({
-    where: { userId },
-    data: { status: staff.status === "active" ? "suspended" : "active" },
+  const status = staff.status === "active" ? "suspended" : "active"
+  await prisma.$transaction(async (tx) => {
+    await tx.adminStaff.update({ where: { userId }, data: { status } })
+    if (status === "suspended") await revokeAllUserAuth(tx, userId, new Date())
+    await tx.auditEvent.create({
+      data: {
+        actorId: session.user.id,
+        actorName: session.user.email ?? "Admin",
+        action: "staff.status",
+        module: "tim",
+        targetId: userId,
+        targetLabel: userId,
+        outcome: "success",
+        detail: `Status staf ${userId} diubah menjadi ${status}.`,
+      },
+    })
   })
 
   return { ok: true }

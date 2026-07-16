@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 
 const createSchema = z.object({
   code: z.string().min(1).max(50),
@@ -37,6 +38,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -47,9 +50,23 @@ export async function POST(request: Request) {
 
   const parsed = createSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
-  const { code, description, type, value, minPurchase, maxDiscount, startsAt, expiresAt, active, maxUses } = parsed.data
+  const {
+    code,
+    description,
+    type,
+    value,
+    minPurchase,
+    maxDiscount,
+    startsAt,
+    expiresAt,
+    active,
+    maxUses,
+  } = parsed.data
 
   const promo = await prisma.promo.create({
     data: {
@@ -82,6 +99,8 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -98,9 +117,23 @@ export async function PATCH(request: Request) {
 
   const parsed = patchSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
-  const { code, description, type, value, minPurchase, maxDiscount, startsAt, expiresAt, active, maxUses } = parsed.data
+  const {
+    code,
+    description,
+    type,
+    value,
+    minPurchase,
+    maxDiscount,
+    startsAt,
+    expiresAt,
+    active,
+    maxUses,
+  } = parsed.data
 
   const data: Record<string, unknown> = {}
   if (code != null) data.code = String(code).toUpperCase()
@@ -132,6 +165,8 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

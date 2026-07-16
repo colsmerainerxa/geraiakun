@@ -24,7 +24,6 @@ import { ProductCard } from "@/components/storefront/product-card"
 import { QaSection } from "@/components/storefront/qa-section"
 import { ReviewsSection } from "@/components/storefront/reviews-section"
 import { ShareButtons } from "@/components/storefront/share-buttons"
-import { ViewersBadge } from "@/components/storefront/social-proof-toast"
 import { WishlistButton } from "@/components/storefront/wishlist-button"
 import {
   Accordion,
@@ -82,7 +81,7 @@ export function ProductDetail({
   }, [product.slug, addRecent])
 
   const { data: allProducts } = useProducts()
-  const { data: articles = [] } = useArticles()
+  const { data: articles = [] } = useArticles(isEn ? "en" : "id")
   const crossSell = (allProducts ?? []).filter((p) => p.slug !== product.slug).slice(0, 2)
   const relatedArticles = (articles as any[]).filter((a) => a.tags?.includes(product.slug) || a.tags?.includes(product.brand)).slice(0, 3)
 
@@ -224,9 +223,6 @@ export function ProductDetail({
               {formatNumber(product.soldCount)} {tc("sold")}
             </span>
           </div>
-
-          {/* Live viewers (social proof) */}
-          <ViewersBadge />
 
           {/* Price */}
           <div className="flex items-end gap-3 rounded-base border-2 border-border bg-secondary-background p-4 shadow-shadow-sm">

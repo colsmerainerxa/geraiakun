@@ -1,3 +1,4 @@
+import type { ArticleLocale } from "@/content/articles/types"
 import { routing } from "@/i18n/routing"
 
 /** Canonical production origin — single source of truth for SEO/metadata. */
@@ -16,6 +17,15 @@ export function seoAlternates(locale: string, path: string) {
   const canonical = locale === routing.defaultLocale ? idPath : enPath
   return {
     canonical,
+    languages: { id: idPath, en: enPath, "x-default": idPath },
+  }
+}
+
+export function articleAlternates(locale: ArticleLocale, idSlug: string, enSlug: string) {
+  const idPath = `/id/artikel/${idSlug}`
+  const enPath = `/en/artikel/${enSlug}`
+  return {
+    canonical: locale === "id" ? idPath : enPath,
     languages: { id: idPath, en: enPath, "x-default": idPath },
   }
 }

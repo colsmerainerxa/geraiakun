@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 
 const postSchema = z.object({
   orderId: z.string().optional(),
@@ -33,6 +34,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const originError = rejectUntrustedRequestOrigin(req, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -44,7 +47,10 @@ export async function POST(req: Request) {
 
   const parsed = postSchema.safeParse(await req.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { orderId, productName, reason, amount } = parsed.data
 

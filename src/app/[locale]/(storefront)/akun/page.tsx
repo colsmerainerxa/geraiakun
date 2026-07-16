@@ -20,10 +20,16 @@ export async function generateMetadata({
 export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
-  await requireCustomerSession(locale, "/akun")
+  const session = await requireCustomerSession(locale, "/akun")
   return (
     <Container className="py-10">
-      <AccountView />
+      <AccountView
+        initialUser={{
+          name: session.user.name ?? "",
+          email: session.user.email ?? "",
+          image: session.user.image ?? null,
+        }}
+      />
     </Container>
   )
 }

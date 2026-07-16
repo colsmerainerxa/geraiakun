@@ -128,15 +128,7 @@ function normalizeChargeResponse(
 
 export async function createMidtransCharge(input: CreateMidtransChargeInput) {
   if (!backendFlags.midtransConfigured) {
-    return {
-      paymentCode: demoPaymentCode(input.invoice, input.method),
-      qrPayload:
-        input.method === "qris"
-          ? `00020101021226670016ID.GERAIAKUN.WWW0118${input.invoice}520458125303360540${input.amount}5802ID`
-          : null,
-      midtransTransactionId: null,
-      rawResponse: { mode: "demo", invoice: input.invoice, method: input.method },
-    }
+    throw new Error("Midtrans belum dikonfigurasi.")
   }
 
   const response = await coreApi().charge(chargePayload(input))
@@ -149,7 +141,7 @@ export async function normalizeMidtransNotification(payload: Record<string, unkn
 }
 
 export function isValidMidtransSignature(payload: Record<string, unknown>) {
-  if (!backendFlags.midtransConfigured) return true
+  if (!backendFlags.midtransConfigured) return false
   const orderId = String(payload.order_id ?? "")
   const statusCode = String(payload.status_code ?? "")
   const grossAmount = String(payload.gross_amount ?? "")

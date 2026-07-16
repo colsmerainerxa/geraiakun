@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 
 const patchSchema = z.object({
   id: z.string().min(1),
@@ -38,7 +39,17 @@ export async function GET(request: Request) {
   const [data, total] = await Promise.all([
     prisma.fulfillmentTask.findMany({
       where,
-      include: { order: { select: { invoice: true, customerName: true, customerEmail: true, status: true, total: true } } },
+      include: {
+        order: {
+          select: {
+            invoice: true,
+            customerName: true,
+            customerEmail: true,
+            status: true,
+            total: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,
@@ -50,6 +61,8 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -60,14 +73,27 @@ export async function PATCH(request: Request) {
 
   const parsed = patchSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { id, risk } = parsed.data
 
   const task = await prisma.fulfillmentTask.update({
     where: { id },
     data: { risk },
-    include: { order: { select: { invoice: true, customerName: true, customerEmail: true, status: true, total: true } } },
+    include: {
+      order: {
+        select: {
+          invoice: true,
+          customerName: true,
+          customerEmail: true,
+          status: true,
+          total: true,
+        },
+      },
+    },
   })
 
   return NextResponse.json(task)

@@ -2,8 +2,6 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "../src/generated/prisma/client"
 import { categories } from "../src/lib/mock/categories"
 import { products } from "../src/lib/mock/products"
-import { promos } from "../src/lib/mock/transactions"
-import { encryptSecret } from "../src/lib/server/crypto"
 import { hashPassword } from "../src/lib/server/password"
 
 const databaseUrl = process.env.DATABASE_URL
@@ -30,21 +28,17 @@ const productBadge = {
   langka: "RARE",
 } as const
 
-const promoType = {
-  persen: "PERCENT",
-  nominal: "NOMINAL",
-} as const
-
 async function seedUsers() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@geraiakun.id"
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "geraiakun-admin"
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "geraiakun-admin-2026"
 
   await prisma.user.upsert({
     where: { email: adminEmail },
-    update: { role: "ADMIN" },
+    update: { role: "ADMIN", emailVerified: new Date() },
     create: {
       name: "Admin geraiakun",
       email: adminEmail,
+      emailVerified: new Date(),
       role: "ADMIN",
       passwordHash: await hashPassword(adminPassword),
       profile: { create: { status: "vip" } },
@@ -155,71 +149,9 @@ async function seedCatalog() {
   }
 }
 
-async function seedPromos() {
-  for (const promo of promos) {
-    await prisma.promo.upsert({
-      where: { code: promo.code },
-      update: {
-        description: promo.description,
-        type: promoType[promo.type],
-        value: promo.value,
-        minSpend: promo.minSpend,
-        maxDiscount: promo.maxDiscount,
-        used: promo.used,
-        quota: promo.quota,
-        expiresAt: new Date(`${promo.expiresAt}T23:59:59.000Z`),
-        active: promo.active,
-        scope: promo.scope,
-      },
-      create: {
-        id: promo.id,
-        code: promo.code,
-        description: promo.description,
-        type: promoType[promo.type],
-        value: promo.value,
-        minSpend: promo.minSpend,
-        maxDiscount: promo.maxDiscount,
-        used: promo.used,
-        quota: promo.quota,
-        expiresAt: new Date(`${promo.expiresAt}T23:59:59.000Z`),
-        active: promo.active,
-        scope: promo.scope,
-      },
-    })
-  }
-}
-
-async function seedCredentialStock() {
-  const variants = await prisma.productVariant.findMany({
-    include: { product: true },
-    take: 12,
-  })
-
-  for (let index = 0; index < variants.length; index += 1) {
-    const variant = variants[index]
-    await prisma.credentialStock.upsert({
-      where: { id: `cred-seed-${index + 1}` },
-      update: {},
-      create: {
-        id: `cred-seed-${index + 1}`,
-        productId: variant.productId,
-        variantId: variant.id,
-        productName: variant.product.name,
-        variantLabel: variant.label,
-        loginEmailEncrypted: encryptSecret(`vault${index + 1}@geraiakun.test`) ?? "",
-        passwordEncrypted: encryptSecret(`Geraiakun-${index + 1}-secure`) ?? "",
-        noteEncrypted: encryptSecret("Seed credential untuk sandbox fulfillment."),
-        status: "AVAILABLE",
-      },
-    })
-  }
-}
-
 async function main() {
   await seedUsers()
   await seedCatalog()
-  await seedPromos()
-  await seedCredentialStock()
 }
 
 main()

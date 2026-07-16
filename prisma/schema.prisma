@@ -12,6 +12,22 @@ enum UserRole {
   ADMIN
 }
 
+enum AccountTokenPurpose {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+  STAFF_INVITE
+  LOGIN_GRANT
+}
+
+enum AuthSecurityAction {
+  LOGIN
+  REGISTER
+  PASSWORD_RESET
+  VERIFICATION_RESEND
+  LOGIN_OTP_SEND
+  LOGIN_OTP_VERIFY
+}
+
 enum AccountType {
   SHARING
   PRIVATE
@@ -110,28 +126,31 @@ enum RefundStatus {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  passwordHash  String?
-  role          UserRole  @default(CUSTOMER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  passwordHash   String?
+  role           UserRole  @default(CUSTOMER)
+  sessionVersion Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  accounts        Account[]
-  sessions        Session[]
-  authenticators  Authenticator[]
-  profile         CustomerProfile?
-  adminStaff      AdminStaff?
-  orders          Order[]
-  tickets         Ticket[]
-  refundCases     RefundCase[]
-  vaultAccounts   VaultAccount[]
-  reviews         Review[]
-  reseller        Reseller?
-  wishlist        Wishlist[]
+  accounts           Account[]
+  sessions           Session[]
+  authenticators     Authenticator[]
+  profile            CustomerProfile?
+  adminStaff         AdminStaff?
+  orders             Order[]
+  tickets            Ticket[]
+  refundCases        RefundCase[]
+  vaultAccounts      VaultAccount[]
+  reviews            Review[]
+  reseller           Reseller?
+  wishlist           Wishlist[]
+  trustedDevices     TrustedDevice[]
+  loginOtpChallenges LoginOtpChallenge[]
 }
 
 model Account {
@@ -173,6 +192,70 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
+model AccountToken {
+  id         String              @id @default(cuid())
+  purpose    AccountTokenPurpose
+  email      String
+  tokenHash  String              @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime            @default(now())
+
+  @@index([email, purpose, createdAt])
+  @@index([expiresAt])
+}
+
+model AuthSecurityEvent {
+  id           String             @id @default(cuid())
+  action       AuthSecurityAction
+  identityHash String
+  ipHash       String?
+  success      Boolean            @default(false)
+  createdAt    DateTime           @default(now())
+
+  @@index([action, identityHash, createdAt])
+  @@index([action, ipHash, createdAt])
+  @@index([createdAt])
+}
+
+model TrustedDevice {
+  id            String    @id @default(cuid())
+  userId        String
+  deviceHash    String
+  userAgentHash String
+  label         String
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  lastUsedAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceHash])
+  @@index([userId, revokedAt, expiresAt])
+  @@index([expiresAt])
+}
+
+model LoginOtpChallenge {
+  id             String    @id @default(cuid())
+  userId         String
+  deviceHash     String
+  userAgentHash  String
+  codeHash       String
+  locale         String
+  failedAttempts Int       @default(0)
+  sendCount      Int       @default(1)
+  lastSentAt     DateTime  @default(now())
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([expiresAt])
+}
+
 model Authenticator {
   credentialID         String  @unique
   userId               String
@@ -189,26 +272,30 @@ model Authenticator {
 }
 
 model CustomerProfile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  whatsapp  String?
-  avatar    String?
-  status    String   @default("baru")
-  joinedAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  whatsapp            String?
+  avatar              String?
+  status              String   @default("baru")
+  notifyOrderUpdates  Boolean  @default(true)
+  notifyPromos        Boolean  @default(true)
+  notifyTicketReplies Boolean  @default(true)
+  notifyNewsletter    Boolean  @default(false)
+  joinedAt            DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AdminStaff {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  role             UserRole @default(ADMIN)
-  status           String   @default("active")
-  twoFactorEnabled Boolean  @default(false)
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  role             UserRole  @default(ADMIN)
+  status           String    @default("active")
+  twoFactorEnabled Boolean   @default(false)
   lastActiveAt     DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -396,19 +483,19 @@ model MidtransEvent {
 }
 
 model CredentialStock {
-  id                   String           @id @default(cuid())
-  productId            String
-  variantId            String?
-  productName          String
-  variantLabel         String
-  loginEmailEncrypted  String
-  passwordEncrypted    String
-  pinEncrypted         String?
-  noteEncrypted        String?
-  status               CredentialStatus @default(AVAILABLE)
-  addedAt              DateTime         @default(now())
-  soldAt               DateTime?
-  updatedAt            DateTime         @updatedAt
+  id                  String           @id @default(cuid())
+  productId           String
+  variantId           String?
+  productName         String
+  variantLabel        String
+  loginEmailEncrypted String
+  passwordEncrypted   String
+  pinEncrypted        String?
+  noteEncrypted       String?
+  status              CredentialStatus @default(AVAILABLE)
+  addedAt             DateTime         @default(now())
+  soldAt              DateTime?
+  updatedAt           DateTime         @updatedAt
 
   product       Product         @relation(fields: [productId], references: [id])
   variant       ProductVariant? @relation(fields: [variantId], references: [id])
@@ -464,8 +551,8 @@ model FulfillmentTask {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product        @relation(fields: [productId], references: [id])
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product        @relation(fields: [productId], references: [id])
   variantRef ProductVariant @relation(fields: [variantId], references: [id])
 
   @@index([status])
@@ -571,35 +658,63 @@ model FlashSale {
 }
 
 // ── Articles ──
+enum ArticleLocale {
+  id
+  en
+}
+
 model Article {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  excerpt     String
-  body        String
-  category    String   @default("tips")
-  tags        String[] @default([])
-  coverImage  String   @default("")
-  published   Boolean  @default(true)
-  publishedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String               @id
+  key                 String               @unique
+  category            String
+  tags                String[]             @default([])
+  relatedProductSlugs String[]             @default([])
+  coverImage          String               @default("")
+  authorName          String
+  reviewerName        String
+  published           Boolean              @default(false)
+  publishedAt         DateTime
+  reviewedAt          DateTime
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  translations        ArticleTranslation[]
 
   @@index([published, publishedAt])
 }
 
+model ArticleTranslation {
+  id             String        @id @default(cuid())
+  articleId      String
+  locale         ArticleLocale
+  slug           String
+  title          String
+  excerpt        String
+  seoTitle       String
+  seoDescription String
+  searchPhrases  String[]      @default([])
+  content        Json
+  sources        Json
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  article        Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, locale])
+  @@unique([locale, slug])
+  @@index([locale, slug])
+}
+
 // ── Reseller ──
 model Reseller {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  code      String   @unique
-  tier      String   @default("bronze")
-  commission Int     @default(10)
-  balance   Int      @default(0)
-  totalSales Int     @default(0)
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  code       String   @unique
+  tier       String   @default("bronze")
+  commission Int      @default(10)
+  balance    Int      @default(0)
+  totalSales Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

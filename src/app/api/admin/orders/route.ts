@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 
 export const runtime = "nodejs"
 
@@ -60,6 +61,8 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -70,7 +73,10 @@ export async function PATCH(request: Request) {
 
   const parsed = patchSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { id, status } = parsed.data
 

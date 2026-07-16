@@ -3,6 +3,7 @@ import { promisify } from "node:util"
 
 const scrypt = promisify(scryptCallback)
 const KEY_LENGTH = 64
+const DUMMY_HASH = `scrypt:${"0".repeat(32)}:${"0".repeat(KEY_LENGTH * 2)}`
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex")
@@ -11,11 +12,13 @@ export async function hashPassword(password: string) {
 }
 
 export async function verifyPassword(password: string, storedHash: string | null | undefined) {
-  if (!storedHash) return false
-  const [scheme, salt, hash] = storedHash.split(":")
-  if (scheme !== "scrypt" || !salt || !hash) return false
-  const derivedKey = (await scrypt(password, salt, KEY_LENGTH)) as Buffer
-  const stored = Buffer.from(hash, "hex")
+  const candidate = storedHash ?? DUMMY_HASH
+  const [scheme, salt, hash] = candidate.split(":")
+  const validFormat = scheme === "scrypt" && Boolean(salt && hash)
+  const safeSalt = validFormat ? salt : "0".repeat(32)
+  const safeHash = validFormat ? hash : "0".repeat(KEY_LENGTH * 2)
+  const derivedKey = (await scrypt(password, safeSalt, KEY_LENGTH)) as Buffer
+  const stored = Buffer.from(safeHash, "hex")
   if (stored.length !== derivedKey.length) return false
-  return timingSafeEqual(stored, derivedKey)
+  return Boolean(storedHash && validFormat) && timingSafeEqual(stored, derivedKey)
 }

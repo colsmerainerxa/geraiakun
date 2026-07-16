@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 
 const productIdSchema = z.object({ productId: z.string().min(1) })
 
@@ -28,6 +29,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const originError = rejectUntrustedRequestOrigin(req, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -39,7 +42,10 @@ export async function POST(req: Request) {
 
   const parsed = productIdSchema.safeParse(await req.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { productId } = parsed.data
 
@@ -54,6 +60,8 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const originError = rejectUntrustedRequestOrigin(req, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -65,7 +73,10 @@ export async function DELETE(req: Request) {
 
   const parsed = productIdSchema.safeParse(await req.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { productId } = parsed.data
 

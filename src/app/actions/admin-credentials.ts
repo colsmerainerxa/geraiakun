@@ -46,7 +46,7 @@ export async function bulkImportCredentials(input: z.infer<typeof bulkImportSche
   if (!parsed.success) throw new Error("INVALID_INPUT")
   const session = await requireAdmin()
   if (!parsed.data.items?.length) throw new Error("ITEMS_REQUIRED")
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo", count: input.items.length }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const created = await prisma.$transaction(async (tx) => {
     const results: { id: string }[] = []
@@ -112,7 +112,7 @@ export async function bulkImportCredentials(input: z.infer<typeof bulkImportSche
 export async function deleteCredential(rawId: string) {
   const id = idSchema.parse(rawId)
   const session = await requireAdmin()
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   return prisma.$transaction(async (tx) => {
     const cred = await tx.credentialStock.findUnique({ where: { id } })
@@ -142,7 +142,7 @@ export async function deleteCredential(rawId: string) {
 export async function assignCredentialToTask(rawTaskId: string, rawCredentialId: string) {
   const { taskId, credentialId } = assignSchema.parse({ taskId: rawTaskId, credentialId: rawCredentialId })
   const session = await requireAdmin()
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   return prisma.$transaction(async (tx) => {
     const [task, credential] = await Promise.all([

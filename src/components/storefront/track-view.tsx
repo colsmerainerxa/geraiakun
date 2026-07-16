@@ -26,7 +26,6 @@ import { Link } from "@/i18n/navigation"
 import { useOrder } from "@/lib/api/queries"
 import { downloadInvoice } from "@/lib/invoice"
 import { cn, formatDate, formatIDR } from "@/lib/utils"
-import { useAdminOverlay } from "@/stores/admin-overlay"
 import { usePurchasedOrders } from "@/stores/orders"
 import type { Order, OrderStatus } from "@/types"
 
@@ -64,9 +63,7 @@ function OrderResult({ order }: { order: Order }) {
   const tc = useTranslations("common")
   const ts = useTranslations("orderStatus")
   const isEn = useLocale() === "en"
-  // Apply the demo admin status override if present.
-  const ovStatus = useAdminOverlay((s) => s.orderStatus[order.invoice])
-  const status = ovStatus ?? order.status
+  const status = order.status
   const meta = STATUS_META[status]
   const activeIdx = TIMELINE.indexOf(status)
   const isTimeline = activeIdx !== -1

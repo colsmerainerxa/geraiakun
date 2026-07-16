@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 export function SectionHeading({
   eyebrow,
   title,
+  titleAs = "h2",
   subtitle,
   align = "left",
   className,
@@ -11,11 +12,14 @@ export function SectionHeading({
 }: {
   eyebrow?: string
   title: React.ReactNode
+  titleAs?: "h1" | "h2"
   subtitle?: string
   align?: "left" | "center"
   className?: string
   action?: React.ReactNode
 }) {
+  const Title = titleAs
+
   return (
     <div
       className={cn(
@@ -30,9 +34,9 @@ export function SectionHeading({
             {eyebrow}
           </span>
         )}
-        <h2 className="font-heading text-3xl font-extrabold leading-tight text-balance sm:text-4xl">
+        <Title className="font-heading text-3xl font-extrabold leading-tight text-balance sm:text-4xl">
           {title}
-        </h2>
+        </Title>
         {subtitle && <p className="max-w-2xl text-base text-foreground/70">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

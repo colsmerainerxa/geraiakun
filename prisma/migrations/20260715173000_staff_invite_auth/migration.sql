@@ -1,0 +1,1 @@
+ALTER TYPE "AccountTokenPurpose" ADD VALUE 'STAFF_INVITE';

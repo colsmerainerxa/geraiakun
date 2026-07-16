@@ -46,7 +46,7 @@ export const useNotifications = create<NotificationsState>()(
       clear: () => set({ items: [] }),
       unread: () => get().items.filter((n) => !n.read).length,
     }),
-    { name: "geraiakun-notifications" },
+    { name: "geraiakun-notifications-v2" },
   ),
 )
 

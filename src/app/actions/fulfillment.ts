@@ -14,7 +14,7 @@ export async function deliverFulfillmentCredential(taskId: string) {
     throw new Error("ADMIN_REQUIRED")
   }
   if (!backendFlags.databaseConfigured) {
-    return { ok: true, mode: "demo" }
+    throw new Error("DATABASE_NOT_CONFIGURED")
   }
 
   return prisma.$transaction(async (tx) => {

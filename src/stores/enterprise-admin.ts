@@ -2,10 +2,7 @@
 
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { credentials as seedCredentials } from "@/lib/mock/credentials"
-import { refundCases as seedRefunds } from "@/lib/mock/enterprise"
 import { products as seedProducts } from "@/lib/mock/products"
-import { promos as seedPromos } from "@/lib/mock/transactions"
 import { useAdminGamification } from "@/stores/admin-gamification"
 import type {
   AdminPermission,
@@ -363,17 +360,17 @@ function auditEvent(
 export const useEnterpriseAdmin = create<EnterpriseAdminState>()(
   persist(
     (set, get) => ({
-      activeStaffId: "staff-owner",
-      staff: SEED_STAFF,
-      audits: SEED_AUDITS,
-      refunds: seedRefunds,
-      risks: SEED_RISKS,
-      resellers: SEED_RESELLERS,
-      ledger: SEED_LEDGER,
-      bulkOrders: SEED_BULK_ORDERS,
+      activeStaffId: "",
+      staff: [],
+      audits: [],
+      refunds: [],
+      risks: [],
+      resellers: [],
+      ledger: [],
+      bulkOrders: [],
       catalog: cloneProducts(),
-      promos: seedPromos,
-      credentials: seedCredentials,
+      promos: [],
+      credentials: [],
       setActiveStaff: (activeStaffId) => set({ activeStaffId }),
       inviteStaff: (input) =>
         set((state) => {
@@ -713,19 +710,19 @@ export const useEnterpriseAdmin = create<EnterpriseAdminState>()(
       },
       reset: () =>
         set({
-          activeStaffId: "staff-owner",
-          staff: SEED_STAFF,
-          audits: SEED_AUDITS,
-          refunds: seedRefunds,
-          risks: SEED_RISKS,
-          resellers: SEED_RESELLERS,
-          ledger: SEED_LEDGER,
-          bulkOrders: SEED_BULK_ORDERS,
+          activeStaffId: "",
+          staff: [],
+          audits: [],
+          refunds: [],
+          risks: [],
+          resellers: [],
+          ledger: [],
+          bulkOrders: [],
           catalog: cloneProducts(),
-          promos: seedPromos,
-          credentials: seedCredentials,
+          promos: [],
+          credentials: [],
         }),
     }),
-    { name: "geraiakun-enterprise-admin" },
+    { name: "geraiakun-enterprise-admin-v2" },
   ),
 )

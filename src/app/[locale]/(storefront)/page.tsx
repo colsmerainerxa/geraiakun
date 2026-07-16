@@ -8,10 +8,8 @@ import { FlashSaleStrip } from "@/components/storefront/flash-sale-strip"
 import { Hero } from "@/components/storefront/hero"
 import { ProductCard } from "@/components/storefront/product-card"
 import { RecentlyViewedStrip } from "@/components/storefront/recently-viewed-strip"
-import { TestimonialsMarquee } from "@/components/storefront/testimonials-marquee"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/navigation"
-import { fakeApi } from "@/lib/mock/fake-api"
 import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld"
 import { getCatalogCategories, getCatalogProducts } from "@/lib/server/catalog"
 
@@ -21,11 +19,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations("home")
   const tc = await getTranslations("common")
 
-  const [categories, allProducts, testimonials] = await Promise.all([
-    getCatalogCategories(),
-    getCatalogProducts(),
-    fakeApi.getTestimonials(),
-  ])
+  const [categories, allProducts] = await Promise.all([getCatalogCategories(), getCatalogProducts()])
   const featured = allProducts.filter((p) => p.featured)
 
   const steps = [
@@ -141,17 +135,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </RevealGroup>
         </Container>
       </div>
-
-      {/* Testimonials */}
-      <Container className="py-16">
-        <SectionHeading
-          align="center"
-          eyebrow={t("testimonialsEyebrow")}
-          title={t("testimonialsTitle")}
-          subtitle={t("testimonialsSubtitle")}
-        />
-      </Container>
-      <TestimonialsMarquee items={testimonials} />
 
       {/* CTA */}
       <Container className="py-16">

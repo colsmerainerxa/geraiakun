@@ -1,4 +1,3 @@
-import Script from "next/script"
 import type {
   BlogPosting,
   BreadcrumbList,
@@ -8,6 +7,7 @@ import type {
   WebSite,
   WithContext,
 } from "schema-dts"
+import { JsonLdScript } from "@/components/shared/json-ld-script"
 import { SITE_URL } from "@/lib/seo/site"
 import type { Product } from "@/types"
 
@@ -111,25 +111,32 @@ export function itemListJsonLd(items: { name: string; path: string }[]): WithCon
 export function articleJsonLd(a: {
   title: string
   description: string
-  slug: string
-  date: string
+  url: string
+  image: string
+  locale: "id" | "en"
+  publishedAt: string
+  modifiedAt: string
+  authorName: string
+  keywords: string[]
 }): WithContext<BlogPosting> {
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: a.title,
     description: a.description,
-    datePublished: a.date,
-    dateModified: a.date,
-    url: `${BASE}/artikel/${a.slug}`,
-    image: `${BASE}/opengraph-image`,
-    author: { "@type": "Organization", name: "geraiakun", url: BASE },
+    datePublished: a.publishedAt,
+    dateModified: a.modifiedAt,
+    url: a.url,
+    image: [a.image],
+    inLanguage: a.locale === "en" ? "en-US" : "id-ID",
+    keywords: a.keywords,
+    author: { "@type": "Organization", name: a.authorName, url: BASE },
     publisher: {
       "@type": "Organization",
       name: "geraiakun",
       logo: { "@type": "ImageObject", url: `${BASE}/icon.png` },
     },
-    mainEntityOfPage: `${BASE}/artikel/${a.slug}`,
+    mainEntityOfPage: a.url,
   }
 }
 
@@ -157,12 +164,5 @@ function safeJsonLd(data: object) {
 }
 
 export function JsonLd({ data, id }: { data: object; id: string }) {
-  return (
-    <Script
-      id={id}
-      type="application/ld+json"
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: required for JSON-LD
-      dangerouslySetInnerHTML={{ __html: safeJsonLd(data) }}
-    />
-  )
+  return <JsonLdScript id={id} html={safeJsonLd(data)} />
 }

@@ -1,87 +1,95 @@
 "use client"
 
-import { useLocale, useTranslations } from "next-intl"
+import Image from "next/image"
+import { useLocale } from "next-intl"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Link } from "@/i18n/navigation"
-import { bgFor } from "@/lib/accent"
-import { useArticles } from "@/lib/api/queries"
+import type { LocalizedArticle } from "@/lib/server/articles"
 import { cn, formatDate } from "@/lib/utils"
 
-const ACCENTS = ["accent-cyan", "accent-lime", "accent-pink", "accent-purple"]
-const EMOJIS = ["🎓", "🤖", "🔐", "⚡"]
+const categoryLabels = {
+  guides: { id: "Panduan", en: "Guides" },
+  comparisons: { id: "Perbandingan", en: "Comparisons" },
+  security: { id: "Keamanan", en: "Security" },
+  developers: { id: "Developer", en: "Developers" },
+} as const
 
-export function ArticleList() {
-  const t = useTranslations("blog")
-  const isEn = useLocale() === "en"
-  const [cat, setCat] = useState("all")
-
-  const { data: articles = [] as any[] } = useArticles()
-
-  const cats: string[] = Array.from(new Set(articles.map((a: any) => a.category)))
-  const list = cat === "all" ? articles : articles.filter((a: any) => a.category === cat)
-
-  const filters = [
-    { value: "all", label: isEn ? "All" : "Semua" },
-    ...cats.map((c: string) => ({ value: c, label: c })),
-  ]
+export function ArticleList({ articles }: { articles: LocalizedArticle[] }) {
+  const locale = useLocale() === "en" ? "en" : "id"
+  const [category, setCategory] = useState("all")
+  const categories = Array.from(new Set(articles.map((article) => article.category)))
+  const visible =
+    category === "all" ? articles : articles.filter((article) => article.category === category)
 
   if (articles.length === 0) {
     return (
       <p className="py-8 text-center text-foreground/60">
-        {isEn ? "No articles yet." : "Belum ada artikel."}
+        {locale === "en" ? "No articles yet." : "Belum ada artikel."}
       </p>
     )
   }
 
   return (
     <>
-      <div className="mt-6 flex flex-wrap gap-2">
-        {filters.map((f) => (
-          <button
-            key={f.value}
-            type="button"
-            onClick={() => setCat(f.value)}
-            aria-pressed={cat === f.value}
-            className={cn(
-              "rounded-base border-2 border-border px-3.5 py-1.5 font-heading text-sm font-bold transition-all",
-              cat === f.value
-                ? "bg-main text-main-foreground shadow-shadow-sm"
-                : "bg-secondary-background hover:-translate-y-0.5",
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((a: any, i: number) => (
-          <Link
-            key={a.slug}
-            href={`/artikel/${a.slug}`}
-            className="group flex flex-col overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow transition-shadow hover:shadow-shadow-lg"
-          >
-            <div
+      <fieldset className="mt-7 flex flex-wrap gap-2">
+        <legend className="sr-only">
+          {locale === "en" ? "Article categories" : "Kategori artikel"}
+        </legend>
+        {["all", ...categories].map((value) => {
+          const label =
+            value === "all"
+              ? locale === "en"
+                ? "All"
+                : "Semua"
+              : (categoryLabels[value as keyof typeof categoryLabels]?.[locale] ?? value)
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setCategory(value)}
+              aria-pressed={category === value}
               className={cn(
-                "flex aspect-[16/9] items-center justify-center border-b-2 border-border text-6xl",
-                bgFor(ACCENTS[i % ACCENTS.length]),
+                "rounded-base border-2 border-border px-3.5 py-1.5 font-heading text-sm font-bold transition-all",
+                category === value
+                  ? "bg-main text-main-foreground shadow-shadow-sm"
+                  : "bg-secondary-background hover:-translate-y-0.5",
               )}
             >
-              {EMOJIS[i % EMOJIS.length]}
+              {label}
+            </button>
+          )
+        })}
+      </fieldset>
+
+      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((article, index) => (
+          <Link
+            key={article.key}
+            href={`/artikel/${article.slug}`}
+            className="group flex min-w-0 flex-col overflow-hidden rounded-base border-2 border-border bg-secondary-background shadow-shadow transition-all hover:-translate-y-1 hover:shadow-shadow-lg"
+          >
+            <div className="relative aspect-video overflow-hidden border-b-2 border-border bg-main/10">
+              <Image
+                src={article.coverImage}
+                alt=""
+                fill
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : undefined}
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
             </div>
             <div className="flex flex-1 flex-col gap-2 p-5">
-              <div className="flex items-center gap-2 text-xs text-foreground/60">
-                <Badge variant="neutral">{a.category}</Badge>
-              </div>
-              <h2 className="font-heading text-lg font-bold leading-snug">
-                {a.title}
-              </h2>
-              <p className="line-clamp-2 text-sm text-foreground/70">
-                {a.excerpt}
-              </p>
-              <span className="mt-auto pt-2 text-xs text-foreground/60">
-                {formatDate(a.publishedAt, isEn ? "en-US" : "id-ID")}
+              <Badge variant="neutral" className="w-fit">
+                {categoryLabels[article.category as keyof typeof categoryLabels]?.[locale] ??
+                  article.category}
+              </Badge>
+              <h2 className="font-heading text-lg font-bold leading-snug">{article.title}</h2>
+              <p className="line-clamp-3 text-sm leading-6 text-foreground/70">{article.excerpt}</p>
+              <span className="mt-auto pt-3 text-xs text-foreground/60">
+                {formatDate(article.publishedAt, locale === "en" ? "en-US" : "id-ID")} ·{" "}
+                {article.readMinutes} {locale === "en" ? "min read" : "menit baca"}
               </span>
             </div>
           </Link>

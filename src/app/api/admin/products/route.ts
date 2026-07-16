@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 
 export const runtime = "nodejs"
 
@@ -18,7 +19,10 @@ const createProductSchema = z.object({
   image: z.string().optional().default(""),
   logo: z.string().optional().default(""),
   accent: z.string().optional().default("#000000"),
-  badges: z.array(z.enum(["BESTSELLER", "NEW", "PROMO", "RARE"])).optional().default([]),
+  badges: z
+    .array(z.enum(["BESTSELLER", "NEW", "PROMO", "RARE"]))
+    .optional()
+    .default([]),
   features: z.array(z.string()).optional().default([]),
   featuresEn: z.array(z.string()).optional().default([]),
   featured: z.boolean().optional().default(false),
@@ -72,6 +76,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -82,7 +88,10 @@ export async function POST(request: Request) {
 
   const parsed = createProductSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const body = parsed.data
 

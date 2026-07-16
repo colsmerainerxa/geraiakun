@@ -2,8 +2,7 @@
 
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query"
 import { fakeApi, type ProductQuery } from "@/lib/mock/fake-api"
-import type { Order } from "@/types"
-import type { PaymentMethod } from "@/types"
+import type { AdminRole, AdminStaff, Order, PaymentMethod } from "@/types"
 import type { PaymentAttempt } from "@/types/enterprise"
 
 async function fetchJson<T>(url: string, fallback: () => Promise<T>): Promise<T> {
@@ -34,7 +33,6 @@ export const qk = {
   product: (slug: string) => ["product", slug] as const,
   featured: ["featured"] as const,
   related: (slug: string) => ["related", slug] as const,
-  testimonials: ["testimonials"] as const,
   banners: ["banners"] as const,
   orders: ["orders"] as const,
   order: (invoice: string) => ["order", invoice] as const,
@@ -44,6 +42,8 @@ export const qk = {
   credentials: ["credentials"] as const,
   dashboard: ["dashboard-stats"] as const,
   currentUserOrders: ["account", "orders"] as const,
+  accountProfile: ["account", "profile"] as const,
+  trustedDevices: ["account", "trusted-devices"] as const,
   userRefunds: ["account", "refunds"] as const,
   userWishlist: ["account", "wishlist"] as const,
   adminResellers: ["admin", "resellers"] as const,
@@ -95,19 +95,17 @@ export function useRelated(slug: string) {
   })
 }
 
-export function useTestimonials() {
-  return useQuery({
-    queryKey: qk.testimonials,
-    queryFn: fakeApi.getTestimonials,
-  })
-}
-
 export function useBanners() {
   return useQuery({ queryKey: qk.banners, queryFn: fakeApi.getBanners })
 }
 
 // ---- Admin ----
-export function useAdminOrders(filters?: { page?: number; limit?: number; search?: string; status?: string }) {
+export function useAdminOrders(filters?: {
+  page?: number
+  limit?: number
+  search?: string
+  status?: string
+}) {
   const params = new URLSearchParams()
   if (filters?.page) params.set("page", String(filters.page))
   if (filters?.limit) params.set("limit", String(filters.limit))
@@ -124,7 +122,12 @@ export function useAdminOrders(filters?: { page?: number; limit?: number; search
   })
 }
 
-export function useAdminTickets(filters?: { page?: number; limit?: number; status?: string; search?: string }) {
+export function useAdminTickets(filters?: {
+  page?: number
+  limit?: number
+  status?: string
+  search?: string
+}) {
   const params = new URLSearchParams()
   if (filters?.page) params.set("page", String(filters.page))
   if (filters?.limit) params.set("limit", String(filters.limit))
@@ -141,7 +144,12 @@ export function useAdminTickets(filters?: { page?: number; limit?: number; statu
   })
 }
 
-export function useAdminRefunds(filters?: { page?: number; limit?: number; status?: string; search?: string }) {
+export function useAdminRefunds(filters?: {
+  page?: number
+  limit?: number
+  status?: string
+  search?: string
+}) {
   const params = new URLSearchParams()
   if (filters?.page) params.set("page", String(filters.page))
   if (filters?.limit) params.set("limit", String(filters.limit))
@@ -158,7 +166,12 @@ export function useAdminRefunds(filters?: { page?: number; limit?: number; statu
   })
 }
 
-export function useAdminCustomers(filters?: { page?: number; limit?: number; search?: string; status?: string }) {
+export function useAdminCustomers(filters?: {
+  page?: number
+  limit?: number
+  search?: string
+  status?: string
+}) {
   const params = new URLSearchParams()
   if (filters?.page) params.set("page", String(filters.page))
   if (filters?.limit) params.set("limit", String(filters.limit))
@@ -175,7 +188,13 @@ export function useAdminCustomers(filters?: { page?: number; limit?: number; sea
   })
 }
 
-export function useAdminProducts(filters?: { page?: number; limit?: number; search?: string; category?: string; active?: boolean }) {
+export function useAdminProducts(filters?: {
+  page?: number
+  limit?: number
+  search?: string
+  category?: string
+  active?: boolean
+}) {
   const params = new URLSearchParams()
   if (filters?.page) params.set("page", String(filters.page))
   if (filters?.limit) params.set("limit", String(filters.limit))
@@ -193,7 +212,11 @@ export function useAdminProducts(filters?: { page?: number; limit?: number; sear
   })
 }
 
-export function useAdminCredentials(filters?: { productId?: string; variantId?: string; status?: string }) {
+export function useAdminCredentials(filters?: {
+  productId?: string
+  variantId?: string
+  status?: string
+}) {
   const params = new URLSearchParams()
   if (filters?.productId) params.set("productId", filters.productId)
   if (filters?.variantId) params.set("variantId", filters.variantId)
@@ -241,10 +264,43 @@ export function useAdminTeam() {
     queryKey: ["admin", "team"],
     queryFn: async () => {
       const r = await fetch("/api/admin/team")
-      if (!r.ok) return []
-      return r.json()
+      if (!r.ok) return [] as AdminStaff[]
+      const members = (await r.json()) as Array<{
+        id: string
+        userId: string
+        role: string
+        status: string
+        twoFactorEnabled: boolean
+        lastActiveAt: string | null
+        user: { name: string | null; email: string | null }
+      }>
+      return members.map(
+        (member): AdminStaff => ({
+          id: member.userId,
+          name: member.user.name ?? "Staf",
+          email: member.user.email ?? "",
+          role: isAdminTeamRole(member.role) ? member.role : "owner",
+          status: isAdminTeamStatus(member.status) ? member.status : "suspended",
+          twoFactorEnabled: member.twoFactorEnabled,
+          lastActiveAt: member.lastActiveAt,
+        }),
+      )
     },
   })
+}
+
+function isAdminTeamRole(value: string): value is AdminRole {
+  return (
+    value === "owner" ||
+    value === "operations" ||
+    value === "customer-support" ||
+    value === "finance" ||
+    value === "marketing"
+  )
+}
+
+function isAdminTeamStatus(value: string): value is AdminStaff["status"] {
+  return value === "active" || value === "invited" || value === "suspended"
 }
 
 export function useAdminAudit(filters?: { page?: number; limit?: number; module?: string }) {
@@ -344,13 +400,14 @@ export function useFlashSale() {
 }
 
 // ---- Articles ----
-export function useArticles(category?: string, limit?: number) {
+export function useArticles(locale: "id" | "en", category?: string, limit?: number) {
   const params = new URLSearchParams()
+  params.set("locale", locale)
   if (category) params.set("category", category)
   if (limit) params.set("limit", String(limit))
   const qs = params.toString()
   return useQuery({
-    queryKey: ["articles", category ?? "all", limit ?? "all"],
+    queryKey: ["articles", locale, category ?? "all", limit ?? "all"],
     queryFn: async () => {
       const r = await fetch(`/api/articles${qs ? `?${qs}` : ""}`)
       if (!r.ok) return []
@@ -359,11 +416,12 @@ export function useArticles(category?: string, limit?: number) {
   })
 }
 
-export function useArticle(slug: string) {
+export function useArticle(locale: "id" | "en", slug: string) {
   return useQuery({
-    queryKey: ["article", slug],
+    queryKey: ["article", locale, slug],
     queryFn: async () => {
-      const r = await fetch(`/api/articles?slug=${slug}`)
+      const params = new URLSearchParams({ locale, slug })
+      const r = await fetch(`/api/articles?${params}`)
       if (!r.ok) return null
       return r.json()
     },
@@ -468,13 +526,49 @@ export function useAdminRisk(status?: string, risk?: string) {
 }
 
 // ---- Account Profile ----
+export type AccountProfile = {
+  name: string
+  email: string
+  image: string
+  emailVerified: boolean
+  whatsapp: string
+  notifications: {
+    orderUpdates: boolean
+    promos: boolean
+    ticketReplies: boolean
+    newsletter: boolean
+  }
+}
+
 export function useAccountProfile() {
-  return useQuery({
-    queryKey: ["account", "profile"],
+  return useQuery<AccountProfile>({
+    queryKey: qk.accountProfile,
     queryFn: async () => {
-      const r = await fetch("/api/account/profile")
-      if (!r.ok) return null
-      return r.json()
+      const response = await fetch("/api/account/profile", { cache: "no-store" })
+      if (!response.ok) throw new Error("Account profile request failed")
+      return response.json()
+    },
+  })
+}
+
+export type TrustedDeviceView = {
+  id: string
+  label: string
+  current: boolean
+  status: "active" | "expired" | "revoked"
+  createdAt: string
+  lastUsedAt: string
+  expiresAt: string
+  revokedAt: string | null
+}
+
+export function useTrustedDevices() {
+  return useQuery<TrustedDeviceView[]>({
+    queryKey: qk.trustedDevices,
+    queryFn: async () => {
+      const response = await fetch("/api/account/devices", { cache: "no-store" })
+      if (!response.ok) throw new Error("Trusted devices request failed")
+      return response.json()
     },
   })
 }

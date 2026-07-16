@@ -3,16 +3,11 @@
 import { z } from "zod"
 import { auth } from "@/auth"
 import type { Prisma } from "@/generated/prisma/client"
-import { products as mockProducts } from "@/lib/mock/products"
-import { getPromo as getMockPromo } from "@/lib/mock/transactions"
-import { computeDiscount } from "@/lib/promo"
 import { backendFlags } from "@/lib/server/env"
 import { createMidtransCharge, demoPaymentCode } from "@/lib/server/midtrans"
 import { prisma } from "@/lib/server/prisma"
 import { serializeOrder, serializePaymentAttempt } from "@/lib/server/serializers"
 import { paymentMethodToDb } from "@/lib/server/status"
-import type { Order, Promo } from "@/types"
-import type { PaymentAttempt } from "@/types/enterprise"
 
 const FEE = 1000
 
@@ -65,66 +60,6 @@ function promoDiscount(
   return Math.min(capped, subtotal)
 }
 
-function demoCheckout(input: CheckoutActionInput): { order: Order; payment: PaymentAttempt } {
-  const invoice = makeInvoice()
-  const now = new Date()
-  const items = input.items.map((item) => {
-    const product = mockProducts.find((candidate) => candidate.id === item.productId)
-    const variant = product?.variants.find((candidate) => candidate.id === item.variantId)
-    if (!product || !variant) throw new Error("Produk tidak ditemukan.")
-    return {
-      productId: product.id,
-      productName: product.name,
-      productLogo: product.logo,
-      variantId: variant.id,
-      variantLabel: variant.label,
-      price: variant.price,
-      qty: item.qty,
-    }
-  })
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0)
-  const promo = input.promoCode ? getMockPromo(input.promoCode) : null
-  const discount = computeDiscount((promo as Promo | null) ?? null, subtotal)
-  const total = subtotal - discount + FEE
-  const paymentCode = demoPaymentCode(invoice, input.paymentMethod)
-
-  return {
-    order: {
-      id: `ord-${invoice}`,
-      invoice,
-      customerName: input.customer.name,
-      customerEmail: input.customer.email,
-      whatsapp: input.customer.whatsapp,
-      items,
-      subtotal,
-      discount,
-      fee: FEE,
-      total,
-      status: "menunggu-pembayaran",
-      paymentMethod: input.paymentMethod,
-      createdAt: now.toISOString(),
-      paidAt: null,
-      credentials: [],
-    },
-    payment: {
-      id: `pay-${invoice}`,
-      invoice,
-      method: input.paymentMethod,
-      status: "pending",
-      amount: total,
-      paymentCode,
-      qrPayload:
-        input.paymentMethod === "qris"
-          ? `00020101021226670016ID.GERAIAKUN.WWW0118${invoice}520458125303360540${total}5802ID`
-          : null,
-      expiresAt: expiresAt().toISOString(),
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-      failureReason: null,
-    },
-  }
-}
-
 export async function createCheckoutOrder(input: CheckoutActionInput) {
   const parsed = checkoutSchema.safeParse(input)
   if (!parsed.success) {
@@ -137,7 +72,7 @@ export async function createCheckoutOrder(input: CheckoutActionInput) {
   }
 
   if (!backendFlags.databaseConfigured) {
-    return demoCheckout(parsed.data)
+    throw new Error("Database belum dikonfigurasi.")
   }
 
   const invoice = makeInvoice()

@@ -112,6 +112,6 @@ export const usePayments = create<PaymentState>()(
           ),
         })),
     }),
-    { name: "geraiakun-payments" },
+    { name: "geraiakun-payments-v2" },
   ),
 )

@@ -7,7 +7,7 @@ import { useState } from "react"
 import { ThemeProvider } from "@/components/shared/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children, nonce }: { children: React.ReactNode; nonce?: string }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -24,7 +24,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        disableTransitionOnChange
+        nonce={nonce}
+      >
         {/* reducedMotion="user" makes ALL framer-motion animations respect
             prefers-reduced-motion (the CSS @media rule only covers CSS animations). */}
         <MotionConfig reducedMotion="user">{children}</MotionConfig>

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation"
 import { setRequestLocale } from "next-intl/server"
 import { ProductDetail } from "@/components/storefront/product-detail"
 import { routing } from "@/i18n/routing"
-import { reviewsForProduct } from "@/lib/mock/reviews"
 import { breadcrumbJsonLd, faqPageJsonLd, JsonLd, productJsonLd } from "@/lib/seo/json-ld"
 import { seoAlternates } from "@/lib/seo/site"
 import { getCatalogProduct, getCatalogProducts } from "@/lib/server/catalog"
@@ -25,7 +24,7 @@ function isDbUnavailable(error: unknown) {
 }
 
 async function getReviews(productId: string) {
-  if (!backendFlags.databaseConfigured) return reviewsForProduct(productId)
+  if (!backendFlags.databaseConfigured) return []
   try {
     const prisma = await getPrisma()
     const dbReviews = await prisma.review.findMany({
@@ -44,7 +43,7 @@ async function getReviews(productId: string) {
       verified: r.verified,
     }))
   } catch (error) {
-    if (isDbUnavailable(error)) return reviewsForProduct(productId)
+    if (isDbUnavailable(error)) return []
     throw error
   }
 }

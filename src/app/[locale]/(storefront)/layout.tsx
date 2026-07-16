@@ -1,11 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server"
+import { auth } from "@/auth"
 import { ScrollToTop } from "@/components/shared/scroll-to-top"
 import { CartDrawer } from "@/components/storefront/cart-drawer"
 import { CompareBar, CompareDrawer } from "@/components/storefront/compare"
 import { Footer } from "@/components/storefront/footer"
 import { MobileBottomNav } from "@/components/storefront/mobile-bottom-nav"
 import { Navbar } from "@/components/storefront/navbar"
-import { SocialProofToast } from "@/components/storefront/social-proof-toast"
 import { WhatsAppWidget } from "@/components/storefront/whatsapp-widget"
 
 export default async function StorefrontLayout({
@@ -17,7 +17,7 @@ export default async function StorefrontLayout({
 }) {
   const { locale } = await params
   setRequestLocale(locale)
-  const t = await getTranslations("common")
+  const [t, session] = await Promise.all([getTranslations("common"), auth()])
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -27,7 +27,15 @@ export default async function StorefrontLayout({
       >
         {t("skipToContent")}
       </a>
-      <Navbar />
+      <Navbar
+        user={
+          session?.user
+            ? {
+                name: session.user.name ?? null,
+              }
+            : null
+        }
+      />
       <main id="main" className="flex-1">
         {children}
       </main>
@@ -36,7 +44,6 @@ export default async function StorefrontLayout({
       <CompareDrawer />
       <CompareBar />
       <MobileBottomNav />
-      <SocialProofToast />
       <WhatsAppWidget />
       <ScrollToTop />
     </div>

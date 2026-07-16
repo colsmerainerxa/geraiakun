@@ -95,7 +95,7 @@ export async function updateCustomerProfile(input: z.input<typeof updateProfileS
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const data: Prisma.CustomerProfileUpdateInput = {}
   if (parsed.data.status) data.status = parsed.data.status

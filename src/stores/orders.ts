@@ -11,8 +11,7 @@ interface OrdersState {
   getByInvoice: (invoice: string) => Order | undefined
 }
 
-// Orders the user created at checkout (demo: no backend). Persisted so the
-// generated invoice is findable in /lacak across reloads.
+// Cache orders returned by checkout so the current browser can render immediately.
 export const usePurchasedOrders = create<OrdersState>()(
   persist(
     (set, get) => ({
@@ -30,6 +29,6 @@ export const usePurchasedOrders = create<OrdersState>()(
       getByInvoice: (invoice) =>
         get().orders.find((o) => o.invoice.toLowerCase() === invoice.toLowerCase()),
     }),
-    { name: "geraiakun-orders" },
+    { name: "geraiakun-orders-v2" },
   ),
 )

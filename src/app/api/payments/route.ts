@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import type { Prisma } from "@/generated/prisma/client"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import type { Prisma } from "@/generated/prisma/client"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { createMidtransCharge, demoPaymentCode } from "@/lib/server/midtrans"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
 import { serializePaymentAttempt } from "@/lib/server/serializers"
 import { paymentMethodToDb } from "@/lib/server/status"
 import type { PaymentMethod } from "@/types"
@@ -37,6 +38,8 @@ function demoAttempt(invoice: string, method: PaymentMethod, amount = 0) {
 }
 
 export async function POST(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -44,7 +47,10 @@ export async function POST(request: Request) {
 
   const parsed = postSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { invoice, method } = parsed.data as { invoice: string; method: PaymentMethod }
 

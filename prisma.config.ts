@@ -1,5 +1,7 @@
-import "dotenv/config"
+import { loadEnvConfig } from "@next/env"
 import { defineConfig } from "prisma/config"
+
+loadEnvConfig(process.cwd())
 
 const fallbackDatabaseUrl =
   "postgresql://geraiakun:geraiakun@localhost:5432/geraiakun?schema=public"

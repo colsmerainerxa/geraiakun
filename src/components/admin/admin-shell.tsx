@@ -38,11 +38,11 @@ import {
 } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Link, usePathname } from "@/i18n/navigation"
+import { useAdminTeam } from "@/lib/api/queries"
 import { cn, initials } from "@/lib/utils"
 import { levelForXp, levelProgress, useAdminGamification } from "@/stores/admin-gamification"
 import { ADMIN_ROLE_LABELS, roleCan } from "@/stores/enterprise-admin"
-import { useAdminTeam } from "@/lib/api/queries"
-import type { AdminPermission } from "@/types"
+import type { AdminPermission, AdminRole } from "@/types"
 
 interface NavItem {
   href: string
@@ -133,7 +133,7 @@ function useActive() {
 }
 
 function useStaffFromApi() {
-  const { data: staff = [] as any[] } = useAdminTeam()
+  const { data: staff = [] } = useAdminTeam()
   const [activeStaffId, setActiveStaffId] = useState("")
   const currentId = activeStaffId || staff[0]?.id || ""
   return { staff, activeStaffId: currentId, setActiveStaff: setActiveStaffId }
@@ -142,7 +142,7 @@ function useStaffFromApi() {
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const isActive = useActive()
   const { staff, activeStaffId } = useStaffFromApi()
-  const role = staff.find((member: any) => member.id === activeStaffId)?.role ?? "owner"
+  const role = staff.find((member) => member.id === activeStaffId)?.role ?? "owner"
 
   return (
     <nav className="flex flex-col gap-5" aria-label="Navigasi admin">
@@ -210,8 +210,8 @@ function RoleSwitcher() {
         </SelectTrigger>
         <SelectContent>
           {staff
-            .filter((member: any) => member.status !== "suspended")
-            .map((member: any) => (
+            .filter((member) => member.status !== "suspended")
+            .map((member) => (
               <SelectItem key={member.id} value={member.id}>
                 {member.name} - {ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}
               </SelectItem>
@@ -284,12 +284,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const { staff, activeStaffId } = useStaffFromApi()
-  const member = staff.find((item: any) => item.id === activeStaffId) ?? staff[0]
+  const member = staff.find((item) => item.id === activeStaffId) ??
+    staff[0] ?? { name: "Admin", role: "owner" }
   const current = NAV.find((item) =>
     item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href),
   )
   const title = current?.label ?? "Dashboard"
-  const allowed = current ? roleCan(member.role, current.permission) : true
+  const role = (member?.role ?? "owner") as AdminRole
+  const allowed = current ? roleCan(role, current.permission) : true
 
   return (
     <div className="flex min-h-dvh bg-background">
@@ -334,14 +336,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </Avatar>
               <div className="hidden sm:block">
                 <p className="text-xs font-bold leading-tight">{member.name}</p>
-                <p className="text-[10px] text-foreground/60">{ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}</p>
+                <p className="text-[10px] text-foreground/60">
+                  {ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]}
+                </p>
               </div>
             </div>
           </div>
         </header>
 
         <main id="admin-content" tabIndex={-1} className="min-w-0 flex-1 p-4 outline-none sm:p-6">
-          {allowed ? children : <PermissionDenied role={ADMIN_ROLE_LABELS[member.role as keyof typeof ADMIN_ROLE_LABELS]} />}
+          {allowed ? children : <PermissionDenied role={ADMIN_ROLE_LABELS[role]} />}
         </main>
       </div>
     </div>

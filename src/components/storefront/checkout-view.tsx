@@ -309,11 +309,11 @@ export function CheckoutView() {
             <div>
               <h2 className="font-heading text-lg font-extrabold">Status pembayaran</h2>
               <p className="text-sm text-foreground/60">
-                Demo UI: pembayaran terkonfirmasi dan credential masuk antrian delivery.
+                Instruksi pembayaran dibuat dan pesanan menunggu konfirmasi gateway.
               </p>
             </div>
             <span className="rounded-base border-2 border-border bg-accent-lime px-3 py-1 font-heading text-xs font-bold shadow-shadow-sm">
-              Paid
+              Menunggu Pembayaran
             </span>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-4">
@@ -526,7 +526,6 @@ export function CheckoutView() {
             </div>
           </section>
 
-          <CheckoutAssurancePanel method={method} />
         </div>
 
         {/* Summary */}

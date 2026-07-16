@@ -96,7 +96,7 @@ export async function updateOrderStatus(invoice: string, status: string) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const order = await prisma.order.update({
     where: { invoice },

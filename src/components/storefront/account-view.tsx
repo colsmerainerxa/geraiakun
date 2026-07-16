@@ -2,7 +2,6 @@
 
 import {
   ArrowRight,
-  Gift,
   KeyRound,
   Package,
   ShieldCheck,
@@ -20,12 +19,9 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMounted } from "@/hooks/use-mounted"
 import { Link } from "@/i18n/navigation"
-import { useCurrentUserOrders } from "@/lib/api/queries"
-import { useProducts } from "@/lib/api/queries"
-import { cn, formatDate, formatIDR, formatNumber, initials } from "@/lib/utils"
-import { getTier, useLoyalty } from "@/stores/loyalty"
+import { useAccountProfile, useCurrentUserOrders, useProducts } from "@/lib/api/queries"
+import { cn, formatDate, formatIDR, initials } from "@/lib/utils"
 import { usePurchasedOrders } from "@/stores/orders"
-import { useUser } from "@/stores/user"
 import { useWishlist } from "@/stores/wishlist"
 import type { OrderStatus } from "@/types"
 
@@ -44,12 +40,17 @@ function maskEmail(email: string) {
   return `${visible}${"*".repeat(Math.max(local.length - 2, 3))}@${domain}`
 }
 
-export function AccountView() {
+type AccountIdentity = {
+  name: string
+  email: string
+  image: string | null
+}
+
+export function AccountView({ initialUser }: { initialUser: AccountIdentity }) {
   const t = useTranslations("account")
   const ts = useTranslations("orderStatus")
   const tw = useTranslations("wishlist")
   const mounted = useMounted()
-  const profile = useUser((s) => s.profile)
   const wishedSlugs = useWishlist((s) => s.slugs)
   const { data: allProducts } = useProducts()
   const wished = mounted
@@ -61,6 +62,7 @@ export function AccountView() {
   const dateLocale = locale === "en" ? "en-US" : "id-ID"
   const localOrders = usePurchasedOrders((s) => s.orders)
   const { data: orders, isLoading } = useCurrentUserOrders()
+  const { data: accountProfile } = useAccountProfile()
 
   const list = orders?.length ? orders : mounted ? localOrders : []
   const totalOrders = list.length
@@ -68,9 +70,13 @@ export function AccountView() {
   const totalSpent = list.filter((o) => o.paidAt).reduce((s, o) => s + o.total, 0)
 
   const delivered = list.filter((o) => o.credentials.length > 0)
-  const loyaltyPoints = useLoyalty((s) => s.points)
-  const loyaltyLifetime = useLoyalty((s) => s.lifetimeEarned)
-  const loyaltyTier = mounted ? getTier(loyaltyLifetime) : null
+  const displayName =
+    accountProfile?.name?.trim() ||
+    initialUser.name.trim() ||
+    accountProfile?.email?.split("@")[0] ||
+    initialUser.email.split("@")[0] ||
+    "Pelanggan"
+  const displayImage = accountProfile ? accountProfile.image || null : initialUser.image
 
   const stats = [
     {
@@ -99,13 +105,13 @@ export function AccountView() {
       <Reveal>
         <div className="flex items-center gap-4 rounded-base border-2 border-border bg-secondary-background p-6 shadow-shadow">
           <Avatar className="size-16">
-            {mounted && profile.avatar && <AvatarImage src={profile.avatar} alt={profile.name} />}
-            <AvatarFallback>{initials(mounted ? profile.name : "Rafa Pratama")}</AvatarFallback>
+            {displayImage && <AvatarImage src={displayImage} alt={displayName} />}
+            <AvatarFallback>{initials(displayName)}</AvatarFallback>
           </Avatar>
           <div>
             <p className="text-sm text-foreground/60">{t("greeting")},</p>
             <h1 className="font-heading text-2xl font-extrabold sm:text-3xl">
-              {mounted ? profile.name : "Rafa Pratama"}
+              {displayName}
             </h1>
           </div>
         </div>
@@ -135,31 +141,6 @@ export function AccountView() {
           </div>
         ))}
       </div>
-
-      {/* Loyalty banner */}
-      {mounted && loyaltyTier && (
-        <Reveal>
-          <Link
-            href="/reward"
-            className="group flex flex-wrap items-center justify-between gap-4 rounded-base border-2 border-border bg-accent-purple p-5 shadow-shadow transition-all hover:-translate-y-0.5 hover:shadow-shadow-lg"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex size-11 items-center justify-center rounded-base border-2 border-border bg-secondary-background shadow-shadow-sm">
-                <Gift className="size-5" />
-              </span>
-              <div>
-                <p className="font-heading text-sm font-extrabold">
-                  {loyaltyTier.name} - {formatNumber(loyaltyPoints)} poin
-                </p>
-                <p className="text-xs text-foreground/70">{loyaltyTier.perk}</p>
-              </div>
-            </div>
-            <span className="inline-flex items-center gap-1 rounded-base border-2 border-border bg-secondary-background px-3 py-1.5 font-heading text-xs font-bold transition-all group-hover:bg-main">
-              {t("redeemPoints")} <ArrowRight className="size-3.5" />
-            </span>
-          </Link>
-        </Reveal>
-      )}
 
       {/* Tabs */}
       <Tabs defaultValue="orders">

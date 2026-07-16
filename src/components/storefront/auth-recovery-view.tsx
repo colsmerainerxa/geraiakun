@@ -22,17 +22,15 @@ import {
   resetPassword,
   verifyEmailToken,
 } from "@/app/actions/auth"
+import { AuthChallenge } from "@/components/storefront/auth-challenge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link } from "@/i18n/navigation"
 import { cn } from "@/lib/utils"
-import { useUser } from "@/stores/user"
 
 type RecoveryMode = "forgot" | "reset" | "verify"
 type ViewState = "idle" | "loading" | "sent" | "success"
-
-const emailSchema = z.string().email()
 
 export function AuthRecoveryView({
   mode,
@@ -43,19 +41,19 @@ export function AuthRecoveryView({
   expired?: boolean
   token?: string | null
 }) {
-  const isEn = useLocale() === "en"
-  const profile = useUser((state) => state.profile)
-  const emailVerified = useUser((state) => state.emailVerified)
-  const setEmailVerified = useUser((state) => state.setEmailVerified)
-  const [state, setState] = useState<ViewState>(
-    emailVerified && mode === "verify" ? "success" : "idle",
-  )
-  const [email, setEmail] = useState(profile.email)
+  const locale = useLocale() === "en" ? "en" : "id"
+  const isEn = locale === "en"
+  const [state, setState] = useState<ViewState>("idle")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
-  const [actionToken, setActionToken] = useState(token ?? "")
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState(
+    expired ? (isEn ? "This link has expired." : "Tautan sudah kedaluwarsa.") : "",
+  )
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [challengeReset, setChallengeReset] = useState(0)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const content = {
     forgot: {
@@ -69,54 +67,63 @@ export function AuthRecoveryView({
       icon: LockKeyhole,
       title: isEn ? "Create a new password" : "Buat Kata Sandi Baru",
       body: isEn
-        ? "Use at least eight characters with a number."
-        : "Gunakan minimal delapan karakter dan sertakan angka.",
+        ? "Use at least 12 characters with a letter and number."
+        : "Gunakan minimal 12 karakter dengan huruf dan angka.",
     },
     verify: {
       icon: MailCheck,
       title: isEn ? "Verify your email" : "Verifikasi Email",
       body: isEn
-        ? "Confirm your email before accessing account and purchase history."
-        : "Konfirmasi email sebelum mengakses akun dan riwayat pembelian.",
+        ? "Use the secure email link before signing in."
+        : "Gunakan tautan email yang aman sebelum masuk.",
     },
   }[mode]
   const Icon = content.icon
 
-  async function submitEmail(event: React.FormEvent) {
+  function resetChallenge() {
+    setTurnstileToken(null)
+    setChallengeReset((value) => value + 1)
+  }
+
+  async function requestLink(event: React.FormEvent) {
     event.preventDefault()
     setError("")
-    if (!emailSchema.safeParse(email).success) {
+    if (!z.email().safeParse(email.trim()).success) {
       setError(isEn ? "Enter a valid email address." : "Masukkan alamat email yang valid.")
       return
     }
+    if (!turnstileToken) {
+      setError(isEn ? "Complete the security verification." : "Selesaikan verifikasi keamanan.")
+      return
+    }
+
     setState("loading")
-    const result = await requestPasswordReset(email)
+    const input = { email, turnstileToken, locale } as const
+    const result =
+      mode === "verify" ? await requestEmailVerification(input) : await requestPasswordReset(input)
+    resetChallenge()
     if (!result.ok) {
       setState("idle")
       setError(result.message)
       return
     }
-    if ("token" in result && typeof result.token === "string") setActionToken(result.token)
+    setPreviewUrl(result.previewUrl)
     setState("sent")
-    toast.success(isEn ? "Reset link sent" : "Tautan reset dikirim")
+    toast.success(result.message)
   }
 
   async function submitPassword(event: React.FormEvent) {
     event.preventDefault()
     setError("")
-    if (!actionToken) {
-      setError(
-        isEn
-          ? "Open the reset link from your email first."
-          : "Buka tautan reset dari email terlebih dahulu.",
-      )
+    if (!token) {
+      setError(isEn ? "Open the reset link from your email." : "Buka tautan reset dari email.")
       return
     }
-    if (password.length < 8 || !/\d/.test(password)) {
+    if (password.length < 12 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
       setError(
         isEn
-          ? "Use at least 8 characters and one number."
-          : "Gunakan minimal 8 karakter dan satu angka.",
+          ? "Use at least 12 characters with a letter and number."
+          : "Gunakan minimal 12 karakter dengan huruf dan angka.",
       )
       return
     }
@@ -124,60 +131,31 @@ export function AuthRecoveryView({
       setError(isEn ? "Passwords do not match." : "Konfirmasi kata sandi tidak cocok.")
       return
     }
+
     setState("loading")
-    const result = await resetPassword({ token: actionToken, password })
+    const result = await resetPassword({ token, password, locale })
     if (!result.ok) {
       setState("idle")
       setError(result.message)
       return
     }
     setState("success")
-    toast.success(isEn ? "Password updated" : "Kata sandi diperbarui")
+    toast.success(result.message)
   }
 
-  async function verifyEmail() {
-    setError("")
+  async function verifyToken() {
+    if (!token) return
     setState("loading")
-    if (actionToken) {
-      const result = await verifyEmailToken(actionToken)
-      if (!result.ok) {
-        setState("idle")
-        setError(result.message)
-        return
-      }
-      setEmailVerified(true)
-      setState("success")
-      toast.success(isEn ? "Email verified" : "Email berhasil diverifikasi")
-      return
-    }
-
-    const result = await requestEmailVerification(email || profile.email)
+    setError("")
+    const result = await verifyEmailToken(token, locale)
     if (!result.ok) {
       setState("idle")
       setError(result.message)
       return
     }
-    if ("token" in result && typeof result.token === "string") setActionToken(result.token)
-    setState("sent")
-    toast.success(isEn ? "Verification link sent" : "Tautan verifikasi dikirim")
+    setState("success")
+    toast.success(result.message)
   }
-
-  async function resend() {
-    setError("")
-    setState("loading")
-    const result =
-      mode === "verify" ? await requestEmailVerification(email) : await requestPasswordReset(email)
-    if (!result.ok) {
-      setState("idle")
-      setError(result.message)
-      return
-    }
-    if ("token" in result && typeof result.token === "string") setActionToken(result.token)
-    setState("sent")
-    toast.success(isEn ? "A new link has been sent" : "Tautan baru telah dikirim")
-  }
-
-  const invalidLink = expired && state !== "sent" && state !== "success"
 
   return (
     <div className="mx-auto w-full max-w-lg">
@@ -197,98 +175,41 @@ export function AuthRecoveryView({
         </div>
 
         <div className="p-6">
-          {invalidLink ? (
-            <div className="text-center">
-              <AlertTriangle className="mx-auto size-12 text-warning" />
-              <h2 className="mt-3 font-heading text-lg font-extrabold">
-                {isEn ? "This link has expired" : "Tautan Sudah Kedaluwarsa"}
-              </h2>
-              <p className="mt-1 text-sm text-foreground/60">
-                {isEn
-                  ? "Request a new secure link to continue."
-                  : "Minta tautan aman yang baru untuk melanjutkan."}
-              </p>
-              <Button className="mt-5" onClick={resend}>
-                <RefreshCcw className="size-4" /> {isEn ? "Send new link" : "Kirim Tautan Baru"}
-              </Button>
-            </div>
-          ) : state === "success" ? (
-            <div className="text-center">
-              <CheckCircle2 className="mx-auto size-14 text-success" />
-              <h2 className="mt-3 font-heading text-xl font-extrabold">
-                {mode === "verify"
-                  ? isEn
-                    ? "Email verified"
-                    : "Email Terverifikasi"
-                  : isEn
-                    ? "Password updated"
-                    : "Kata Sandi Diperbarui"}
-              </h2>
-              <p className="mt-1 text-sm text-foreground/60">
-                {isEn ? "Your account is ready to use." : "Akun Anda siap digunakan."}
-              </p>
-              <Button asChild className="mt-5">
-                <Link href={mode === "verify" ? "/akun" : "/masuk"}>
-                  {mode === "verify"
-                    ? isEn
-                      ? "Open account"
-                      : "Buka Akun"
-                    : isEn
-                      ? "Sign in"
-                      : "Masuk"}
-                </Link>
-              </Button>
-            </div>
-          ) : mode === "forgot" && state === "sent" ? (
+          {state === "success" ? (
+            <SuccessState mode={mode} isEn={isEn} />
+          ) : state === "sent" ? (
             <div className="text-center">
               <MailCheck className="mx-auto size-14 text-accent-cyan" />
               <h2 className="mt-3 font-heading text-xl font-extrabold">
-                {isEn ? "Check your inbox" : "Periksa Kotak Masuk"}
+                {isEn ? "Check your email" : "Periksa Email Kamu"}
               </h2>
               <p className="mt-1 text-sm text-foreground/60">
-                {isEn ? `A reset link was sent to ${email}.` : `Tautan reset dikirim ke ${email}.`}
+                {isEn
+                  ? "If the account is available, a secure link has been sent."
+                  : "Jika akun tersedia, tautan aman telah dikirim."}
               </p>
-              <div className="mt-5 flex justify-center gap-2">
-                <Button asChild>
-                  <Link
-                    href={
-                      actionToken
-                        ? `/reset-sandi?token=${encodeURIComponent(actionToken)}`
-                        : "/reset-sandi"
-                    }
-                  >
-                    {isEn ? "Open reset link" : "Buka Tautan Reset"}
-                  </Link>
+              {previewUrl && (
+                <Button asChild className="mt-5">
+                  <a href={previewUrl} target="_blank" rel="noopener noreferrer">
+                    {isEn ? "Open test email" : "Buka email pengujian"}
+                  </a>
                 </Button>
-                <Button variant="neutral" onClick={resend}>
-                  <RefreshCcw className="size-4" /> {isEn ? "Resend" : "Kirim Ulang"}
-                </Button>
-              </div>
-            </div>
-          ) : mode === "forgot" ? (
-            <form onSubmit={submitEmail} className="grid gap-4">
-              <div className="grid gap-1.5">
-                <Label htmlFor="recovery-email">Email</Label>
-                <Input
-                  id="recovery-email"
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  aria-invalid={Boolean(error)}
-                />
-              </div>
-              {error && <p className="text-sm font-bold text-danger">{error}</p>}
-              <Button type="submit" disabled={state === "loading"}>
-                {state === "loading" ? (
-                  <LoaderCircle className="size-4 animate-spin" />
-                ) : (
-                  <Send className="size-4" />
-                )}
-                {isEn ? "Send reset link" : "Kirim Tautan Reset"}
+              )}
+              <Button
+                variant="neutral"
+                className="mt-3 w-full"
+                onClick={() => {
+                  setState("idle")
+                  setPreviewUrl(null)
+                  resetChallenge()
+                }}
+              >
+                <RefreshCcw className="size-4" /> {isEn ? "Send another link" : "Kirim tautan lain"}
               </Button>
-            </form>
+            </div>
           ) : mode === "reset" ? (
             <form onSubmit={submitPassword} className="grid gap-4">
+              {expired && <ExpiredNotice isEn={isEn} />}
               <PasswordField
                 id="new-password"
                 label={isEn ? "New password" : "Kata sandi baru"}
@@ -305,7 +226,7 @@ export function AuthRecoveryView({
                 show={showPassword}
               />
               {error && <p className="text-sm font-bold text-danger">{error}</p>}
-              <Button type="submit" disabled={state === "loading"}>
+              <Button type="submit" disabled={state === "loading" || expired}>
                 {state === "loading" ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : (
@@ -314,18 +235,15 @@ export function AuthRecoveryView({
                 {isEn ? "Update password" : "Perbarui Kata Sandi"}
               </Button>
             </form>
-          ) : (
+          ) : mode === "verify" && token ? (
             <div className="text-center">
-              <p className="rounded-base border-2 border-dashed border-border bg-background p-4 font-heading text-sm font-bold">
-                {profile.email}
-              </p>
-              {state === "sent" && (
-                <p className="mt-3 text-sm font-bold text-accent-cyan">
-                  {isEn ? "Verification link has been sent." : "Tautan verifikasi sudah dikirim."}
-                </p>
-              )}
+              {expired && <ExpiredNotice isEn={isEn} />}
               {error && <p className="mt-3 text-sm font-bold text-danger">{error}</p>}
-              <Button className="mt-5" onClick={verifyEmail} disabled={state === "loading"}>
+              <Button
+                className="mt-5"
+                onClick={verifyToken}
+                disabled={state === "loading" || expired}
+              >
                 {state === "loading" ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : (
@@ -333,13 +251,80 @@ export function AuthRecoveryView({
                 )}
                 {isEn ? "Verify email" : "Verifikasi Email"}
               </Button>
-              <Button variant="ghost" className="mt-2 w-full" onClick={resend}>
-                {isEn ? "Send a new verification link" : "Kirim tautan verifikasi baru"}
-              </Button>
             </div>
+          ) : (
+            <form onSubmit={requestLink} className="grid gap-4">
+              {expired && <ExpiredNotice isEn={isEn} />}
+              <div className="grid gap-1.5">
+                <Label htmlFor="recovery-email">Email</Label>
+                <Input
+                  id="recovery-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  aria-invalid={Boolean(error)}
+                />
+              </div>
+              <AuthChallenge
+                action={mode === "verify" ? "verification_resend" : "password_reset"}
+                label={isEn ? "Security verification" : "Verifikasi keamanan"}
+                resetSignal={challengeReset}
+                onTokenChange={setTurnstileToken}
+              />
+              {error && <p className="text-sm font-bold text-danger">{error}</p>}
+              <Button type="submit" disabled={state === "loading"}>
+                {state === "loading" ? (
+                  <LoaderCircle className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4" />
+                )}
+                {mode === "verify"
+                  ? isEn
+                    ? "Send verification link"
+                    : "Kirim Tautan Verifikasi"
+                  : isEn
+                    ? "Send reset link"
+                    : "Kirim Tautan Reset"}
+              </Button>
+            </form>
           )}
         </div>
       </section>
+    </div>
+  )
+}
+
+function ExpiredNotice({ isEn }: { isEn: boolean }) {
+  return (
+    <div className="rounded-base border-2 border-warning bg-warning/10 p-3 text-sm font-bold">
+      <AlertTriangle className="mr-2 inline size-4" />
+      {isEn
+        ? "This link has expired. Request a new one."
+        : "Tautan sudah kedaluwarsa. Minta tautan baru."}
+    </div>
+  )
+}
+
+function SuccessState({ mode, isEn }: { mode: RecoveryMode; isEn: boolean }) {
+  return (
+    <div className="text-center">
+      <CheckCircle2 className="mx-auto size-14 text-success" />
+      <h2 className="mt-3 font-heading text-xl font-extrabold">
+        {mode === "verify"
+          ? isEn
+            ? "Email verified"
+            : "Email Terverifikasi"
+          : isEn
+            ? "Password updated"
+            : "Kata Sandi Diperbarui"}
+      </h2>
+      <p className="mt-1 text-sm text-foreground/60">
+        {isEn ? "Your account is ready to use." : "Akun Anda siap digunakan."}
+      </p>
+      <Button asChild className="mt-5">
+        <Link href="/masuk">{isEn ? "Sign in" : "Masuk"}</Link>
+      </Button>
     </div>
   )
 }
@@ -366,6 +351,9 @@ function PasswordField({
         <Input
           id={id}
           type={show ? "text" : "password"}
+          autoComplete="new-password"
+          minLength={12}
+          maxLength={128}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           className={cn(toggle && "pr-10")}
@@ -375,7 +363,7 @@ function PasswordField({
             type="button"
             onClick={toggle}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60"
-            aria-label={show ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+            aria-label={show ? "Hide password" : "Show password"}
           >
             {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>

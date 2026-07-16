@@ -1,5 +1,6 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import {
   Check,
   Copy,
@@ -41,10 +42,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useAdminTeam } from "@/lib/api/queries"
 import { formatDate, initials } from "@/lib/utils"
 import { ADMIN_ROLE_LABELS, ROLE_PERMISSIONS } from "@/stores/enterprise-admin"
-import { useAdminTeam } from "@/lib/api/queries"
-import { useQueryClient } from "@tanstack/react-query"
 import type { AdminRole } from "@/types"
 
 const ROLES = Object.keys(ADMIN_ROLE_LABELS) as AdminRole[]
@@ -52,7 +52,7 @@ const RECOVERY_CODES = ["BK-29PX-7QAW", "BK-J4MN-82LC", "BK-6TVD-1RKE", "BK-W9HF
 
 export function AdminTeamView() {
   const queryClient = useQueryClient()
-  const { data: staff = [] as any[] } = useAdminTeam()
+  const { data: staff = [] } = useAdminTeam()
   const activeStaffId = ""
   const [inviteOpen, setInviteOpen] = useState(false)
   const [securityId, setSecurityId] = useState("")
@@ -66,10 +66,22 @@ export function AdminTeamView() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     })
-    if (r.ok) {
-      queryClient.invalidateQueries({ queryKey: ["admin", "team"] })
-      toast.success("Anggota tim diundang")
+    const result = await r.json()
+    if (!r.ok) {
+      toast.error(result.error ?? "Undangan staf gagal dikirim")
+      return false
     }
+    await queryClient.invalidateQueries({ queryKey: ["admin", "team"] })
+    toast.success("Undangan staf dikirim", {
+      description: "Staf perlu membuka email dan menetapkan kata sandi.",
+      action: result.previewUrl
+        ? {
+            label: "Buka preview",
+            onClick: () => window.open(result.previewUrl, "_blank", "noopener,noreferrer"),
+          }
+        : undefined,
+    })
+    return true
   }
   async function updateStaff(id: string, patch: Record<string, unknown>) {
     const r = await fetch("/api/admin/team", {
@@ -84,25 +96,25 @@ export function AdminTeamView() {
 
   const stats = useMemo(
     () => ({
-      active: staff.filter((member: any) => member.status === "active").length,
-      invited: staff.filter((member: any) => member.status === "invited").length,
-      twoFactor: staff.filter((member: any) => member.twoFactorEnabled).length,
-      roles: new Set(staff.map((member: any) => member.role)).size,
+      active: staff.filter((member) => member.status === "active").length,
+      invited: staff.filter((member) => member.status === "invited").length,
+      twoFactor: staff.filter((member) => member.twoFactorEnabled).length,
+      roles: new Set(staff.map((member) => member.role)).size,
     }),
     [staff],
   )
-  const securityMember = staff.find((member: any) => member.id === securityId)
+  const securityMember = staff.find((member) => member.id === securityId)
 
-  function submitInvite() {
+  async function submitInvite() {
     if (name.trim().length < 2 || !email.includes("@")) {
       toast.error("Nama dan email staf wajib diisi dengan benar")
       return
     }
-    inviteStaff({ name: name.trim(), email: email.trim(), role })
+    const invited = await inviteStaff({ name: name.trim(), email: email.trim(), role })
+    if (!invited) return
     setInviteOpen(false)
     setName("")
     setEmail("")
-    toast.success("Undangan staf dibuat")
   }
 
   return (
@@ -145,7 +157,7 @@ export function AdminTeamView() {
           <span>Aksi</span>
         </div>
         <div className="divide-y-2 divide-border">
-          {staff.map((member: any) => (
+          {staff.map((member) => (
             <div
               key={member.id}
               className="grid gap-4 p-5 md:grid-cols-[1.5fr_1fr_1fr_1fr_auto] md:items-center"
@@ -261,7 +273,7 @@ export function AdminTeamView() {
           <DialogHeader>
             <DialogTitle>Undang Staf</DialogTitle>
             <DialogDescription>
-              Undangan mock akan masuk ke daftar dengan status invited.
+              Staf menerima tautan aman untuk menetapkan kata sandi dan memverifikasi email.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">

@@ -1,20 +1,24 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { auth } from "@/auth"
-import { backendFlags } from "@/lib/server/env"
+import { backendFlags, serverEnv } from "@/lib/server/env"
 import { prisma } from "@/lib/server/prisma"
+import { rejectUntrustedRequestOrigin } from "@/lib/server/request-security"
+import { createStaffInvite } from "@/lib/server/staff-invite"
+import { revokeAllUserAuth } from "@/lib/server/trusted-devices"
 
-const postSchema = z.object({
+const staffRoleSchema = z.enum(["owner", "operations", "customer-support", "finance", "marketing"])
+
+const postSchema = z.strictObject({
   name: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(6),
-  role: z.string().min(1),
+  role: staffRoleSchema,
 })
 
-const patchSchema = z.object({
+const patchSchema = z.strictObject({
   id: z.string().min(1),
-  role: z.string().optional(),
-  status: z.string().optional(),
+  role: staffRoleSchema.optional(),
+  status: z.enum(["active", "invited", "suspended"]).optional(),
   twoFactorEnabled: z.boolean().optional(),
 })
 
@@ -44,19 +48,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await requireAdmin()
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   if (!backendFlags.databaseConfigured) {
-    return NextResponse.json({ ok: true, mode: "demo" })
+    return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
   const parsed = postSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
-  const { name, email, password, role } = parsed.data
+  const { name, email } = parsed.data
 
   const normalizedEmail = email.toLowerCase()
   const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } })
@@ -64,21 +73,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email already registered" }, { status: 409 })
   }
 
-  const { hashPassword } = await import("@/lib/server/password")
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email: normalizedEmail,
-      passwordHash: await hashPassword(password),
-      role: "ADMIN",
-      adminStaff: {
-        create: {
-          status: "active",
-          role: role === "ADMIN" ? "ADMIN" : "ADMIN", // ponytail: UserRole only has CUSTOMER|ADMIN; add when more roles exist
-        },
-      },
-    },
-  })
+  let invitation: Awaited<ReturnType<typeof createStaffInvite>>
+  try {
+    invitation = await createStaffInvite({ name, email: normalizedEmail })
+  } catch {
+    return NextResponse.json({ error: "Unable to send staff invitation" }, { status: 503 })
+  }
+  const { user } = invitation
 
   await prisma.auditEvent.create({
     data: {
@@ -93,21 +94,26 @@ export async function POST(request: Request) {
     },
   })
 
-  return NextResponse.json({ ok: true, id: user.id })
+  return NextResponse.json({ ok: true, id: user.id, previewUrl: invitation.previewUrl })
 }
 
 export async function PATCH(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await requireAdmin()
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   if (!backendFlags.databaseConfigured) {
-    return NextResponse.json({ ok: true, mode: "demo" })
+    return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
   const parsed = patchSchema.safeParse(await request.json())
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json(
+      { error: "Invalid input", details: parsed.error.flatten() },
+      { status: 400 },
+    )
   }
   const { id, role, status, twoFactorEnabled } = parsed.data
 
@@ -116,34 +122,39 @@ export async function PATCH(request: Request) {
   if (status) data.status = status
   if (role) data.role = "ADMIN" // ponytail: UserRole only has CUSTOMER|ADMIN
 
-  const staff = await prisma.adminStaff.update({
-    where: { userId: id },
-    data,
-  })
-
-  await prisma.auditEvent.create({
-    data: {
-      actorId: session.user.id,
-      actorName: session.user.email ?? "Admin",
-      action: "staff.update",
-      module: "tim",
-      targetId: id,
-      targetLabel: id,
-      outcome: "success",
-      detail: `Staf ${id} diperbarui.`,
-    },
+  const staff = await prisma.$transaction(async (tx) => {
+    const updated = await tx.adminStaff.update({
+      where: { userId: id },
+      data,
+    })
+    if (status === "suspended") await revokeAllUserAuth(tx, id, new Date())
+    await tx.auditEvent.create({
+      data: {
+        actorId: session.user.id,
+        actorName: session.user.email ?? "Admin",
+        action: "staff.update",
+        module: "tim",
+        targetId: id,
+        targetLabel: id,
+        outcome: "success",
+        detail: `Staf ${id} diperbarui.`,
+      },
+    })
+    return updated
   })
 
   return NextResponse.json({ ok: true, staff })
 }
 
 export async function DELETE(request: Request) {
+  const originError = rejectUntrustedRequestOrigin(request, serverEnv.APP_URL)
+  if (originError) return originError
   const session = await requireAdmin()
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   if (!backendFlags.databaseConfigured) {
-    return NextResponse.json({ ok: true, mode: "demo" })
+    return NextResponse.json({ error: "Database not configured" }, { status: 503 })
   }
 
   const url = new URL(request.url)

@@ -39,7 +39,7 @@ export async function createPromo(input: z.input<typeof promoSchema>) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const promo = await prisma.promo.create({
     data: {
@@ -80,7 +80,7 @@ export async function updatePromo(id: string, input: z.input<typeof promoSchema>
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const promo = await prisma.promo.update({
     where: { id },
@@ -119,7 +119,7 @@ export async function deletePromo(id: string) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const promo = await prisma.promo.delete({ where: { id } })
 

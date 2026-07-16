@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react"
-import { AchievementsPanel } from "@/components/admin/achievements-panel"
 import { StatCard } from "@/components/admin/parts"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -179,8 +178,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Gamification */}
-      <AchievementsPanel />
     </div>
   )
 }

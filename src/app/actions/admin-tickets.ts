@@ -77,7 +77,7 @@ export async function replyTicket(input: z.input<typeof replySchema>) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const ticket = await prisma.ticket.findUnique({ where: { id: parsed.data.ticketId } })
   if (!ticket) throw new Error("Tiket tidak ditemukan.")
@@ -123,7 +123,7 @@ export async function updateTicketStatus(ticketId: string, status: string) {
   if (!session?.user?.id || session.user.role !== "admin") {
     throw new Error("ADMIN_REQUIRED")
   }
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const ticket = await prisma.ticket.update({
     where: { id: ticketId },

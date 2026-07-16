@@ -16,7 +16,7 @@ export async function updateMyProfile(input: z.input<typeof updateProfileSchema>
 
   const session = await auth()
   if (!session?.user?.id) throw new Error("AUTH_REQUIRED")
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const data: Record<string, unknown> = {}
   if (parsed.data.name !== undefined) data.name = parsed.data.name
@@ -59,7 +59,7 @@ export async function replyMyTicket(input: z.input<typeof replyTicketSchema>) {
 
   const session = await auth()
   if (!session?.user?.id) throw new Error("AUTH_REQUIRED")
-  if (!backendFlags.databaseConfigured) return { ok: true, mode: "demo" }
+  if (!backendFlags.databaseConfigured) throw new Error("DATABASE_NOT_CONFIGURED")
 
   const ticket = await prisma.ticket.findFirst({
     where: { id: parsed.data.ticketId, userId: session.user.id },

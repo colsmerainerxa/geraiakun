@@ -1,38 +1,11 @@
 import { PrismaAdapter } from "@auth/prisma-adapter"
-
-// ponytail: simple in-memory rate limiter — replace with Redis in production
-const loginAttempts = new Map<string, { count: number; resetAt: number }>()
-const MAX_ATTEMPTS = 5
-const WINDOW_MS = 15 * 60 * 1000
-
-function checkRateLimit(email: string): boolean {
-  const key = email.toLowerCase()
-  const now = Date.now()
-  const entry = loginAttempts.get(key)
-  if (entry && now < entry.resetAt) {
-    if (entry.count >= MAX_ATTEMPTS) return false
-    entry.count += 1
-  } else {
-    loginAttempts.set(key, { count: 1, resetAt: now + WINDOW_MS })
-  }
-  return true
-}
-
-function clearRateLimit(email: string) {
-  loginAttempts.delete(email.toLowerCase())
-}
-import NextAuth, { type NextAuthConfig } from "next-auth"
+import NextAuth, { CredentialsSignin, type NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
-import { z } from "zod"
+import { consumeLoginGrant } from "@/lib/server/account-tokens"
+import { parseLoginGrantCredentials, sessionIsCurrent } from "@/lib/server/auth-flows"
 import { backendFlags, serverEnv } from "@/lib/server/env"
-import { verifyPassword } from "@/lib/server/password"
 import { prisma } from "@/lib/server/prisma"
-
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-})
 
 const providers: NextAuthConfig["providers"] = [
   ...(backendFlags.googleConfigured
@@ -44,24 +17,20 @@ const providers: NextAuthConfig["providers"] = [
       ]
     : []),
   Credentials({
-    name: "Email",
+    name: "Email grant",
     credentials: {
-      email: { label: "Email", type: "email" },
-      password: { label: "Password", type: "password" },
+      grant: { label: "Login grant", type: "text" },
     },
     async authorize(rawCredentials) {
-      const parsed = credentialsSchema.safeParse(rawCredentials)
-      if (!parsed.success) return null
-
-      const email = parsed.data.email.toLowerCase()
-      if (!checkRateLimit(email)) return null
-
-      const user = await prisma.user.findUnique({
-        where: { email },
-      })
-      const valid = await verifyPassword(parsed.data.password, user?.passwordHash)
-      if (!user || !valid) return null
-      clearRateLimit(email)
+      let parsed: ReturnType<typeof parseLoginGrantCredentials>
+      try {
+        parsed = parseLoginGrantCredentials({ grant: rawCredentials?.grant })
+      } catch {
+        return null
+      }
+      const user = await consumeLoginGrant(parsed.grant)
+      if (!user?.emailVerified) return null
+      if (user.role === "ADMIN" && user.adminStaff?.status !== "active") return null
 
       return {
         id: user.id,
@@ -69,48 +38,101 @@ const providers: NextAuthConfig["providers"] = [
         email: user.email,
         image: user.image,
         role: user.role === "ADMIN" ? "admin" : "customer",
+        sessionVersion: user.sessionVersion,
       }
     },
   }),
 ]
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   adapter: PrismaAdapter(prisma as never),
   session: { strategy: "jwt" },
   secret: serverEnv.AUTH_SECRET,
   trustHost: true,
   providers,
-  callbacks: {
-    async signIn({ user }) {
-      if (!user.id || !user.email) return true
+  logger: {
+    error(error) {
+      if (error instanceof CredentialsSignin) return
+      console.error("[auth][error]", error.name, error.message)
+    },
+    warn(code) {
+      console.warn("[auth][warning]", code)
+    },
+    debug() {},
+  },
+  events: {
+    async createUser({ user }) {
+      if (!user.id) throw new Error("Auth adapter created a user without an ID")
       await prisma.customerProfile.upsert({
         where: { userId: user.id },
         update: {},
-        create: {
-          userId: user.id,
-          avatar: user.image,
-        },
+        create: { userId: user.id, avatar: user.image },
       })
-      return true
     },
+  },
+  callbacks: {
     async jwt({ token, user }) {
       if (user?.id) {
         token.id = user.id
         token.role = user.role ?? "customer"
+        token.sessionVersion = user.sessionVersion
+        token.invalidated = false
       }
-      if (!token.role && token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email },
-          select: { id: true, role: true },
-        })
-        token.id = dbUser?.id ?? token.id
-        token.role = dbUser?.role === "ADMIN" ? "admin" : "customer"
+
+      const userId = String(token.id ?? user?.id ?? "")
+      const dbUser = userId
+        ? await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+              role: true,
+              sessionVersion: true,
+              adminStaff: { select: { status: true } },
+            },
+          })
+        : token.email
+          ? await prisma.user.findUnique({
+              where: { email: token.email },
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                role: true,
+                sessionVersion: true,
+                adminStaff: { select: { status: true } },
+              },
+            })
+          : null
+
+      const tokenSessionVersion =
+        typeof token.sessionVersion === "number" ? token.sessionVersion : undefined
+      const accountEnabled = dbUser?.role !== "ADMIN" || dbUser.adminStaff?.status === "active"
+      if (
+        !dbUser ||
+        !accountEnabled ||
+        !sessionIsCurrent(tokenSessionVersion, dbUser.sessionVersion)
+      ) {
+        token.id = ""
+        token.invalidated = true
+        return token
       }
+
+      token.id = dbUser.id
+      token.name = dbUser.name
+      token.email = dbUser.email
+      token.picture = dbUser.image
+      token.role = dbUser.role === "ADMIN" ? "admin" : "customer"
+      token.sessionVersion = dbUser.sessionVersion
+      token.invalidated = false
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = String(token.id ?? "")
+        session.user.id = token.invalidated ? "" : String(token.id ?? "")
         session.user.role = token.role === "admin" ? "admin" : "customer"
       }
       return session

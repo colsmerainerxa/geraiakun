@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google"
+import { headers } from "next/headers"
 import { notFound } from "next/navigation"
 import { hasLocale, NextIntlClientProvider } from "next-intl"
 import { getTranslations, setRequestLocale } from "next-intl/server"
@@ -83,6 +84,7 @@ export default async function LocaleLayout({
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)
+  const nonce = (await headers()).get("x-nonce") ?? undefined
 
   return (
     <html
@@ -92,7 +94,7 @@ export default async function LocaleLayout({
     >
       <body className="min-h-dvh antialiased">
         <NextIntlClientProvider>
-          <Providers>{children}</Providers>
+          <Providers nonce={nonce}>{children}</Providers>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -3,13 +3,8 @@ import type { CategorySlug, Product } from "@/types"
 export type { ProductQuery, SortKey, DurationBucket } from "@/types"
 import type { ProductQuery } from "@/types"
 import { categories } from "./categories"
-import { banners, testimonials } from "./content"
-import { credentialStats, credentials } from "./credentials"
-import { customers } from "./customers"
-import { orders } from "./orders"
+import { banners } from "./content"
 import { productMinPrice, products } from "./products"
-import { reviewsForProduct } from "./reviews"
-import { promos, transactions } from "./transactions"
 
 // Data mock resolve instan — latensi buatan dihapus agar UI terasa cepat.
 // (Dengan API nyata, latensi datang dari jaringan; tak perlu disimulasikan.)
@@ -97,7 +92,7 @@ export const fakeApi = {
     await delay(200)
     const product = products.find((p) => p.slug === slug)
     if (!product) return null
-    return { ...product, reviews: reviewsForProduct(product.id) }
+    return { ...product, reviews: [] }
   },
 
   async getFeatured() {
@@ -112,11 +107,6 @@ export const fakeApi = {
     return products.filter((p) => p.category === product.category && p.slug !== slug).slice(0, 4)
   },
 
-  async getTestimonials() {
-    await delay(120)
-    return testimonials
-  },
-
   async getBanners() {
     await delay(120)
     return banners.filter((b) => b.active)
@@ -124,52 +114,34 @@ export const fakeApi = {
 
   // ---- Admin ----
   async getOrders() {
-    await delay(250)
-    return [...orders].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    return []
   },
-  async getOrder(invoice: string) {
-    await delay(200)
-    return orders.find((o) => o.invoice.toLowerCase() === invoice.toLowerCase()) ?? null
+  async getOrder(_invoice: string) {
+    return null
   },
   async getCustomers() {
-    await delay(250)
-    return customers
+    return []
   },
   async getTransactions() {
-    await delay(250)
-    return transactions
+    return []
   },
   async getPromos() {
-    await delay(200)
-    return promos
+    return []
   },
   async getCredentials() {
-    await delay(200)
-    return credentials
+    return []
   },
 
   async getDashboardStats() {
-    await delay(300)
-    const paid = orders.filter((o) => o.paidAt)
-    const revenue = paid.reduce((s, o) => s + o.total, 0)
     return {
-      revenue,
-      orderCount: orders.length,
-      customerCount: customers.length,
+      revenue: 0,
+      orderCount: 0,
+      customerCount: 0,
       productCount: products.length,
-      pendingOrders: orders.filter((o) => o.status === "menunggu-pembayaran").length,
-      completedOrders: orders.filter((o) => o.status === "selesai").length,
-      credentials: credentialStats(),
-      // 7-hari revenue trend (dummy, deterministik)
-      trend: [
-        { day: "Sen", value: 1250000 },
-        { day: "Sel", value: 1820000 },
-        { day: "Rab", value: 1430000 },
-        { day: "Kam", value: 2100000 },
-        { day: "Jum", value: 2680000 },
-        { day: "Sab", value: 3120000 },
-        { day: "Min", value: 2450000 },
-      ],
+      pendingOrders: 0,
+      completedOrders: 0,
+      credentials: { total: 0, tersedia: 0, terjual: 0, kadaluarsa: 0 },
+      trend: [],
       topProducts: [...products]
         .sort((a, b) => b.soldCount - a.soldCount)
         .slice(0, 5)
